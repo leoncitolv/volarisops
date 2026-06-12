@@ -202,6 +202,23 @@ html,body{background:var(--bg-body);color:var(--text-main);transition:background
 .btn-admin-act.del{background:rgba(200,34,68,.18);color:#ff7799;border:1px solid rgba(200,34,68,.25);}
 .btn-historial{display:flex;align-items:center;gap:.3rem;padding:.22rem .55rem;border:none;border-radius:99px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.6rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:rgba(100,60,200,.12);color:rgba(180,130,255,.6);border:1px solid rgba(180,100,255,.15);transition:background .15s;}
 .btn-historial:active{background:rgba(100,60,200,.25);}
+.btn-admin-act.copy{background:rgba(85,200,170,.14);color:#55eecc;border:1px solid rgba(85,200,170,.25);}
+.btn-admin-act.copy:active{background:rgba(85,200,170,.28);}
+.btn-admin-act.report{background:rgba(255,170,60,.14);color:#ffbb55;border:1px solid rgba(255,170,60,.25);}
+.btn-admin-act.report:active{background:rgba(255,170,60,.28);}
+
+/* ─── TOAST ─── */
+#appToast{
+  position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%) translateY(20px);
+  background:linear-gradient(135deg,#5500aa,#aa22ff);color:#fff;
+  padding:.7rem 1.3rem;border-radius:999px;
+  font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:900;letter-spacing:.05em;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;z-index:999;
+  transition:opacity .25s,transform .25s;
+  white-space:nowrap;
+}
+#appToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .historial-wrap{background:rgba(20,0,50,.6);border-radius:10px;padding:.55rem .8rem;margin-top:.3rem;display:flex;flex-direction:column;gap:.38rem;}
 [data-theme="light"] .historial-wrap{background:rgba(200,180,255,.3);}
 .historial-row{display:flex;gap:.45rem;align-items:flex-start;}
@@ -749,6 +766,9 @@ textarea.input-field{min-height:110px;resize:none;line-height:1.5;}
   </div>
 </div>
 
+<!-- Toast -->
+<div id="appToast"></div>
+
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1172,7 +1192,54 @@ window.toggleSubItem=async(nombre,entryId,itemIdx)=>{
   await fbUpdateEntry(nombre,entryId,fields);
 };
 
-function buildSubItemsNode(entry,nombre){
+/* ══════════════════════════
+   TOAST
+══════════════════════════ */
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('appToast');
+  if(!t)return;
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ══════════════════════════
+   COPIAR TAREAS DE UNA NOTA
+══════════════════════════ */
+function getEntryTasksText(entry){
+  if(entry.items&&entry.items.length){
+    return entry.items.map(it=>'🔹 '+it.texto).join('\n');
+  }
+  return '🔹 '+(entry.texto||'');
+}
+async function copyEntryTasks(entry){
+  const texto=getEntryTasksText(entry);
+  try{
+    await navigator.clipboard.writeText(texto);
+    showToast('📋 Tareas copiadas');
+  }catch(e){
+    // Fallback para navegadores sin soporte de clipboard
+    const ta=document.createElement('textarea');
+    ta.value=texto;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');showToast('📋 Tareas copiadas');}
+    catch(e2){showToast('⚠️ No se pudo copiar');}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ══════════════════════════
+   ACCESO DIRECTO A REPORTES
+══════════════════════════ */
+function openReportsWithTasks(nombre,entry){
+  const texto=getEntryTasksText(entry);
+  const url='reports.html?matricula='+encodeURIComponent(nombre)+'&pendientes='+encodeURIComponent(texto);
+  window.open(url,'_blank');
+}
+
+
   const items=entry.items;
   if(!items||!items.length)return null;
   const wrap=document.createElement('div');wrap.className='nota-subitems';
@@ -1214,6 +1281,8 @@ function buildNotaPersonalNode(k,nombre,entry){
   const act=document.createElement('div');act.style.cssText='display:flex;align-items:center;gap:.42rem;flex-wrap:wrap;';
   if(puedeEditar()){const eb=document.createElement('button');eb.className='btn-admin-act';eb.style.cssText='background:rgba(85,170,255,.12);color:#88ccff;border:1px solid rgba(85,170,255,.22);';eb.textContent='✏️';eb.onclick=(()=>{const _n=nombre,_id=entry.id,_t=entry.texto;return()=>openModal('edit',_n,_id,_t);})();act.appendChild(eb);}
   if(puedeBorrar()){const db2=document.createElement('button');db2.className='btn-admin-act del';db2.textContent='🗑';db2.onclick=(()=>{const _n=nombre,_id=entry.id;return()=>confirmDeleteEntry(_n,_id);})();act.appendChild(db2);}
+  const cpBtn=document.createElement('button');cpBtn.className='btn-admin-act copy';cpBtn.title='Copiar tareas';cpBtn.textContent='📋';cpBtn.onclick=(()=>{const _e=entry;return()=>copyEntryTasks(_e);})();act.appendChild(cpBtn);
+  const rpBtn=document.createElement('button');rpBtn.className='btn-admin-act report';rpBtn.title='Enviar a Reporte de Turno';rpBtn.textContent='📤';rpBtn.onclick=(()=>{const _n=nombre,_e=entry;return()=>openReportsWithTasks(_n,_e);})();act.appendChild(rpBtn);
   const hb=document.createElement('button');hb.className='btn-historial';hb.textContent='📜 ('+log.length+')';hb.onclick=()=>{if(expandedHistorial.has(histKey))expandedHistorial.delete(histKey);else expandedHistorial.add(histKey);renderFolderScreen(fsCurrentKey);};act.appendChild(hb);
   div.appendChild(act);
   if(isHistOpen&&log.length){const hw=document.createElement('div');hw.className='historial-wrap';log.forEach(item=>{const {dot,text}=actionLabel(item.action);const r=document.createElement('div');r.className='historial-row';r.innerHTML=`<span class="historial-dot ${dot}"></span><span class="historial-text"><strong>${item.userName}${item.userNum?' <span style="opacity:.5">#'+item.userNum+'</span>':''}</strong> — ${text}</span><span class="historial-time">${fmtTs(item.ts)}</span>`;hw.appendChild(r);});div.appendChild(hw);}

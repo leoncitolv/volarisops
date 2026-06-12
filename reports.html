@@ -1074,7 +1074,35 @@
     document.addEventListener('DOMContentLoaded', () => {
       setFechaActual();
       cargarReportes();
+      precargarDesdeURL();
     });
+
+    // Precarga matrícula y pendientes si vienen desde Volaris Ops
+    function precargarDesdeURL() {
+      const params = new URLSearchParams(window.location.search);
+      const matricula = params.get('matricula');
+      const pendientes = params.get('pendientes');
+      let hayDatos = false;
+
+      if (matricula) {
+        document.getElementById('reportMatricula').value = matricula;
+        hayDatos = true;
+      }
+      if (pendientes) {
+        const campoPendientes = document.getElementById('reportPendientes');
+        campoPendientes.value = campoPendientes.value
+          ? campoPendientes.value + '\n' + pendientes
+          : pendientes;
+        hayDatos = true;
+      }
+
+      if (hayDatos) {
+        // Asegurarse de estar en la pestaña de nuevo reporte
+        document.querySelector('[onclick*="\'nuevo\'"]')?.click();
+        // Limpiar la URL para que no se vuelva a precargar al recargar/guardar
+        history.replaceState(null, '', window.location.pathname);
+      }
+    }
     
     // Establecer fecha actual
     function setFechaActual() {
