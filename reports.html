@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte de Turno • Laraclv</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-dark: #0a0e27;
+      --bg-card: #151b3a;
+      --bg-hover: #1f2847;
+      --border: rgba(147, 112, 219, 0.2);
+      --text-main: #e8d8ff;
+      --text-sub: #9370db;
+      --accent: #aa22ff;
+      --accent-light: #cc55ff;
+      --success: #00d4aa;
+      --warning: #ff9500;
+      --error: #ff3b30;
+    }
+    
+    [data-theme="light"] {
+      --bg-dark: #f8f6ff;
+      --bg-card: #ffffff;
+      --bg-hover: #f0e8ff;
+      --border: rgba(147, 112, 219, 0.15);
+      --text-main: #2a1a4a;
+      --text-sub: #7a5fc4;
+      --accent: #8b2fb2;
+      --accent-light: #a855f7;
+    }
+    
+    html, body {
+      height: 100%;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Nunito', sans-serif;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(170, 34, 255, 0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 60% at 0% 100%, rgba(85, 200, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* ════════════════════════════════════════
+       HEADER CON NOMBRE
+       ════════════════════════════════════════ */
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+      padding: 30px 0;
+      animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .user-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #aa22ff, #cc55ff);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(170, 34, 255, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    
+    .header h1 {
+      font-size: clamp(32px, 10vw, 56px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #cc55ff, #aa22ff, #55ccff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .header p {
+      font-size: 14px;
+      color: var(--text-sub);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    
+    /* ════════════════════════════════════════
+       TABS
+       ════════════════════════════════════════ */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+      padding-bottom: 16px;
+    }
+    
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    
+    .tab-btn:hover {
+      color: var(--accent-light);
+    }
+    
+    .tab-btn.active {
+      color: var(--accent);
+    }
+    
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 2px;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { width: 0; left: 50%; }
+      to { width: 100%; left: 0; }
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ════════════════════════════════════════
+       FORMULARIO
+       ════════════════════════════════════════ */
+    .form-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    
+    .form-title {
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: -0.5px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--text-sub);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .input-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select {
+      width: 100%;
+      background: rgba(170, 34, 255, 0.05);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    input[type="time"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(170, 34, 255, 0.1);
+      box-shadow: 0 0 20px rgba(170, 34, 255, 0.2);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-size: 13px;
+    }
+    
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(170, 34, 255, 0.05);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .checkbox-item:hover {
+      border-color: var(--accent);
+      background: rgba(170, 34, 255, 0.1);
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+    
+    .checkbox-item input[type="checkbox"]:checked {
+      accent-color: var(--success);
+    }
+    
+    /* ════════════════════════════════════════
+       BOTONES
+       ════════════════════════════════════════ */
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Nunito', sans-serif;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #aa22ff, #cc55ff);
+      color: white;
+      box-shadow: 0 8px 24px rgba(170, 34, 255, 0.3);
+      flex: 1;
+      justify-content: center;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(170, 34, 255, 0.4);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary {
+      background: rgba(170, 34, 255, 0.1);
+      color: var(--accent-light);
+      border: 2px solid var(--border);
+      flex: 1;
+      justify-content: center;
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      background: rgba(170, 34, 255, 0.15);
+    }
+    
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 12px;
+      flex: none;
+    }
+    
+    .btn-danger {
+      background: rgba(255, 59, 48, 0.2);
+      color: #ff3b30;
+      border: 2px solid rgba(255, 59, 48, 0.4);
+    }
+    
+    .btn-danger:hover {
+      border-color: #ff3b30;
+      background: rgba(255, 59, 48, 0.3);
+    }
+    
+    .btn-success {
+      background: rgba(0, 212, 170, 0.2);
+      color: #00d4aa;
+      border: 2px solid rgba(0, 212, 170, 0.4);
+    }
+    
+    .btn-success:hover {
+      border-color: #00d4aa;
+      background: rgba(0, 212, 170, 0.3);
+    }
+    
+    /* ════════════════════════════════════════
+       REPORTES GUARDADOS
+       ════════════════════════════════════════ */
+    .reports-grid {
+      display: grid;
+      gap: 16px;
+    }
+    
+    .report-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      animation: cardSlide 0.4s ease-out;
+    }
+    
+    @keyframes cardSlide {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .report-card:hover {
+      border-color: var(--accent);
+      background: var(--bg-hover);
+      box-shadow: 0 8px 24px rgba(170, 34, 255, 0.15);
+    }
+    
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 16px;
+    }
+    
+    .report-title {
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: -0.5px;
+    }
+    
+    .report-date {
+      font-size: 12px;
+      color: var(--text-sub);
+      font-weight: 700;
+    }
+    
+    .report-badge {
+      display: inline-block;
+      background: rgba(0, 212, 170, 0.2);
+      color: #00d4aa;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+    
+    .report-content {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out;
+    }
+    
+    .report-card.expanded .report-content {
+      display: block;
+      max-height: 2000px;
+    }
+    
+    .report-field {
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+    
+    .report-label {
+      color: var(--text-sub);
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    
+    .report-value {
+      color: var(--text-main);
+      font-weight: 700;
+      word-break: break-word;
+      padding: 8px;
+      background: rgba(170, 34, 255, 0.05);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+    }
+
+    /* Lista de actividades en historial */
+    .report-value-list {
+      color: var(--text-main);
+      font-weight: 700;
+      word-break: break-word;
+      padding: 8px 8px 8px 4px;
+      background: rgba(170, 34, 255, 0.05);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+    }
+
+    .report-value-list .actividad-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+      transition: background 0.15s;
+    }
+
+    .report-value-list .actividad-item:hover {
+      background: rgba(170, 34, 255, 0.08);
+    }
+
+    .report-value-list .actividad-item + .actividad-item {
+      border-top: 1px solid var(--border);
+    }
+
+    .report-value-list .actividad-emoji {
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .report-value-list .actividad-texto {
+      flex: 1;
+    }
+    
+    .report-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    
+    /* ════════════════════════════════════════
+       ESTADOS
+       ════════════════════════════════════════ */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    
+    .empty-text {
+      color: var(--text-sub);
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    
+    /* ════════════════════════════════════════
+       TOAST NOTIFICATIONS
+       ════════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      animation: toastSlide 0.4s ease-out;
+      z-index: 1000;
+      max-width: 400px;
+    }
+    
+    @keyframes toastSlide {
+      from {
+        opacity: 0;
+        transform: translateX(400px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .toast.success {
+      border-color: #00d4aa;
+      color: #00d4aa;
+    }
+    
+    .toast.error {
+      border-color: #ff3b30;
+      color: #ff3b30;
+    }
+    
+    /* ════════════════════════════════════════
+       MODAL EDICIÓN
+       ════════════════════════════════════════ */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-header {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.5px;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    .modal-close:hover {
+      color: var(--accent);
+    }
+    
+    /* ════════════════════════════════════════
+       FOTOS
+       ════════════════════════════════════════ */
+    .foto-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(170, 34, 255, 0.03);
+      margin-top: 12px;
+    }
+
+    .foto-upload-area:hover {
+      border-color: var(--accent);
+      background: rgba(170, 34, 255, 0.08);
+    }
+
+    .foto-upload-area input[type="file"] {
+      display: none;
+    }
+
+    .foto-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      color: var(--text-sub);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .foto-upload-label span {
+      font-size: 22px;
+    }
+
+    .fotos-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .foto-thumb-wrapper {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      animation: cardSlide 0.3s ease-out;
+    }
+
+    .foto-thumb-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .foto-thumb-delete {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 59, 48, 0.85);
+      border: none;
+      color: white;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    /* Fotos en el historial */
+    .report-fotos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .report-foto-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .report-foto-thumb:hover {
+      transform: scale(1.06);
+      border-color: var(--accent);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 90vh;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 36px;
+      cursor: pointer;
+      z-index: 3001;
+      line-height: 1;
+    }
+
+    /* Botón WhatsApp */
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn-whatsapp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+    }
+
+    .foto-count-badge {
+      display: inline-block;
+      background: rgba(170,34,255,0.2);
+      color: var(--accent-light);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 900;
+      margin-left: 8px;
+    }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .header {
+        margin-bottom: 30px;
+      }
+      
+      .form-section {
+        padding: 20px;
+      }
+      
+      .button-group {
+        gap: 8px;
+      }
+      
+      .btn {
+        padding: 12px 20px;
+        font-size: 12px;
+      }
+      
+      .tabs {
+        gap: 8px;
+      }
+      
+      .tab-btn {
+        padding: 10px 16px;
+        font-size: 12px;
+      }
+    }
+    
+    /* iOS fix: font-size mínimo 16px para evitar zoom al enfocar */
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+
+    @media (min-width: 769px) {
+      input[type="text"],
+      input[type="date"],
+      input[type="time"],
+      textarea,
+      select {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <div class="header">
+      <div class="user-badge">👤 LARACLV</div>
+      <h1>📋 Reporte de Turno</h1>
+      <p>Documenta tus actividades diarias</p>
+    </div>
+    
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(event, 'nuevo')">✍️ Nuevo Reporte</button>
+      <button class="tab-btn" onclick="switchTab(event, 'historial')">📚 Historial</button>
+    </div>
+    
+    <!-- TAB: NUEVO REPORTE -->
+    <div id="nuevo" class="tab-content active">
+      <form id="formReporte" onsubmit="guardarReporte(event)">
+        
+        <!-- FECHA Y HORA -->
+        <div class="form-section">
+          <div class="form-title">📅 Información del Turno</div>
+          
+          <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📆</span>
+              <input type="date" id="reportFecha" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Hora de Inicio</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🕐</span>
+              <input type="time" id="reportHora" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Matrícula de Aeronave</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✈️</span>
+              <input type="text" id="reportMatricula" placeholder="Ej: N12345" required>
+            </div>
+          </div>
+        </div>
+        
+        
+        <!-- ACTIVIDADES -->
+        <div class="form-section">
+          <div class="form-title">✨ Actividades Realizadas</div>
+          <div class="form-group">
+            <label class="form-label">Describe lo que hiciste hoy</label>
+            <textarea id="reportActividades" placeholder="Presiona Enter para agregar viñetas automáticas 🔹" required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📷 Fotos de Actividades</label>
+            <div class="foto-upload-area" onclick="document.getElementById('fotosActividades').click()">
+              <label class="foto-upload-label">
+                <span>📸</span> Tomar foto o elegir de galería
+              </label>
+              <input type="file" id="fotosActividades" accept="image/*" multiple
+                onchange="previsualizarFotos(event, 'previewActividades')">
+            </div>
+            <div class="fotos-preview" id="previewActividades"></div>
+          </div>
+        </div>
+        
+        <!-- PENDIENTES -->
+        <div class="form-section">
+          <div class="form-title">⚠️ Pendientes para el Siguiente Turno</div>
+          <div class="form-group">
+            <label class="form-label">¿Qué falta por hacer?</label>
+            <textarea id="reportPendientes" placeholder="Tareas pendientes, observaciones, notas..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📷 Fotos de Pendientes</label>
+            <div class="foto-upload-area" onclick="document.getElementById('fotosPendientes').click()">
+              <label class="foto-upload-label">
+                <span>📸</span> Tomar foto o elegir de galería
+              </label>
+              <input type="file" id="fotosPendientes" accept="image/*" multiple
+                onchange="previsualizarFotos(event, 'previewPendientes')">
+            </div>
+            <div class="fotos-preview" id="previewPendientes"></div>
+          </div>
+        </div>
+        
+        <!-- PERSONAL -->
+        <div class="form-section">
+          <div class="form-group">
+            <label class="form-label">Personal Responsable</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="reportPersonal" value="Laraclv" required>
+            </div>
+          </div>
+          
+          <div class="button-group">
+            <button type="submit" class="btn btn-primary">💾 Guardar Reporte</button>
+            <button type="reset" class="btn btn-secondary">🔄 Limpiar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <!-- TAB: HISTORIAL -->
+    <div id="historial" class="tab-content">
+      <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+        <button class="btn btn-primary" style="flex:1; min-width:140px;" onclick="exportarReportes()">📤 Exportar respaldo</button>
+        <label class="btn btn-secondary" style="flex:1; min-width:140px; justify-content:center; cursor:pointer;">
+          📥 Importar respaldo
+          <input type="file" id="importarJSON" accept=".json" style="display:none" onchange="importarReportes(event)">
+        </label>
+      </div>
+      <div id="reportsContainer" class="reports-grid"></div>
+    </div>
+  </div>
+  
+  <!-- MODAL EDICIÓN -->
+  <div id="modalEditar" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="cerrarModal()">✕</button>
+      <div class="modal-header">✏️ Editar Reporte</div>
+      
+      <form id="formEditar" onsubmit="guardarEdicion(event)">
+        <div class="form-group">
+          <label class="form-label">Fecha</label>
+          <div class="input-wrapper">
+            <span class="input-icon">📆</span>
+            <input type="date" id="editFecha" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Hora</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🕐</span>
+            <input type="time" id="editHora" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Matrícula</label>
+          <div class="input-wrapper">
+            <span class="input-icon">✈️</span>
+            <input type="text" id="editMatricula" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Actividades Realizadas</label>
+          <textarea id="editActividades" placeholder="Presiona Enter para agregar viñetas automáticas 🔹" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Pendientes</label>
+          <textarea id="editPendientes"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Personal</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" id="editPersonal" required>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+          <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="lightbox" onclick="cerrarLightbox()">
+    <button class="lightbox-close" onclick="cerrarLightbox()">✕</button>
+    <img id="lightboxImg" src="" alt="Foto reporte">
+  </div>
+
+  <script>
+    // ════════════════════════════════════════
+    // INICIALIZACIÓN
+    // ════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', () => {
+      setFechaActual();
+      cargarReportes();
+    });
+    
+    // Establecer fecha actual
+    function setFechaActual() {
+      const hoy = new Date().toISOString().split('T')[0];
+      document.getElementById('reportFecha').value = hoy;
+      
+      const horaActual = new Date().toTimeString().slice(0, 5);
+      document.getElementById('reportHora').value = horaActual;
+      
+      // Agregar funcionalidad de auto-emoji en Actividades
+      const textareaActividades = document.getElementById('reportActividades');
+      textareaActividades.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const cursorPos = textareaActividades.selectionStart;
+          const antes = textareaActividades.value.substring(0, cursorPos);
+          const despues = textareaActividades.value.substring(cursorPos);
+          
+          textareaActividades.value = antes + '\n🔹 ' + despues;
+          textareaActividades.selectionStart = textareaActividades.selectionEnd = cursorPos + 3;
+        }
+      });
+      
+      // Mismo para el modal de edición
+      const textareaEditar = document.getElementById('editActividades');
+      if (textareaEditar) {
+        textareaEditar.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const cursorPos = textareaEditar.selectionStart;
+            const antes = textareaEditar.value.substring(0, cursorPos);
+            const despues = textareaEditar.value.substring(cursorPos);
+            
+            textareaEditar.value = antes + '\n🔹 ' + despues;
+            textareaEditar.selectionStart = textareaEditar.selectionEnd = cursorPos + 3;
+          }
+        });
+      }
+    }
+    
+    // ════════════════════════════════════════
+    // TABS
+    // ════════════════════════════════════════
+    function switchTab(e, tab) {
+      e.preventDefault();
+      
+      // Desactivar todos los tabs
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      
+      // Activar tab seleccionado
+      document.getElementById(tab).classList.add('active');
+      e.target.classList.add('active');
+      
+      // Recargar reportes al abrir historial
+      if (tab === 'historial') {
+        cargarReportes();
+      }
+    }
+    
+    // ════════════════════════════════════════
+    // FOTOS
+    // ════════════════════════════════════════
+    let fotosActividades = []; // base64 array
+    let fotosPendientes  = []; // base64 array
+
+    // ── Compresión de imágenes (máx 900px, ~100-150KB) ──
+    function comprimirImagen(file, maxW=900, quality=0.72) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const data = canvas.toDataURL('image/jpeg', quality);
+            // Si sigue muy grande, comprimir más
+            if (data.length > 200 * 1024 * 1.37) {
+              const c2 = document.createElement('canvas');
+              c2.width = w; c2.height = h;
+              c2.getContext('2d').drawImage(img, 0, 0, w, h);
+              resolve(c2.toDataURL('image/jpeg', 0.5));
+            } else {
+              resolve(data);
+            }
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function previsualizarFotos(event, previewId) {
+      const files = Array.from(event.target.files);
+      const preview = document.getElementById(previewId);
+      const esActividades = previewId === 'previewActividades';
+      const arr = esActividades ? fotosActividades : fotosPendientes;
+
+      for (const file of files) {
+        try {
+          const b64 = await comprimirImagen(file);
+          arr.push(b64);
+          const idx = arr.length - 1;
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'foto-thumb-wrapper';
+          wrapper.dataset.idx = idx;
+          wrapper.dataset.tipo = esActividades ? 'actividades' : 'pendientes';
+          wrapper.innerHTML = `
+            <img src="${b64}" onclick="abrirLightbox('${b64}')">
+            <button class="foto-thumb-delete" onclick="eliminarFotoPreview(this)">✕</button>
+          `;
+          preview.appendChild(wrapper);
+        } catch(err) { console.error('Error comprimiendo foto:', err); }
+      }
+      // Reset input para permitir subir la misma foto de nuevo
+      event.target.value = '';
+    }
+
+    function eliminarFotoPreview(btn) {
+      const wrapper = btn.parentElement;
+      const idx = parseInt(wrapper.dataset.idx);
+      const tipo = wrapper.dataset.tipo;
+      if (tipo === 'actividades') fotosActividades.splice(idx, 1);
+      else fotosPendientes.splice(idx, 1);
+      wrapper.remove();
+      // Reasignar índices
+      const preview = document.getElementById(tipo === 'actividades' ? 'previewActividades' : 'previewPendientes');
+      preview.querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+    }
+
+    function abrirLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('active');
+    }
+
+    function cerrarLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    // ════════════════════════════════════════
+    // GUARDAR REPORTE
+    // ════════════════════════════════════════
+    function guardarReporte(e) {
+      e.preventDefault();
+      
+      // Crear objeto reporte
+      const reporte = {
+        id: Date.now(),
+        fecha: document.getElementById('reportFecha').value,
+        hora: document.getElementById('reportHora').value,
+        matricula: document.getElementById('reportMatricula').value,
+        actividades: document.getElementById('reportActividades').value,
+        pendientes: document.getElementById('reportPendientes').value,
+        personal: document.getElementById('reportPersonal').value,
+        fotosActividades: [...fotosActividades],
+        fotosPendientes: [...fotosPendientes],
+        timestamp: new Date().toLocaleString('es-MX')
+      };
+      
+      // Guardar en localStorage
+      let reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      reportes.unshift(reporte);
+      localStorage.setItem('reportesTurno', JSON.stringify(reportes));
+      
+      // Limpiar y mostrar confirmación
+      document.getElementById('formReporte').reset();
+      fotosActividades = [];
+      fotosPendientes  = [];
+      document.getElementById('previewActividades').innerHTML = '';
+      document.getElementById('previewPendientes').innerHTML = '';
+      setFechaActual();
+      mostrarToast('✅ Reporte guardado exitosamente', 'success');
+      
+      // Cambiar a historial
+      setTimeout(() => {
+        document.querySelector('[onclick="switchTab(event, \'historial\')"]').click();
+      }, 1000);
+    }
+    
+    // ════════════════════════════════════════
+    // FORMATEAR ACTIVIDADES COMO LISTA
+    // ════════════════════════════════════════
+    function formatearActividades(texto) {
+      if (!texto) return '';
+      // Separar por saltos de línea y filtrar líneas vacías
+      const lineas = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lineas.length <= 1) {
+        // Si es una sola línea, mostrar normal
+        return `<div class="report-value">${texto}</div>`;
+      }
+      const items = lineas.map(linea => {
+        // Detectar si ya tiene emoji al inicio
+        const tieneEmoji = /^[\u{1F000}-\u{1FFFF}🔹🔸▪️•\-*]/u.test(linea);
+        const emoji = tieneEmoji ? '' : '🔹';
+        // Limpiar el emoji propio si ya tiene para no duplicar
+        const textoLimpio = tieneEmoji ? linea.replace(/^[\u{1F000}-\u{1FFFF}🔹🔸▪️•\-*\s]+/u, '') : linea;
+        const emojiMostrar = tieneEmoji ? linea.match(/^[\u{1F000}-\u{1FFFF}🔹🔸▪️•\-*]+/u)?.[0] || '🔹' : '🔹';
+        return `<div class="actividad-item">
+          <span class="actividad-emoji">${emojiMostrar}</span>
+          <span class="actividad-texto">${tieneEmoji ? textoLimpio : linea}</span>
+        </div>`;
+      }).join('');
+      return `<div class="report-value-list">${items}</div>`;
+    }
+
+    // ════════════════════════════════════════
+    // CARGAR REPORTES
+    // ════════════════════════════════════════
+    function cargarReportes() {
+      const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      const container = document.getElementById('reportsContainer');
+      
+      if (reportes.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-text">No hay reportes aún</div>
+            <p style="color: var(--text-sub); font-size: 12px;">Crea tu primer reporte para que aparezca aquí</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = reportes.map(r => `
+        <div class="report-card" onclick="toggleReporte(this)">
+          <div class="report-header">
+            <div>
+              <div class="report-title">✈️ ${r.matricula}</div>
+              <div class="report-date">${r.fecha} • ${r.hora}
+                ${(r.fotosActividades?.length || 0) + (r.fotosPendientes?.length || 0) > 0
+                  ? `<span class="foto-count-badge">📷 ${(r.fotosActividades?.length||0)+(r.fotosPendientes?.length||0)} foto(s)</span>`
+                  : ''}
+              </div>
+            </div>
+            <div class="report-badge">Guardado</div>
+          </div>
+          
+          <div class="report-content">
+            <div class="report-field">
+              <div class="report-label">✨ Actividades</div>
+              ${formatearActividades(r.actividades)}
+              ${r.fotosActividades && r.fotosActividades.length ? `
+                <div class="report-fotos">
+                  ${r.fotosActividades.map(src => `
+                    <img class="report-foto-thumb" src="${src}" onclick="event.stopPropagation(); abrirLightbox('${src}')" alt="Foto actividad">
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+            
+            ${r.pendientes ? `
+              <div class="report-field">
+                <div class="report-label">⚠️ Pendientes</div>
+                <div class="report-value">${r.pendientes}</div>
+                ${r.fotosPendientes && r.fotosPendientes.length ? `
+                  <div class="report-fotos">
+                    ${r.fotosPendientes.map(src => `
+                      <img class="report-foto-thumb" src="${src}" onclick="event.stopPropagation(); abrirLightbox('${src}')" alt="Foto pendiente">
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
+            
+            <div class="report-field">
+              <div class="report-label">👤 Personal</div>
+              <div class="report-value">${r.personal}</div>
+            </div>
+            
+            <div class="report-actions">
+              <button class="btn btn-small btn-whatsapp" onclick="compartirWhatsApp(event, ${r.id})">
+                💬 WhatsApp
+              </button>
+              <button class="btn btn-small btn-success" onclick="copiarAlPortapapeles(event, ${r.id})">
+                📋 Copiar
+              </button>
+              <button class="btn btn-small btn-success" onclick="abrirModalEditar(event, ${r.id})">
+                ✏️ Editar
+              </button>
+              <button class="btn btn-small btn-danger" onclick="eliminarReporte(event, ${r.id})">
+                🗑️ Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // ════════════════════════════════════════
+    // EXPANDIR/CONTRAER REPORTE
+    // ════════════════════════════════════════
+    function toggleReporte(element) {
+      element.classList.toggle('expanded');
+    }
+    
+    // ════════════════════════════════════════
+    // COPIAR A PORTAPAPELES
+    // ════════════════════════════════════════
+    function copiarAlPortapapeles(e, id) {
+      e.stopPropagation();
+      
+      const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      const reporte = reportes.find(r => r.id === id);
+      
+      if (!reporte) return;
+      
+      // Formato para WhatsApp
+      const texto = `
+📋 *REPORTE DE TURNO*
+━━━━━━━━━━━━━━━━━━━━━
+📅 *Fecha:* ${reporte.fecha}
+🕐 *Hora:* ${reporte.hora}
+✈️ *Aeronave:* ${reporte.matricula}
+━━━━━━━━━━━━━━━━━━━━━
+
+✨ *ACTIVIDADES:*
+${reporte.actividades}
+
+${reporte.pendientes ? `⚠️ *PENDIENTES:*
+${reporte.pendientes}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 *Personal:* ${reporte.personal}
+✅ *Estatus:* Finalizado y verificado
+━━━━━━━━━━━━━━━━━━━━━
+`.trim();
+      
+      navigator.clipboard.writeText(texto).then(() => {
+        mostrarToast('✅ Copiado al portapapeles', 'success');
+      }).catch(() => {
+        mostrarToast('❌ Error al copiar', 'error');
+      });
+    }
+    
+    // ════════════════════════════════════════
+    // COMPARTIR A WHATSAPP
+    // ════════════════════════════════════════
+    function compartirWhatsApp(e, id) {
+      e.stopPropagation();
+      
+      const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      const reporte = reportes.find(r => r.id === id);
+      if (!reporte) return;
+
+      const totalFotos = (reporte.fotosActividades?.length || 0) + (reporte.fotosPendientes?.length || 0);
+
+      const texto = `📋 *REPORTE DE TURNO*
+━━━━━━━━━━━━━━━━━━━━━
+📅 *Fecha:* ${reporte.fecha}
+🕐 *Hora:* ${reporte.hora}
+✈️ *Aeronave:* ${reporte.matricula}
+━━━━━━━━━━━━━━━━━━━━━
+
+✨ *ACTIVIDADES:*
+${reporte.actividades}
+
+${reporte.pendientes ? `⚠️ *PENDIENTES:*
+${reporte.pendientes}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 *Personal:* ${reporte.personal}
+✅ *Estatus:* Finalizado y verificado
+${totalFotos > 0 ? `📷 *Fotos adjuntas:* ${totalFotos} imagen(es)` : ''}
+━━━━━━━━━━━━━━━━━━━━━`.trim();
+
+      // Abrir WhatsApp siempre de inmediato (el click del usuario lo permite)
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
+      window.open(url, '_blank');
+
+      // Si hay fotos, mostrar banner para descargarlas por separado
+      if (totalFotos > 0) {
+        mostrarBannerFotos(reporte, totalFotos);
+      }
+    }
+
+    // ════════════════════════════════════════
+    // BANNER DE DESCARGA DE FOTOS
+    // ════════════════════════════════════════
+    function mostrarBannerFotos(reporte, totalFotos) {
+      // Eliminar banner anterior si existe
+      const prev = document.getElementById('bannerFotos');
+      if (prev) prev.remove();
+
+      const banner = document.createElement('div');
+      banner.id = 'bannerFotos';
+      banner.style.cssText = `
+        position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+        background:var(--bg-card);border:2px solid var(--accent);
+        border-radius:16px;padding:16px 20px;z-index:2000;
+        display:flex;flex-direction:column;gap:10px;align-items:center;
+        box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:320px;width:90%;
+        animation:toastSlide 0.4s ease-out;
+      `;
+
+      banner.innerHTML = `
+        <div style="font-size:13px;font-weight:900;color:var(--text-main);text-align:center;">
+          📷 Este reporte tiene ${totalFotos} foto(s)<br>
+          <span style="font-weight:700;color:var(--text-sub);font-size:12px;">Descárgalas y envíalas junto al mensaje</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+          ${[
+            ...(reporte.fotosActividades || []).map((src, i) => ({ src, nombre: `actividad_${i+1}` })),
+            ...(reporte.fotosPendientes  || []).map((src, i) => ({ src, nombre: `pendiente_${i+1}` })),
+          ].map(({ src, nombre }) => `
+            <a href="${src}" download="reporte_${reporte.matricula}_${nombre}.jpg"
+               style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+              <img src="${src}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:2px solid var(--accent);">
+              <span style="font-size:9px;color:var(--text-sub);font-weight:900;">⬇ Bajar</span>
+            </a>
+          `).join('')}
+        </div>
+        <button onclick="document.getElementById('bannerFotos').remove()"
+          style="background:none;border:1px solid var(--border);border-radius:8px;
+          padding:6px 16px;color:var(--text-sub);cursor:pointer;font-family:'Nunito',sans-serif;
+          font-size:12px;font-weight:900;">Cerrar</button>
+      `;
+
+      document.body.appendChild(banner);
+      // Auto cerrar después de 15 segundos
+      setTimeout(() => { if (banner.parentNode) banner.remove(); }, 15000);
+    }
+
+    // ════════════════════════════════════════
+    // ELIMINAR REPORTE
+    // ════════════════════════════════════════
+    function eliminarReporte(e, id) {
+      e.stopPropagation();
+      
+      if (!confirm('¿Estás seguro de que deseas eliminar este reporte?')) return;
+      
+      let reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      reportes = reportes.filter(r => r.id !== id);
+      localStorage.setItem('reportesTurno', JSON.stringify(reportes));
+      
+      cargarReportes();
+      mostrarToast('🗑️ Reporte eliminado', 'success');
+    }
+    
+    // ════════════════════════════════════════
+    // EDITAR REPORTE
+    // ════════════════════════════════════════
+    let reporteEditando = null;
+    
+    function abrirModalEditar(e, id) {
+      e.stopPropagation();
+      
+      const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      const reporte = reportes.find(r => r.id === id);
+      
+      if (!reporte) return;
+      
+      reporteEditando = id;
+      
+      // Llenar formulario con datos del reporte
+      document.getElementById('editFecha').value = reporte.fecha;
+      document.getElementById('editHora').value = reporte.hora;
+      document.getElementById('editMatricula').value = reporte.matricula;
+      document.getElementById('editActividades').value = reporte.actividades;
+      document.getElementById('editPendientes').value = reporte.pendientes;
+      document.getElementById('editPersonal').value = reporte.personal;
+      
+      // Abrir modal
+      document.getElementById('modalEditar').classList.add('active');
+    }
+    
+    function cerrarModal() {
+      document.getElementById('modalEditar').classList.remove('active');
+      reporteEditando = null;
+      document.getElementById('formEditar').reset();
+    }
+    
+    function guardarEdicion(e) {
+      e.preventDefault();
+      
+      if (!reporteEditando) return;
+
+      // Actualizar en localStorage
+      let reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      const indice = reportes.findIndex(r => r.id === reporteEditando);
+      
+      // Obtener datos editados (preservar fotos del original)
+      const reporteActualizado = {
+        id: reporteEditando,
+        fecha: document.getElementById('editFecha').value,
+        hora: document.getElementById('editHora').value,
+        matricula: document.getElementById('editMatricula').value,
+        actividades: document.getElementById('editActividades').value,
+        pendientes: document.getElementById('editPendientes').value,
+        personal: document.getElementById('editPersonal').value,
+        fotosActividades: indice !== -1 ? (reportes[indice].fotosActividades || []) : [],
+        fotosPendientes: indice !== -1 ? (reportes[indice].fotosPendientes || []) : [],
+        timestamp: new Date().toLocaleString('es-MX')
+      };
+      
+      if (indice !== -1) {
+        reportes[indice] = reporteActualizado;
+        localStorage.setItem('reportesTurno', JSON.stringify(reportes));
+        
+        cargarReportes();
+        cerrarModal();
+        mostrarToast('✅ Reporte actualizado correctamente', 'success');
+      }
+    }
+    
+    // Cerrar modal al hacer click fuera
+    document.addEventListener('click', (e) => {
+      const modal = document.getElementById('modalEditar');
+      if (e.target === modal) {
+        cerrarModal();
+      }
+    });
+    
+    // ════════════════════════════════════════
+    // EXPORTAR / IMPORTAR RESPALDO JSON
+    // ════════════════════════════════════════
+    function exportarReportes() {
+      const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+      if (reportes.length === 0) {
+        mostrarToast('⚠️ No hay reportes para exportar', 'error');
+        return;
+      }
+      const json = JSON.stringify(reportes, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const fecha = new Date().toISOString().split('T')[0];
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `respaldo_reportes_${fecha}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      mostrarToast(`✅ Respaldo exportado (${reportes.length} reporte${reportes.length !== 1 ? 's' : ''})`, 'success');
+    }
+
+    function importarReportes(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const datos = JSON.parse(e.target.result);
+          if (!Array.isArray(datos)) throw new Error('Formato inválido');
+          const existentes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+          // Merge: evitar duplicados por id
+          const idsExistentes = new Set(existentes.map(r => r.id));
+          const nuevos = datos.filter(r => !idsExistentes.has(r.id));
+          const merged = [...nuevos, ...existentes];
+          merged.sort((a, b) => b.id - a.id);
+          localStorage.setItem('reportesTurno', JSON.stringify(merged));
+          cargarReportes();
+          mostrarToast(`✅ Importados ${nuevos.length} reporte${nuevos.length !== 1 ? 's' : ''} nuevos`, 'success');
+        } catch (err) {
+          mostrarToast('❌ Archivo inválido, revisa el JSON', 'error');
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    function mostrarToast(mensaje, tipo = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${tipo}`;
+      toast.textContent = mensaje;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AppVol • Centro de Control</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="theme-color" content="#aa22ff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AppVol">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-dark: #0a0e27;
+      --bg-card: #151b3a;
+      --bg-hover: #1f2847;
+      --border: rgba(147, 112, 219, 0.2);
+      --text-main: #e8d8ff;
+      --text-sub: #9370db;
+      --accent: #aa22ff;
+      --accent-light: #cc55ff;
+    }
+    
+    [data-theme="light"] {
+      --bg-dark: #f8f6ff;
+      --bg-card: #ffffff;
+      --bg-hover: #f0e8ff;
+      --border: rgba(147, 112, 219, 0.15);
+      --text-main: #2a1a4a;
+      --text-sub: #7a5fc4;
+      --accent: #8b2fb2;
+      --accent-light: #a855f7;
+    }
+    
+    html, body {
+      height: 100%;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Nunito', sans-serif;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(170, 34, 255, 0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 60% at 0% 100%, rgba(85, 200, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* TOP BAR */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .signature {
+      font-style: italic;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      opacity: 0.6;
+      letter-spacing: 0.05em;
+      padding-left: 2px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 28px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #aa22ff, #cc55ff, #55ccff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+    
+    .logo-icon {
+      font-size: 36px;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .btn-theme {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+      font-weight: 800;
+    }
+    
+    .btn-theme:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .btn-theme:active {
+      transform: scale(0.95);
+    }
+    
+    /* HERO */
+    .hero {
+      text-align: center;
+      margin-bottom: 50px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .hero h1 {
+      font-size: clamp(28px, 8vw, 48px);
+      margin-bottom: 10px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+    
+    .hero p {
+      font-size: 16px;
+      color: var(--text-sub);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    
+    /* GRID DE APPS */
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      flex: 1;
+      margin-bottom: 20px;
+    }
+    
+    .app-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .drag-handle {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--text-sub);
+      opacity: 0.45;
+      cursor: grab;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      z-index: 2;
+      user-select: none;
+      touch-action: none;
+    }
+    
+    .drag-handle:hover {
+      opacity: 1;
+      color: var(--accent);
+      background: var(--bg-hover);
+    }
+    
+    .app-card.dragging {
+      opacity: 0.4;
+      border-color: var(--accent);
+      transform: scale(0.98);
+    }
+    
+    .app-card.drag-over {
+      border-color: var(--accent-light);
+      box-shadow: 0 0 0 2px var(--accent-light);
+    }
+    
+    .app-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.5s;
+      pointer-events: none;
+    }
+    
+    .app-card:hover::before {
+      left: 100%;
+    }
+    
+    .app-card:hover {
+      border-color: var(--accent);
+      background: var(--bg-hover);
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(170, 34, 255, 0.15);
+    }
+    
+    .app-card:active {
+      transform: translateY(-4px);
+    }
+    
+    .app-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .app-title {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    
+    .app-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 16px;
+      flex: 1;
+      line-height: 1.5;
+    }
+    
+    .app-status {
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(170, 34, 255, 0.1);
+      color: var(--accent-light);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-top: auto;
+    }
+    
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-sub);
+      letter-spacing: 0.08em;
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .topbar {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+      
+      .apps-grid {
+        gap: 16px;
+      }
+      
+      .app-card {
+        padding: 24px 16px;
+      }
+      
+      .hero h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="logo-wrap">
+        <div class="logo">
+          <span class="logo-icon">⚡</span>
+          <span>AppVol</span>
+        </div>
+        <div class="signature">laraclv</div>
+      </div>
+      <div class="controls">
+        <button class="btn-theme" id="btnTheme" title="Cambiar tema">🌙 Tema</button>
+      </div>
+    </div>
+    
+    <!-- HERO SECTION -->
+    <div class="hero">
+      <h1>Centro de Control</h1>
+      <p>Accede a todas tus aplicaciones</p>
+    </div>
+    
+    <!-- APPS GRID -->
+    <div class="apps-grid">
+      <!-- VOLARIS OPS -->
+      <a href="/VolarisOps" class="app-card" draggable="true" data-id="volaris">
+        <span class="drag-handle" title="Arrastrar para mover">⠿</span>
+        <div class="app-icon">✈️</div>
+        <div class="app-title">Volaris Ops</div>
+        <div class="app-desc">Portal de operaciones y seguimiento de matrículas en tiempo real con notas y pendientes.</div>
+        <div class="app-status">▶ Abrir</div>
+      </a>
+      
+      <!-- NÚMEROS DE PARTE -->
+      <a href="/np" class="app-card" draggable="true" data-id="np">
+        <span class="drag-handle" title="Arrastrar para mover">⠿</span>
+        <div class="app-icon">🎨</div>
+        <div class="app-title">Números de Parte</div>
+        <div class="app-desc">Gestión profesional de colores, especificaciones y catálogo de pinturas con búsqueda avanzada.</div>
+        <div class="app-status">▶ Abrir</div>
+      </a>
+      
+      <!-- PAINT -->
+      <a href="/paint" class="app-card" draggable="true" data-id="paint">
+        <span class="drag-handle" title="Arrastrar para mover">⠿</span>
+        <div class="app-icon">🖌️</div>
+        <div class="app-title">Paint</div>
+        <div class="app-desc">Calculador inteligente de cantidades de pintura con conversión de unidades y ratios profesionales.</div>
+        <div class="app-status">▶ Abrir</div>
+      </a>
+      
+      <!-- REPORTE DE TURNO -->
+      <a href="/reports" class="app-card" draggable="true" data-id="reports">
+        <span class="drag-handle" title="Arrastrar para mover">⠿</span>
+        <div class="app-icon">📋</div>
+        <div class="app-title">Reporte de Turno</div>
+        <div class="app-desc">Documenta tus actividades diarias con detalles de fecha, hora y pendientes guardados en tu celular.</div>
+        <div class="app-status">▶ Abrir</div>
+      </a>
+    </div>
+    
+    <!-- FOOTER -->
+    <div class="footer">
+      <p>© 2026 Apone • Todas las aplicaciones en un solo lugar</p>
+    </div>
+  </div>
+  
+  <script>
+    // TEMA
+    const html = document.documentElement;
+    const btnTheme = document.getElementById('btnTheme');
+    
+    // Cargar tema guardado
+    const savedTheme = localStorage.getItem('apone-theme') || 'dark';
+    html.dataset.theme = savedTheme;
+    updateThemeBtn();
+    
+    btnTheme.addEventListener('click', () => {
+      const newTheme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+      html.dataset.theme = newTheme;
+      localStorage.setItem('apone-theme', newTheme);
+      updateThemeBtn();
+    });
+    
+    function updateThemeBtn() {
+      btnTheme.textContent = html.dataset.theme === 'dark' ? '☀️ Tema' : '🌙 Tema';
+    }
+
+    // ORDEN PERSONALIZADO (drag & drop)
+    const grid = document.querySelector('.apps-grid');
+
+    function saveOrder() {
+      const order = [...grid.querySelectorAll('.app-card')].map(c => c.dataset.id);
+      localStorage.setItem('appvol-order', JSON.stringify(order));
+    }
+
+    function loadOrder() {
+      const saved = localStorage.getItem('appvol-order');
+      if (!saved) return;
+      try {
+        const order = JSON.parse(saved);
+        order.forEach(id => {
+          const el = grid.querySelector(`[data-id="${id}"]`);
+          if (el) grid.appendChild(el);
+        });
+      } catch (e) {}
+    }
+
+    loadOrder();
+
+    let dragEl = null;
+
+    grid.querySelectorAll('.drag-handle').forEach(handle => {
+      handle.addEventListener('pointerdown', (e) => {
+        dragEl = handle.closest('.app-card');
+        dragEl.classList.add('dragging');
+        e.preventDefault();
+      });
+    });
+
+    document.addEventListener('pointermove', (e) => {
+      if (!dragEl) return;
+      e.preventDefault();
+      const cards = [...grid.querySelectorAll('.app-card')];
+      for (const card of cards) {
+        if (card === dragEl) continue;
+        const rect = card.getBoundingClientRect();
+        if (
+          e.clientX > rect.left && e.clientX < rect.right &&
+          e.clientY > rect.top && e.clientY < rect.bottom
+        ) {
+          const dragRect = dragEl.getBoundingClientRect();
+          if (e.clientY < dragRect.top || e.clientX < dragRect.left) {
+            grid.insertBefore(dragEl, card);
+          } else {
+            grid.insertBefore(dragEl, card.nextSibling);
+          }
+          break;
+        }
+      }
+    });
+
+    function endDrag() {
+      if (!dragEl) return;
+      dragEl.classList.remove('dragging');
+      dragEl = null;
+      saveOrder();
+    }
+
+    document.addEventListener('pointerup', endDrag);
+    document.addEventListener('pointercancel', endDrag);
+
+    grid.querySelectorAll('.drag-handle').forEach(handle => {
+      handle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+
+    // PWA: registrar service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
