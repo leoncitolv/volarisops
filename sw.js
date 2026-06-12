@@ -1,10 +1,10 @@
-const CACHE = 'appvol-v1';
+const CACHE = 'appvol-v2';
 const ASSETS = [
-  '/',
-  '/Index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
   'https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap'
 ];
 
