@@ -1239,7 +1239,7 @@ function openReportsWithTasks(nombre,entry){
   window.open(url,'_blank');
 }
 
-
+function buildSubItemsNode(entry,nombre){
   const items=entry.items;
   if(!items||!items.length)return null;
   const wrap=document.createElement('div');wrap.className='nota-subitems';
