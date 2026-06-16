@@ -547,6 +547,36 @@ textarea.input-field{min-height:110px;resize:none;line-height:1.5;}
 }
 
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
+
+/* === VISUAL UPGRADE NOTES PANEL === */
+#folderScreen .nota-personal{
+background:linear-gradient(90deg, rgba(255,40,80,.08), rgba(120,40,255,.08));
+border:1px solid rgba(255,80,140,.18)!important;
+border-radius:18px;
+margin:10px 0;
+padding:14px 16px!important;
+box-shadow:0 0 0 1px rgba(255,60,120,.08),0 0 18px rgba(180,60,255,.12);
+transition:.25s ease;
+}
+#folderScreen .nota-personal:hover{
+transform:translateX(4px);
+box-shadow:0 0 24px rgba(255,60,120,.18);
+}
+#folderScreen .btn-add-personal{
+margin-top:12px;
+border-radius:16px;
+border:1px dashed rgba(200,120,255,.25);
+background:rgba(120,40,255,.08);
+}
+#folderScreen .nota-subitem-diamond{
+width:26px;height:26px;
+background:rgba(255,70,110,.15);
+border:1px solid rgba(255,70,110,.28);
+}
+#folderScreen .nota-subitem-diamond.done{
+background:linear-gradient(135deg,#2ddf74,#12b45c);
+}
+
 </style>
 </head>
 <body>
@@ -965,7 +995,7 @@ let isAdmin = false;
 let expandedFolders = new Set();
 let expandedHistorial = new Set();
 const ADMIN_PASS = '2011ss';
-const ADMIN_NUMERO = 'V2771';   // tu número de empleado como admin
+const ADMIN_NUMERO = '2771'; // César Lara administrador automático   // tu número de empleado como admin
 
 /* ══════════════════════════
    SYNC BADGES
@@ -1904,5 +1934,11 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+
+<script>
+window.EMOJI_PERSONALIZADO_NOTA = true;
+window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
+</script>
 </body>
+
 </html>
