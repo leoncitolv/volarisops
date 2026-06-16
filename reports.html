@@ -268,6 +268,12 @@
       min-height: 100px;
       font-size: 13px;
     }
+
+    .modal-content textarea {
+      min-height: 140px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
     
     .checkbox-group {
       display: grid;
@@ -1038,11 +1044,29 @@
         <div class="form-group">
           <label class="form-label">Actividades Realizadas</label>
           <textarea id="editActividades" placeholder="Presiona Enter para agregar viñetas automáticas 🔹" required></textarea>
+          <label class="form-label" style="margin-top:14px;">📷 Fotos de Actividades</label>
+          <div class="foto-upload-area" onclick="document.getElementById('editFotosActividades').click()">
+            <label class="foto-upload-label">
+              <span>📸</span> Tomar foto o elegir de galería
+            </label>
+            <input type="file" id="editFotosActividades" accept="image/*" multiple
+              onchange="previsualizarFotosModal(event, 'editPreviewActividades', 'actividades')">
+          </div>
+          <div class="fotos-preview" id="editPreviewActividades"></div>
         </div>
         
         <div class="form-group">
           <label class="form-label">Pendientes</label>
           <textarea id="editPendientes"></textarea>
+          <label class="form-label" style="margin-top:14px;">📷 Fotos de Pendientes</label>
+          <div class="foto-upload-area" onclick="document.getElementById('editFotosPendientes').click()">
+            <label class="foto-upload-label">
+              <span>📸</span> Tomar foto o elegir de galería
+            </label>
+            <input type="file" id="editFotosPendientes" accept="image/*" multiple
+              onchange="previsualizarFotosModal(event, 'editPreviewPendientes', 'pendientes')">
+          </div>
+          <div class="fotos-preview" id="editPreviewPendientes"></div>
         </div>
         
         <div class="form-group">
@@ -1501,6 +1525,54 @@ ${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
     // EDITAR REPORTE
     // ════════════════════════════════════════
     let reporteEditando = null;
+    let editFotosActividades = [];
+    let editFotosPendientes  = [];
+
+    async function previsualizarFotosModal(event, previewId, tipo) {
+      const files = Array.from(event.target.files);
+      const preview = document.getElementById(previewId);
+      const arr = tipo === 'actividades' ? editFotosActividades : editFotosPendientes;
+
+      for (const file of files) {
+        const localUrl = URL.createObjectURL(file);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'foto-thumb-wrapper';
+        wrapper.dataset.tipo = `edit-${tipo}`;
+        wrapper.innerHTML = `
+          <img src="${localUrl}" style="opacity:0.5;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:900;color:#fff;text-align:center;background:rgba(0,0,0,0.35);">⬆ Subiendo…</div>
+        `;
+        preview.appendChild(wrapper);
+
+        try {
+          const url = await subirACloudinary(file);
+          arr.push(url);
+          const idx = arr.length - 1;
+          wrapper.dataset.idx = idx;
+          wrapper.innerHTML = `
+            <img src="${url}" onclick="abrirLightbox('${url}')">
+            <button class="foto-thumb-delete" onclick="eliminarFotoModalPreview(this)">✕</button>
+          `;
+          URL.revokeObjectURL(localUrl);
+        } catch(err) {
+          console.error('Error subiendo foto:', err);
+          wrapper.remove();
+          mostrarToast('❌ Error al subir foto. Verifica tu conexión.', 'error');
+        }
+      }
+      event.target.value = '';
+    }
+
+    function eliminarFotoModalPreview(btn) {
+      const wrapper = btn.parentElement;
+      const idx = parseInt(wrapper.dataset.idx);
+      const tipo = wrapper.dataset.tipo;
+      if (tipo === 'edit-actividades') editFotosActividades.splice(idx, 1);
+      else editFotosPendientes.splice(idx, 1);
+      wrapper.remove();
+      const previewId = tipo === 'edit-actividades' ? 'editPreviewActividades' : 'editPreviewPendientes';
+      document.getElementById(previewId).querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+    }
     
     function abrirModalEditar(e, id) {
       e.stopPropagation();
@@ -1519,7 +1591,32 @@ ${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
       document.getElementById('editActividades').value = reporte.actividades;
       document.getElementById('editPendientes').value = reporte.pendientes;
       document.getElementById('editPersonal').value = reporte.personal;
-      
+
+      // Inicializar arrays de fotos del modal con las fotos existentes
+      editFotosActividades = [...(reporte.fotosActividades || [])];
+      editFotosPendientes  = [...(reporte.fotosPendientes  || [])];
+
+      // Renderizar fotos existentes en los previews del modal
+      const previewAct = document.getElementById('editPreviewActividades');
+      const previewPen = document.getElementById('editPreviewPendientes');
+      previewAct.innerHTML = '';
+      previewPen.innerHTML = '';
+
+      editFotosActividades.forEach((url, idx) => {
+        previewAct.innerHTML += `
+          <div class="foto-thumb-wrapper" data-tipo="edit-actividades" data-idx="${idx}">
+            <img src="${url}" onclick="abrirLightbox('${url}')">
+            <button class="foto-thumb-delete" onclick="eliminarFotoModalPreview(this)">✕</button>
+          </div>`;
+      });
+      editFotosPendientes.forEach((url, idx) => {
+        previewPen.innerHTML += `
+          <div class="foto-thumb-wrapper" data-tipo="edit-pendientes" data-idx="${idx}">
+            <img src="${url}" onclick="abrirLightbox('${url}')">
+            <button class="foto-thumb-delete" onclick="eliminarFotoModalPreview(this)">✕</button>
+          </div>`;
+      });
+
       // Abrir modal
       document.getElementById('modalEditar').classList.add('active');
     }
@@ -1528,6 +1625,10 @@ ${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
       document.getElementById('modalEditar').classList.remove('active');
       reporteEditando = null;
       document.getElementById('formEditar').reset();
+      editFotosActividades = [];
+      editFotosPendientes  = [];
+      document.getElementById('editPreviewActividades').innerHTML = '';
+      document.getElementById('editPreviewPendientes').innerHTML  = '';
     }
     
     function guardarEdicion(e) {
@@ -1539,7 +1640,7 @@ ${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
       let reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
       const indice = reportes.findIndex(r => r.id === reporteEditando);
       
-      // Obtener datos editados (preservar fotos del original)
+      // Obtener datos editados (usar los arrays de fotos actualizados en el modal)
       const reporteActualizado = {
         id: reporteEditando,
         fecha: document.getElementById('editFecha').value,
@@ -1548,8 +1649,8 @@ ${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
         actividades: document.getElementById('editActividades').value,
         pendientes: document.getElementById('editPendientes').value,
         personal: document.getElementById('editPersonal').value,
-        fotosActividades: indice !== -1 ? (reportes[indice].fotosActividades || []) : [],
-        fotosPendientes: indice !== -1 ? (reportes[indice].fotosPendientes || []) : [],
+        fotosActividades: [...editFotosActividades],
+        fotosPendientes:  [...editFotosPendientes],
         timestamp: new Date().toLocaleString('es-MX')
       };
       

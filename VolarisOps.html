@@ -483,6 +483,57 @@ textarea.input-field{min-height:110px;resize:none;line-height:1.5;}
 @keyframes doneSnap{0%{transform:scale(.5) rotate(-90deg);}60%{transform:scale(1.25) rotate(8deg);}100%{transform:scale(1) rotate(0);}}
 @keyframes doneGlow{0%,100%{box-shadow:0 0 6px rgba(60,220,120,.45);}50%{box-shadow:0 0 14px rgba(60,220,120,.9);}}
 
+/* ─── STATS BAR EN FOLDER SCREEN ─── */
+.fs-stats-bar{display:flex;justify-content:space-around;align-items:center;margin:.8rem .9rem .4rem;background:rgba(0,20,50,.5);border:1px solid rgba(85,200,255,.15);border-radius:14px;padding:.65rem .9rem;flex-shrink:0;}
+.fs-stat-col{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.fs-stat-num{font-size:1.35rem;font-weight:900;line-height:1;}
+.fs-stat-lbl{font-size:.56rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(150,130,200,.55);}
+.fs-stat-div{width:1px;height:32px;background:rgba(120,80,200,.2);}
+
+/* ─── ZONE GROUPS ─── */
+.fs-zone-group{margin-bottom:.6rem;}
+.fs-zone-hdr{display:flex;align-items:center;gap:.45rem;padding:.55rem .1rem .38rem;}
+.fs-zone-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.fs-zone-name{font-size:.62rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;}
+.fs-zone-count{font-size:.56rem;font-weight:900;padding:.06rem .38rem;border-radius:99px;}
+.fs-zone-line{flex:1;height:1px;margin-left:.3rem;}
+/* Puertas */
+.z-puertas .fs-zone-dot{background:#ff4466;}
+.z-puertas .fs-zone-name{color:#ff8899;}
+.z-puertas .fs-zone-count{background:rgba(255,40,80,.14);color:#ff8899;}
+.z-puertas .fs-zone-line{background:rgba(255,40,80,.15);}
+.z-puertas .nota-personal{border-left:2px solid rgba(255,68,102,.4) !important;padding-left:.8rem !important;}
+/* Cabina */
+.z-cabina .fs-zone-dot{background:#aa55ff;}
+.z-cabina .fs-zone-name{color:#cc99ff;}
+.z-cabina .fs-zone-count{background:rgba(150,60,255,.14);color:#cc99ff;}
+.z-cabina .fs-zone-line{background:rgba(150,60,255,.12);}
+.z-cabina .nota-personal{border-left:2px solid rgba(170,85,255,.4) !important;padding-left:.8rem !important;}
+/* Lavatorio */
+.z-lavatorio .fs-zone-dot{background:#44ddaa;}
+.z-lavatorio .fs-zone-name{color:#66eebb;}
+.z-lavatorio .fs-zone-count{background:rgba(60,200,150,.1);color:#66eebb;}
+.z-lavatorio .fs-zone-line{background:rgba(60,200,150,.1);}
+.z-lavatorio .nota-personal{border-left:2px solid rgba(68,221,170,.35) !important;padding-left:.8rem !important;}
+/* Cockpit */
+.z-cockpit .fs-zone-dot{background:#55ccff;}
+.z-cockpit .fs-zone-name{color:#88ddff;}
+.z-cockpit .fs-zone-count{background:rgba(85,200,255,.12);color:#88ddff;}
+.z-cockpit .fs-zone-line{background:rgba(85,200,255,.1);}
+.z-cockpit .nota-personal{border-left:2px solid rgba(85,200,255,.35) !important;padding-left:.8rem !important;}
+/* Exterior */
+.z-exterior .fs-zone-dot{background:#ffaa44;}
+.z-exterior .fs-zone-name{color:#ffcc88;}
+.z-exterior .fs-zone-count{background:rgba(255,160,40,.14);color:#ffcc88;}
+.z-exterior .fs-zone-line{background:rgba(255,160,40,.12);}
+.z-exterior .nota-personal{border-left:2px solid rgba(255,170,68,.35) !important;padding-left:.8rem !important;}
+/* General */
+.z-otros .fs-zone-dot{background:#9977cc;}
+.z-otros .fs-zone-name{color:#bb99dd;}
+.z-otros .fs-zone-count{background:rgba(150,100,200,.14);color:#bb99dd;}
+.z-otros .fs-zone-line{background:rgba(150,100,200,.1);}
+.z-otros .nota-personal{border-left:2px solid rgba(150,100,200,.3) !important;padding-left:.8rem !important;}
+
 /* ─── TOP BAR RESPONSIVE MEJORADO ─── */
 @media(max-width:480px){
   .top-bar{flex-wrap:wrap;padding:0.6rem 0.8rem;gap:0.4rem;}
@@ -1304,38 +1355,94 @@ function buildNotaPersonalNode(k,nombre,entry){
   return div;
 }
 
+/* ══════════════════════════
+   DETECCIÓN DE ZONA POR TEXTO
+══════════════════════════ */
+function getZone(entry){
+  const texts=[];
+  if(entry.items&&entry.items.length)texts.push(...entry.items.map(it=>it.texto||''));
+  else texts.push(entry.texto||'');
+  const t=texts.join(' ').toLowerCase();
+  if(/door|puerta|entrance|scuff|emergency|exit|hatch|jamba|latch|seal|door frame|door sill/.test(t))return'puertas';
+  if(/cabin|attendant|seat|galley|overhead|pax|aisle|compartment|asiento|mesa|bin|tray|window shade|call button|reading light/.test(t))return'cabina';
+  if(/toilet|lav|wc|shroud|waste|restroom|baño|inodoro|assembly|faucet|sink|mirror|soap/.test(t))return'lavatorio';
+  if(/cockpit|flight deck|pilot|captain|windshield|parabrisas|pedestal|instrument|panel|rudder|yoke/.test(t))return'cockpit';
+  if(/exterior|wing|fuselage|landing gear|tire|engine|nacelle|ala|tren|motor|nose|tail|fairing|antenna/.test(t))return'exterior';
+  return'otros';
+}
+const ZONE_LABELS={
+  puertas:{label:'Puertas',emoji:'🚪'},
+  cabina:{label:'Cabina',emoji:'💺'},
+  lavatorio:{label:'Lavatorio',emoji:'🚿'},
+  cockpit:{label:'Cockpit',emoji:'🎯'},
+  exterior:{label:'Exterior',emoji:'🔧'},
+  otros:{label:'General',emoji:'📋'}
+};
+const ZONE_ORDER=['puertas','cabina','lavatorio','cockpit','exterior','otros'];
+
 function renderFolderScreen(k){
   const md=globalData[k];if(!md)return;
   const nombre=md.nombre||k;
   const allE=Object.values(getEntries(md)).filter(e=>!e.deleted);
-  // Contar ítems individuales
-  let totalItems=0,doneItems=0;
+  // Contar ítems individuales y fotos
+  let totalItems=0,doneItems=0,totalFotos=0;
   allE.forEach(e=>{
     if(e.items&&e.items.length){totalItems+=e.items.length;doneItems+=e.items.filter(it=>it.done).length;}
     else{totalItems+=1;if(e.done)doneItems+=1;}
+    totalFotos+=(e.fotos||[]).length;
   });
   const pendingCount=totalItems-doneItems;
   const pending=allE.filter(e=>!e.done),done=allE.filter(e=>e.done);
 
-  // Actualizar header
+  // Actualizar header nav
   document.getElementById('fsTitle').textContent='✈ '+nombre;
   const counts=document.getElementById('fsCounts');counts.innerHTML='';
   if(pendingCount){const s=document.createElement('span');s.style.cssText='font-size:.62rem;font-weight:900;padding:.08rem .42rem;border-radius:99px;background:rgba(255,150,50,.15);color:#ffaa55;';s.textContent=pendingCount+' pend.';counts.appendChild(s);}
   if(doneItems){const s=document.createElement('span');s.style.cssText='font-size:.62rem;font-weight:900;padding:.08rem .42rem;border-radius:99px;background:rgba(60,200,80,.1);color:#55ee88;';s.textContent=doneItems+' hecho'+(doneItems!==1?'s':'');counts.appendChild(s);}
   if(isAdmin){const db3=document.createElement('button');db3.style.cssText='padding:.18rem .48rem;border:none;border-radius:99px;cursor:pointer;font-family:"Nunito",sans-serif;font-size:.6rem;font-weight:900;text-transform:uppercase;background:rgba(200,34,68,.18);color:#ff7799;border:1px solid rgba(200,34,68,.25);';db3.textContent='🗑';db3.onclick=()=>confirmDeleteMat(nombre);counts.appendChild(db3);}
 
-  // Contenido
   const body=document.getElementById('fsBody');body.innerHTML='';
+
+  // ── STATS HEADER (Opción B) ──
+  const statsBar=document.createElement('div');
+  statsBar.className='fs-stats-bar';
+  statsBar.innerHTML=
+    '<div class="fs-stat-col"><div class="fs-stat-num" style="color:#ff8899;">'+pendingCount+'</div><div class="fs-stat-lbl">Pendientes</div></div>'+
+    '<div class="fs-stat-div"></div>'+
+    '<div class="fs-stat-col"><div class="fs-stat-num" style="color:#55ee88;">'+doneItems+'</div><div class="fs-stat-lbl">Cerrados</div></div>'+
+    '<div class="fs-stat-div"></div>'+
+    '<div class="fs-stat-col"><div class="fs-stat-num" style="color:#55ccff;">'+totalFotos+'</div><div class="fs-stat-lbl">Fotos</div></div>';
+  body.appendChild(statsBar);
 
   if(!allE.length){
     const em=document.createElement('div');em.className='fs-empty-msg';
     em.innerHTML='<div class="vacio-icon">📋</div><p>Sin notas en esta matrícula</p>';
     body.appendChild(em);
   } else {
-    [...pending,...done].forEach((entry,i)=>{
-      const node=buildNotaPersonalNode(k,nombre,entry);
-      node.style.animationDelay=(i*0.055)+'s';
-      body.appendChild(node);
+    // ── AGRUPAR POR ZONA (Opción C) ──
+    const grouped={};
+    [...pending,...done].forEach(entry=>{
+      const z=getZone(entry);
+      if(!grouped[z])grouped[z]=[];
+      grouped[z].push(entry);
+    });
+    let itemIdx=0;
+    ZONE_ORDER.forEach(zone=>{
+      if(!grouped[zone]||!grouped[zone].length)return;
+      const zInfo=ZONE_LABELS[zone];
+      const zGroup=document.createElement('div');
+      zGroup.className='fs-zone-group z-'+zone;
+      // Encabezado de zona
+      const zHdr=document.createElement('div');zHdr.className='fs-zone-hdr';
+      zHdr.innerHTML='<div class="fs-zone-dot"></div><div class="fs-zone-name">'+zInfo.emoji+' '+zInfo.label+'</div><div class="fs-zone-count">'+grouped[zone].length+'</div><div class="fs-zone-line"></div>';
+      zGroup.appendChild(zHdr);
+      grouped[zone].forEach(entry=>{
+        const node=buildNotaPersonalNode(k,nombre,entry);
+        node.style.animationDelay=(itemIdx*0.055)+'s';
+        zGroup.appendChild(node);
+        itemIdx++;
+      });
+      body.appendChild(zGroup);
     });
   }
   if(puedeCrear()){const ab=document.createElement('button');ab.className='btn-add-personal';ab.style.cssText='border-radius:14px;margin-top:.3rem;';ab.innerHTML='＋ Agregar nota';ab.onclick=()=>openModal('add',nombre);body.appendChild(ab);}
