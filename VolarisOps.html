@@ -1648,7 +1648,23 @@ window.confirmDeleteEntry=(n,id)=>showConfirm('🗑 Borrar nota','¿Eliminar est
 /* ══════════════════════════
    ADMIN
 ══════════════════════════ */
+function esAdminPermanente(){
+  const p=loadPerfil();
+  return String(p.numero).trim()===ADMIN_NUMERO;
+}
 document.getElementById('btnAdminPencil').addEventListener('click',()=>{
+  if(esAdminPermanente()){
+    // César Lara (2771): admin siempre activo, sin pedir contraseña ni poder desactivarlo
+    if(!isAdmin){
+      isAdmin=true;
+      document.getElementById('btnAdminPencil').classList.add('admin-on');
+      document.getElementById('adminBadge').classList.add('show');
+      document.getElementById('btnAdminPencil').title='Admin permanente';
+      updateAdminUIExtras();
+      renderGlobal();renderFolders(document.getElementById('searchNotas').value);
+    }
+    return;
+  }
   if(isAdmin){
     isAdmin=false;document.getElementById('btnAdminPencil').classList.remove('admin-on');document.getElementById('adminBadge').classList.remove('show');
     renderGlobal();renderFolders(document.getElementById('searchNotas').value);
@@ -1796,6 +1812,15 @@ document.getElementById('searchNotas').addEventListener('input',e=>renderFolders
 /* ══════════════════════════
    LOGIN con número de empleado
 ══════════════════════════ */
+function activarAdminSiCorresponde(){
+  if(esAdminPermanente()&&!isAdmin){
+    isAdmin=true;
+    document.getElementById('btnAdminPencil').classList.add('admin-on');
+    document.getElementById('adminBadge').classList.add('show');
+    document.getElementById('btnAdminPencil').title='Admin permanente';
+    updateAdminUIExtras();
+  }
+}
 const loginInput=document.getElementById('loginNumero');
 const btnLogin=document.getElementById('btnLogin');
 loginInput.addEventListener('input',()=>{ btnLogin.disabled=!loginInput.value.trim(); document.getElementById('loginError').classList.remove('show'); });
@@ -1810,6 +1835,7 @@ btnLogin.addEventListener('click',()=>{
   updateTopUser();
   document.getElementById('loginScreen').classList.remove('show');
   document.getElementById('portal').classList.add('show');
+  activarAdminSiCorresponde();
   renderFolders('');renderGlobal();
 });
 
@@ -1827,6 +1853,7 @@ document.getElementById('btnEnter').addEventListener('click',()=>{
     if(p.numero&&isAuthorized(p.numero)){
       updateTopUser();
       document.getElementById('portal').classList.add('show');
+      activarAdminSiCorresponde();
       renderFolders('');renderGlobal();
     } else {
       document.getElementById('loginScreen').classList.add('show');
