@@ -180,6 +180,9 @@ html,body{background:var(--bg-body);color:var(--text-main);transition:background
 .folder-icon{font-size:1rem;color:rgba(180,130,255,.6);transition:transform .25s;}
 .folder-item.expanded .folder-icon{transform:rotate(90deg);}
 .folder-mat{flex:1;font-size:clamp(.88rem,3.4vw,1rem);font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--notas-color,#cc44ff);}
+.folder-mat-wrap{flex:1;display:flex;flex-direction:column;gap:.08rem;}
+.folder-mat-sub{font-size:.57rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(180,130,255,.45);line-height:1;}
+[data-theme="light"] .folder-mat-sub{color:rgba(100,40,180,.4);}
 .folder-count{font-size:.63rem;font-weight:800;padding:.08rem .42rem;border-radius:99px;}
 .folder-body{display:none;border-top:1px solid rgba(180,100,255,.1);}
 .folder-item.expanded .folder-body{display:block;}
@@ -722,6 +725,11 @@ background:linear-gradient(135deg,#2ddf74,#12b45c);
     <button class="fs-back-btn" id="fsBackBtn">← Volver</button>
     <div class="fs-title-wrap">
       <div class="fs-title" id="fsTitle">Matrícula</div>
+      <div style="display:flex;align-items:center;gap:.4rem;">
+        <div class="fs-title-sub" id="fsTitleSub" style="font-size:.57rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(180,130,255,.45);line-height:1;margin-top:.1rem;display:none;"></div>
+        <button id="btnEditModelo" onclick="window.openEditModelo()" style="display:none;background:rgba(180,100,255,.12);border:1px solid rgba(180,100,255,.2);border-radius:99px;padding:.1rem .38rem;cursor:pointer;font-size:.52rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:rgba(180,130,255,.6);margin-top:.1rem;">✎ modelo</button>
+        <button id="btnRenombrarMat" onclick="window.openRenombrarMat()" style="display:none;background:rgba(85,170,255,.1);border:1px solid rgba(85,170,255,.2);border-radius:99px;padding:.1rem .38rem;cursor:pointer;font-size:.52rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:rgba(85,170,255,.6);margin-top:.1rem;">✎ matrícula</button>
+      </div>
     </div>
     <div class="fs-counts" id="fsCounts"></div>
   </div>
@@ -777,6 +785,24 @@ background:linear-gradient(135deg,#2ddf74,#12b45c);
   <div class="modal-body">
     <div><div class="input-label">Matrícula del avión</div>
       <input class="input-field" id="inputMatricula" type="text" placeholder="Ej: XA-VOL" maxlength="12"/></div>
+    <div id="modeloWrap" style="display:flex;gap:.5rem;">
+      <div style="flex:1;">
+        <div class="input-label" style="font-size:.6rem;margin-bottom:.3rem;">Modelo <span style="opacity:.5;font-weight:700;">(opcional)</span></div>
+        <select id="selectModelo" style="width:100%;background:var(--bg-input);border:1px solid var(--input-border);border-radius:12px;padding:.6rem .8rem;color:var(--text-main);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:800;outline:none;cursor:pointer;transition:border-color .2s;-webkit-appearance:none;appearance:none;">
+          <option value="">— Sin modelo —</option>
+          <option value="A320">A320</option>
+          <option value="A321">A321</option>
+        </select>
+      </div>
+      <div style="flex:1;">
+        <div class="input-label" style="font-size:.6rem;margin-bottom:.3rem;">Variante <span style="opacity:.5;font-weight:700;">(opcional)</span></div>
+        <select id="selectVariante" style="width:100%;background:var(--bg-input);border:1px solid var(--input-border);border-radius:12px;padding:.6rem .8rem;color:var(--text-main);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:800;outline:none;cursor:pointer;transition:border-color .2s;-webkit-appearance:none;appearance:none;">
+          <option value="">— Sin variante —</option>
+          <option value="CEO">CEO</option>
+          <option value="NEO">NEO</option>
+        </select>
+      </div>
+    </div>
     <div><div class="input-label" style="display:flex;align-items:center;justify-content:space-between;">
       <span>Nota / Pendiente</span>
       <button type="button" id="btnMicModal" class="btn-mic-modal" title="Dictar ítem">🎤</button>
@@ -1015,10 +1041,19 @@ onValue(dbRef, snap => {
 }, err => { console.error(err); setSyncOff(); });
 
 function matKey(mat){ return mat.replace(/[.#$/\[\] ]/g,'_'); }
-async function fbSetEntry(mat, entry){
+async function fbSetEntry(mat, entry, modeloVal='', varianteVal=''){
   const key=matKey(mat);
   const snap=await get(ref(db,'volaris_notas/'+key));
-  if(!snap.exists()) await set(ref(db,'volaris_notas/'+key),{nombre:mat,deviceName:DEVICE_NAME,device:DEVICE_ID,ts:Date.now(),deleted:false,entries:{}});
+  if(!snap.exists()){
+    // Matrícula nueva: crear con modelo y variante
+    await set(ref(db,'volaris_notas/'+key),{nombre:mat,deviceName:DEVICE_NAME,device:DEVICE_ID,ts:Date.now(),deleted:false,entries:{},modelo:modeloVal,variante:varianteVal});
+  } else if(modeloVal||varianteVal){
+    // Matrícula existente: actualizar modelo/variante solo si se especificaron
+    const upd={};
+    if(modeloVal) upd.modelo=modeloVal;
+    if(varianteVal) upd.variante=varianteVal;
+    await update(ref(db,'volaris_notas/'+key),upd);
+  }
   await set(ref(db,'volaris_notas/'+key+'/entries/'+entry.id),entry);
 }
 async function fbUpdateEntry(mat,entryId,fields){ await update(ref(db,'volaris_notas/'+matKey(mat)+'/entries/'+entryId),fields); }
@@ -1155,11 +1190,19 @@ function openModal(mode='new',mat='',entryId='',textoActual=''){
   btnUrgente.style.color='#ff7777';
   btnUrgente.textContent='⚠️ Urgente';
   const mi=document.getElementById('inputMatricula');
+  const selMod=document.getElementById('selectModelo');
+  const selVar=document.getElementById('selectVariante');
   if(mode==='edit'){
     document.getElementById('modalTitleText').textContent='✏️ Editar → '+mat;
     mi.value=mat;mi.disabled=true;
-    // Parsear ítems existentes
+    // Cargar modelo/variante existentes (no editables en modo editar nota)
     const k=findMatKey(mat);
+    selMod.value=globalData[k]?.modelo||'';selVar.value=globalData[k]?.variante||'';
+    selMod.disabled=false;selVar.disabled=false;
+    // Mostrar aviso de que también puede editar el modelo
+    let mdEditHint=document.getElementById('mdEditHint');
+    if(!mdEditHint){mdEditHint=document.createElement('div');mdEditHint.id='mdEditHint';mdEditHint.style.cssText='font-size:.6rem;color:rgba(180,130,255,.5);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:.18rem;';document.getElementById('modeloWrap').after(mdEditHint);}
+    mdEditHint.textContent='✎ Puedes actualizar el modelo/variante aquí';mdEditHint.style.display='block';
     const existingEntry=globalData[k]?.entries?.[entryId];
     const items=existingEntry?.items||[{texto:textoActual||'',done:false}];
     initItemsEditor(items);
@@ -1167,6 +1210,9 @@ function openModal(mode='new',mat='',entryId='',textoActual=''){
   } else {
     document.getElementById('modalTitleText').textContent=mode==='add'?'Agregar nota → '+mat:'Nueva Nota';
     mi.value=mode==='add'?mat:'';mi.disabled=mode==='add';
+    // Cargar modelo/variante existente al agregar nota a mat ya conocida
+    if(mode==='add'){const mk2=findMatKey(mat);selMod.value=globalData[mk2]?.modelo||'';selVar.value=globalData[mk2]?.variante||'';selMod.disabled=false;selVar.disabled=false;}else{selMod.value='';selVar.value='';selMod.disabled=false;selVar.disabled=false;}
+    const mdEditHint2=document.getElementById('mdEditHint');if(mdEditHint2)mdEditHint2.style.display='none';
     initItemsEditor([]);
     document.getElementById('btnGuardar').textContent='Guardar nota';
   }
@@ -1175,6 +1221,111 @@ function openModal(mode='new',mat='',entryId='',textoActual=''){
   setTimeout(()=>window.initMicButton(),100);
 }
 window.openModal=openModal;
+
+/* ── Editar Modelo/Variante de una matrícula ── */
+window.openRenombrarMat=function(){
+  const k=fsCurrentKey,md=globalData[k];if(!k||!md)return;
+  const nombreActual=md.nombre||k;
+  // Mini modal para renombrar
+  let ov=document.getElementById('modalRenombrar');if(ov)ov.remove();
+  ov=document.createElement('div');ov.id='modalRenombrar';
+  ov.style.cssText='position:fixed;inset:0;z-index:600;background:rgba(8,0,20,.97);backdrop-filter:blur(22px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2rem;';
+  ov.innerHTML=`
+    <div style="font-size:1.6rem;">✏️</div>
+    <div style="font-size:1rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,#55aaff,#88ccff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Renombrar matrícula</div>
+    <div style="font-size:.72rem;color:rgba(180,130,255,.5);font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Nombre actual: ${nombreActual}</div>
+    <div style="width:100%;max-width:300px;">
+      <div style="font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(180,130,255,.45);margin-bottom:.4rem;">Nuevo nombre</div>
+      <input id="inputNuevoNombre" type="text" value="${nombreActual}" maxlength="20"
+        style="width:100%;background:rgba(60,0,100,.35);border:1px solid rgba(180,100,255,.3);border-radius:12px;padding:.8rem 1rem;color:#e8d8ff;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;outline:none;text-align:center;"
+        oninput="this.value=this.value.toUpperCase()"/>
+      <div id="renErrorMsg" style="font-size:.62rem;color:#ff7799;font-weight:800;letter-spacing:.06em;text-align:center;margin-top:.4rem;opacity:0;transition:opacity .2s;"></div>
+    </div>
+    <div style="display:flex;gap:.7rem;width:100%;max-width:300px;">
+      <button id="renCancelar" style="flex:1;padding:.78rem;border:none;border-radius:999px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;text-transform:uppercase;background:rgba(200,100,100,.15);color:#ff8888;border:1px solid rgba(200,100,100,.2);">Cancelar</button>
+      <button id="renGuardar" style="flex:1;padding:.78rem;border:none;border-radius:999px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;text-transform:uppercase;background:linear-gradient(135deg,#1155aa,#3388ff);color:#fff;box-shadow:0 0 18px rgba(50,120,255,.35);">Renombrar</button>
+    </div>`;
+  document.body.appendChild(ov);
+  const inp=document.getElementById('inputNuevoNombre');
+  setTimeout(()=>{inp.focus();inp.select();},150);
+  document.getElementById('renCancelar').onclick=()=>ov.remove();
+  document.getElementById('renGuardar').onclick=async()=>{
+    const nuevoNombre=inp.value.trim().toUpperCase();
+    const errEl=document.getElementById('renErrorMsg');
+    // Validaciones
+    if(!nuevoNombre){errEl.textContent='Escribe un nombre';errEl.style.opacity=1;return;}
+    if(nuevoNombre===nombreActual){errEl.textContent='Es el mismo nombre actual';errEl.style.opacity=1;return;}
+    // Verificar que no exista ya
+    const yaExiste=Object.values(globalData).some(m=>!m.deleted&&(m.nombre||'').toUpperCase()===nuevoNombre);
+    if(yaExiste){errEl.textContent='Ya existe una matrícula con ese nombre';errEl.style.opacity=1;return;}
+    errEl.style.opacity=0;
+    const btnG=document.getElementById('renGuardar');btnG.disabled=true;btnG.textContent='Guardando...';
+    try{
+      // Estrategia: copiar el nodo completo con el nuevo key → borrar el viejo
+      const nuevoKey=matKey(nuevoNombre);
+      const viejoKey=k;
+      const dataCopia={...md, nombre:nuevoNombre};
+      await set(ref(db,'volaris_notas/'+nuevoKey), dataCopia);
+      await remove(ref(db,'volaris_notas/'+viejoKey));
+      showToast('✅ Renombrado a '+nuevoNombre);
+      ov.remove();
+      closeFolderScreen();
+    }catch(e){
+      btnG.disabled=false;btnG.textContent='Renombrar';
+      errEl.textContent='Error al guardar. Intenta de nuevo.';errEl.style.opacity=1;
+      console.error(e);
+    }
+  };
+  // Enter para guardar
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('renGuardar').click();});
+};
+
+window.openEditModelo=function(){
+  const k=fsCurrentKey,md=globalData[k];if(!k||!md)return;
+  const nombre=md.nombre||k;
+  const curMod=md.modelo||'',curVar=md.variante||'';
+  // Crear mini modal flotante para editar modelo/variante
+  let ov=document.getElementById('modalModelo');
+  if(ov)ov.remove();
+  ov=document.createElement('div');
+  ov.id='modalModelo';
+  ov.style.cssText='position:fixed;inset:0;z-index:600;background:rgba(8,0,20,.96);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2rem;';
+  ov.innerHTML=`
+    <div style="font-size:1.6rem;">✈️</div>
+    <div style="font-size:1rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,#aa22ff,#cc55ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Modelo del Avión</div>
+    <div style="font-size:.72rem;color:rgba(180,130,255,.5);font-weight:700;letter-spacing:.1em;text-transform:uppercase;">${nombre}</div>
+    <div style="display:flex;gap:.6rem;width:100%;max-width:300px;">
+      <div style="flex:1;">
+        <div style="font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(180,130,255,.45);margin-bottom:.3rem;">Modelo</div>
+        <select id="mmModelo" style="width:100%;background:rgba(60,0,100,.35);border:1px solid rgba(180,100,255,.25);border-radius:12px;padding:.7rem .8rem;color:#e8d8ff;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:800;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;">
+          <option value="">Sin modelo</option>
+          <option value="A320" ${curMod==='A320'?'selected':''}>A320</option>
+          <option value="A321" ${curMod==='A321'?'selected':''}>A321</option>
+        </select>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:.58rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:rgba(180,130,255,.45);margin-bottom:.3rem;">Variante</div>
+        <select id="mmVariante" style="width:100%;background:rgba(60,0,100,.35);border:1px solid rgba(180,100,255,.25);border-radius:12px;padding:.7rem .8rem;color:#e8d8ff;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:800;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;">
+          <option value="">Sin variante</option>
+          <option value="CEO" ${curVar==='CEO'?'selected':''}>CEO</option>
+          <option value="NEO" ${curVar==='NEO'?'selected':''}>NEO</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:.7rem;width:100%;max-width:300px;margin-top:.3rem;">
+      <button id="mmCancelar" style="flex:1;padding:.78rem;border:none;border-radius:999px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;text-transform:uppercase;background:rgba(200,100,100,.15);color:#ff8888;border:1px solid rgba(200,100,100,.2);">Cancelar</button>
+      <button id="mmGuardar" style="flex:1;padding:.78rem;border:none;border-radius:999px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;text-transform:uppercase;background:linear-gradient(135deg,#5500aa,#aa22ff);color:#fff;box-shadow:0 0 18px rgba(150,0,255,.35);">Guardar</button>
+    </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('mmCancelar').onclick=()=>ov.remove();
+  document.getElementById('mmGuardar').onclick=async()=>{
+    const modeloFinal=document.getElementById('mmModelo').value;
+    const varianteFinal=document.getElementById('mmVariante').value;
+    await fbUpdateMat(nombre,{modelo:modeloFinal,variante:varianteFinal});
+    showToast('✈ Modelo actualizado');
+    ov.remove();
+  };
+};
 document.getElementById('btnUrgente').addEventListener('click',()=>{
   modalUrgencyPressed=!modalUrgencyPressed;
   const btn=document.getElementById('btnUrgente');
@@ -1211,6 +1362,10 @@ document.getElementById('btnGuardar').addEventListener('click',async()=>{
       }));
       const texto=itemTexts.join(' · ');
       const fields={texto, items:mergedItems};
+      // Actualizar modelo/variante si el usuario los cambió
+      const _eMod=document.getElementById('selectModelo');
+      const _eVar=document.getElementById('selectVariante');
+      await fbUpdateMat(mat,{modelo:_eMod?_eMod.value:'',variante:_eVar?_eVar.value:''});
       if(pendingFotos.length>0){
         document.getElementById('fotoUploading').style.display='block';
         document.getElementById('fotoUploading').textContent='☁️ Subiendo fotos...';
@@ -1248,7 +1403,12 @@ document.getElementById('btnGuardar').addEventListener('click',async()=>{
       document.getElementById('fotoUploading').textContent='⏳ Procesando foto...';
     }
     const entry={id:'e_'+ts+'_'+Math.random().toString(36).slice(2,5),texto,items,device:DEVICE_ID,deviceName:DEVICE_NAME,ts,done:false,deleted:false,fotos:fotoUrls,createdByName:perfil.nombre||DEVICE_NAME,createdByNum:perfil.numero||'',history:[{ts,action:'crea',userName:perfil.nombre||DEVICE_NAME,userNum:perfil.numero||''}]};
-    await fbSetEntry(mat,entry);
+    // Leer modelo y variante del modal antes de guardar
+    const _selMod=document.getElementById('selectModelo');
+    const _selVar=document.getElementById('selectVariante');
+    const _modelo=_selMod?_selMod.value:'';
+    const _variante=_selVar?_selVar.value:'';
+    await fbSetEntry(mat,entry,_modelo,_variante);
     // — Notificación Telegram —
     const quien2=(perfil.nombre||DEVICE_NAME)+(perfil.numero?' #'+perfil.numero:'');
     const hora2=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
@@ -1426,10 +1586,22 @@ function renderFolderScreen(k){
 
   // Actualizar header nav
   document.getElementById('fsTitle').textContent='✈ '+nombre;
+  const fsSub=document.getElementById('fsTitleSub');
+  const fsEditBtn=document.getElementById('btnEditModelo');
+  if(fsSub){const fsModelo=md?.modelo||'',fsVariante=md?.variante||'';const fsSubLabel=fsModelo&&fsVariante?fsModelo+' · '+fsVariante:fsModelo||fsVariante?(fsModelo+fsVariante):'';if(fsSubLabel){fsSub.textContent=fsSubLabel;fsSub.style.display='block';}else{fsSub.style.display='none';}}
+  if(fsEditBtn){fsEditBtn.style.display=puedeEditar()?'inline-block':'none';}
+  const fsRenBtn=document.getElementById('btnRenombrarMat');
+  if(fsRenBtn){fsRenBtn.style.display=puedeEditar()?'inline-block':'none';}
   const counts=document.getElementById('fsCounts');counts.innerHTML='';
   if(pendingCount){const s=document.createElement('span');s.style.cssText='font-size:.62rem;font-weight:900;padding:.08rem .42rem;border-radius:99px;background:rgba(255,150,50,.15);color:#ffaa55;';s.textContent=pendingCount+' pend.';counts.appendChild(s);}
   if(doneItems){const s=document.createElement('span');s.style.cssText='font-size:.62rem;font-weight:900;padding:.08rem .42rem;border-radius:99px;background:rgba(60,200,80,.1);color:#55ee88;';s.textContent=doneItems+' hecho'+(doneItems!==1?'s':'');counts.appendChild(s);}
-  if(isAdmin){const db3=document.createElement('button');db3.style.cssText='padding:.18rem .48rem;border:none;border-radius:99px;cursor:pointer;font-family:"Nunito",sans-serif;font-size:.6rem;font-weight:900;text-transform:uppercase;background:rgba(200,34,68,.18);color:#ff7799;border:1px solid rgba(200,34,68,.25);';db3.textContent='🗑';db3.onclick=()=>confirmDeleteMat(nombre);counts.appendChild(db3);}
+  if(puedeBorrar()){
+    const db3=document.createElement('button');
+    db3.style.cssText='padding:.22rem .55rem;border:none;border-radius:99px;cursor:pointer;font-family:"Nunito",sans-serif;font-size:.62rem;font-weight:900;text-transform:uppercase;background:rgba(200,34,68,.18);color:#ff7799;border:1px solid rgba(200,34,68,.25);display:flex;align-items:center;gap:.28rem;';
+    db3.innerHTML='🗑 Eliminar';
+    db3.onclick=()=>openDeleteMatModal(nombre);
+    counts.appendChild(db3);
+  }
 
   const body=document.getElementById('fsBody');body.innerHTML='';
 
@@ -1517,9 +1689,10 @@ function renderFolders(filter=''){
       else{totalItems+=1;if(e.done)doneItems+=1;}
     });
     const pendingItemCount=totalItems-doneItems;
+    const mdModelo=md?.modelo||'',mdVariante=md?.variante||'';const subLabel=mdModelo&&mdVariante?mdModelo+' · '+mdVariante:mdModelo||mdVariante?(mdModelo+mdVariante):'';
     const folder=document.createElement('div');folder.className='folder-item';
     const hdr=document.createElement('div');hdr.className='folder-header';
-    hdr.innerHTML=`<span class="folder-icon" style="transition:transform .25s;">›</span><span class="folder-mat">${nombre}</span>${pendingItemCount?`<span class="folder-count" style="background:rgba(255,150,50,.15);color:#ffaa55;">${pendingItemCount} pend.</span>`:''}${doneItems?`<span class="folder-count" style="background:rgba(60,200,80,.1);color:#55ee88;">${doneItems} hechos</span>`:''}`;
+    hdr.innerHTML=`<span class="folder-icon" style="transition:transform .25s;">›</span><div class="folder-mat-wrap"><span class="folder-mat">${nombre}</span>${subLabel?'<span class="folder-mat-sub">✈ '+subLabel+'</span>':''}</div>${pendingItemCount?`<span class="folder-count" style="background:rgba(255,150,50,.15);color:#ffaa55;">${pendingItemCount} pend.</span>`:''  }${doneItems?`<span class="folder-count" style="background:rgba(60,200,80,.1);color:#55ee88;">${doneItems} hechos</span>`:''}`;
     hdr.addEventListener('click',()=>openFolderScreen(k));
     folder.appendChild(hdr);
     list.appendChild(folder);
@@ -1645,10 +1818,55 @@ window.toggleDone=async(nombre,entryId)=>{
   const msg = tgMsgToggle(newDone, nombre, entry?.texto||'', perfil);
   tgNotify(msg);
 };
+/* ── Modal de eliminación de matrícula ── */
+window.openDeleteMatModal=function(nombre){
+  let ov=document.getElementById('modalDelMat');
+  if(ov)ov.remove();
+  ov=document.createElement('div');
+  ov.id='modalDelMat';
+  ov.style.cssText='position:fixed;inset:0;z-index:600;background:rgba(8,0,20,.97);backdrop-filter:blur(22px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2rem;';
+  ov.innerHTML=`
+    <div style="font-size:2rem;">⚠️</div>
+    <div style="font-size:1rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#ff7799;text-align:center;">Eliminar matrícula</div>
+    <div style="font-size:1.25rem;font-weight:900;letter-spacing:.12em;color:#cc88ff;text-align:center;">${nombre}</div>
+    <div style="font-size:.75rem;color:rgba(180,130,255,.55);font-weight:700;letter-spacing:.06em;text-align:center;line-height:1.6;max-width:280px;">Elige qué quieres eliminar.<br>Puedes restaurar desde la vista Global.</div>
+    <div style="display:flex;flex-direction:column;gap:.55rem;width:100%;max-width:300px;margin-top:.3rem;">
+      <button id="dmSoloNotas" style="padding:.85rem 1rem;border:none;border-radius:14px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:rgba(200,120,40,.2);color:#ffaa55;border:1px solid rgba(200,120,40,.3);text-align:left;display:flex;align-items:center;gap:.6rem;">
+        <span style="font-size:1.1rem;">📋</span>
+        <div><div>Solo las notas</div><div style="font-size:.6rem;font-weight:700;opacity:.6;text-transform:none;letter-spacing:.04em;">Borra el contenido pero conserva la matrícula</div></div>
+      </button>
+      <button id="dmTodo" style="padding:.85rem 1rem;border:none;border-radius:14px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:rgba(200,34,68,.2);color:#ff7799;border:1px solid rgba(200,34,68,.3);text-align:left;display:flex;align-items:center;gap:.6rem;">
+        <span style="font-size:1.1rem;">🗑</span>
+        <div><div>Matrícula completa</div><div style="font-size:.6rem;font-weight:700;opacity:.6;text-transform:none;letter-spacing:.04em;">Elimina la matrícula y todas sus notas</div></div>
+      </button>
+      <button id="dmCancelar" style="padding:.72rem;border:none;border-radius:14px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:rgba(180,100,255,.1);color:rgba(180,130,255,.6);border:1px solid rgba(180,100,255,.15);">Cancelar</button>
+    </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('dmCancelar').onclick=()=>ov.remove();
+  document.getElementById('dmSoloNotas').onclick=()=>{
+    ov.remove();
+    showConfirm('📋 Borrar notas','¿Eliminar todas las notas de '+nombre+'? La matrícula se conserva.',async()=>{
+      if(!puedeBorrar())return;
+      const k=findMatKey(nombre);const md=globalData[k];if(!md?.entries)return;
+      const u={};Object.keys(getEntries(md)).forEach(eid=>{u[eid+'/deleted']=true;});
+      await update(ref(db,'volaris_notas/'+k+'/entries'),u);
+      closeFolderScreen();showToast('📋 Notas eliminadas');
+    });
+  };
+  document.getElementById('dmTodo').onclick=()=>{
+    ov.remove();
+    showConfirm('🗑 Eliminar matrícula','¿Eliminar '+nombre+' y TODAS sus notas? Podrás restaurarla desde la vista Global.',async()=>{
+      if(!puedeBorrar())return;
+      await fbUpdateMat(nombre,{deleted:true});
+      closeFolderScreen();showToast('🗑 Matrícula eliminada');
+    });
+  };
+};
+
 window.undoMat=async n=>{if(isAdmin)await fbUpdateMat(n,{deleted:false});};
 window.undoEntry=async(n,id)=>{if(isAdmin)await fbUpdateEntry(n,id,{deleted:false});};
-window.confirmDeleteMat=n=>showConfirm('⚠️ Borrar notas','¿Borrar todas las notas de '+n+'?',async()=>{if(!isAdmin)return;const k=findMatKey(n);const md=globalData[k];if(!md?.entries)return;const u={};Object.keys(getEntries(md)).forEach(eid=>{u[eid+'/deleted']=true;});await update(ref(db,'volaris_notas/'+k+'/entries'),u);});
-window.confirmDeleteAll=n=>showConfirm('🗑 Borrar matrícula','Elimina '+n+' y todas sus notas. ¿Continuar?',async()=>{if(isAdmin)await fbUpdateMat(n,{deleted:true});});
+window.confirmDeleteMat=n=>showConfirm('⚠️ Borrar notas','¿Borrar todas las notas de '+n+'?',async()=>{if(!puedeBorrar())return;const k=findMatKey(n);const md=globalData[k];if(!md?.entries)return;const u={};Object.keys(getEntries(md)).forEach(eid=>{u[eid+'/deleted']=true;});await update(ref(db,'volaris_notas/'+k+'/entries'),u);});
+window.confirmDeleteAll=n=>showConfirm('🗑 Borrar matrícula','Elimina '+n+' y todas sus notas. ¿Continuar?',async()=>{if(puedeBorrar())await fbUpdateMat(n,{deleted:true});});
 window.confirmDeleteEntry=(n,id)=>showConfirm('🗑 Borrar nota','¿Eliminar esta nota?',async()=>{if(puedeBorrar())await fbUpdateEntry(n,id,{deleted:true});});
 
 /* ══════════════════════════
