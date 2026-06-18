@@ -1510,10 +1510,16 @@ function renderFolders(filter=''){
   keys.forEach(k=>{
     const md=globalData[k],nombre=md?.nombre||k;
     const allE=Object.values(getEntries(md)).filter(e=>!e.deleted);
-    const pending=allE.filter(e=>!e.done),done=allE.filter(e=>e.done);
+    // Contar ítems individuales (igual que dentro de la matrícula)
+    let totalItems=0,doneItems=0;
+    allE.forEach(e=>{
+      if(e.items&&e.items.length){totalItems+=e.items.length;doneItems+=e.items.filter(it=>it.done).length;}
+      else{totalItems+=1;if(e.done)doneItems+=1;}
+    });
+    const pendingItemCount=totalItems-doneItems;
     const folder=document.createElement('div');folder.className='folder-item';
     const hdr=document.createElement('div');hdr.className='folder-header';
-    hdr.innerHTML=`<span class="folder-icon" style="transition:transform .25s;">›</span><span class="folder-mat">${nombre}</span>${pending.length?`<span class="folder-count" style="background:rgba(255,150,50,.15);color:#ffaa55;">${pending.length} pend.</span>`:''}${done.length?`<span class="folder-count" style="background:rgba(60,200,80,.1);color:#55ee88;">${done.length} hechos</span>`:''}`;
+    hdr.innerHTML=`<span class="folder-icon" style="transition:transform .25s;">›</span><span class="folder-mat">${nombre}</span>${pendingItemCount?`<span class="folder-count" style="background:rgba(255,150,50,.15);color:#ffaa55;">${pendingItemCount} pend.</span>`:''}${doneItems?`<span class="folder-count" style="background:rgba(60,200,80,.1);color:#55ee88;">${doneItems} hechos</span>`:''}`;
     hdr.addEventListener('click',()=>openFolderScreen(k));
     folder.appendChild(hdr);
     list.appendChild(folder);

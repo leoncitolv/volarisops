@@ -836,8 +836,77 @@
     }
 
     /* ════════════════════════════════════════
-       RESPONSIVE
+       AERONAVE CARDS (multi)
        ════════════════════════════════════════ */
+    .aeronave-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 16px;
+      position: relative;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .aeronave-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .aeronave-card-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--accent-light);
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-remove-aeronave {
+      background: rgba(255,59,48,0.15);
+      border: 1.5px solid rgba(255,59,48,0.4);
+      color: #ff3b30;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-remove-aeronave:hover {
+      background: rgba(255,59,48,0.28);
+      border-color: #ff3b30;
+    }
+
+    /* Badge número de aeronave */
+    .aeronave-num-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #aa22ff, #cc55ff);
+      color: white;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    /* Pendientes globales */
+    .pendientes-global-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+
     @media (max-width: 768px) {
       .container {
         padding: 16px;
@@ -929,38 +998,19 @@
             </div>
           </div>
           
-          <div class="form-group">
-            <label class="form-label">Matrícula de Aeronave</label>
-            <div class="input-wrapper">
-              <span class="input-icon">✈️</span>
-              <input type="text" id="reportMatricula" placeholder="Ej: N12345" required>
-            </div>
-          </div>
+        </div>
+
+        <!-- AERONAVES (multi) -->
+        <div id="aeronaves-container"></div>
+
+        <div style="margin-bottom: 24px;">
+          <button type="button" class="btn btn-secondary" style="width:100%; justify-content:center;" onclick="agregarAeronave()">
+            ➕ Agregar otra aeronave
+          </button>
         </div>
         
-        
-        <!-- ACTIVIDADES -->
-        <div class="form-section">
-          <div class="form-title">✨ Actividades Realizadas</div>
-          <div class="form-group">
-            <label class="form-label">Describe lo que hiciste hoy</label>
-            <textarea id="reportActividades" placeholder="Presiona Enter para agregar viñetas automáticas 🔹" required></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">📷 Fotos de Actividades</label>
-            <div class="foto-upload-area" onclick="document.getElementById('fotosActividades').click()">
-              <label class="foto-upload-label">
-                <span>📸</span> Tomar foto o elegir de galería
-              </label>
-              <input type="file" id="fotosActividades" accept="image/*" multiple
-                onchange="previsualizarFotos(event, 'previewActividades')">
-            </div>
-            <div class="fotos-preview" id="previewActividades"></div>
-          </div>
-        </div>
-        
-        <!-- PENDIENTES -->
-        <div class="form-section">
+        <!-- PENDIENTES GLOBALES -->
+        <div class="pendientes-global-section">
           <div class="form-title">⚠️ Pendientes para el Siguiente Turno</div>
           <div class="form-group">
             <label class="form-label">¿Qué falta por hacer?</label>
@@ -973,12 +1023,12 @@
                 <span>📸</span> Tomar foto o elegir de galería
               </label>
               <input type="file" id="fotosPendientes" accept="image/*" multiple
-                onchange="previsualizarFotos(event, 'previewPendientes')">
+                onchange="previsualizarFotos(event, 'previewPendientes', 'pendientes-global')">
             </div>
             <div class="fotos-preview" id="previewPendientes"></div>
           </div>
         </div>
-        
+
         <!-- PERSONAL -->
         <div class="form-section">
           <div class="form-group">
@@ -1032,39 +1082,26 @@
             <input type="time" id="editHora" required>
           </div>
         </div>
-        
-        <div class="form-group">
-          <label class="form-label">Matrícula</label>
-          <div class="input-wrapper">
-            <span class="input-icon">✈️</span>
-            <input type="text" id="editMatricula" required>
-          </div>
+
+        <!-- Aeronaves dinámicas en el modal -->
+        <div id="editAeronavesContainer"></div>
+
+        <div style="margin-bottom:20px;">
+          <button type="button" class="btn btn-secondary" style="width:100%;justify-content:center;" onclick="editAgregarAeronave()">
+            ➕ Agregar otra aeronave
+          </button>
         </div>
         
         <div class="form-group">
-          <label class="form-label">Actividades Realizadas</label>
-          <textarea id="editActividades" placeholder="Presiona Enter para agregar viñetas automáticas 🔹" required></textarea>
-          <label class="form-label" style="margin-top:14px;">📷 Fotos de Actividades</label>
-          <div class="foto-upload-area" onclick="document.getElementById('editFotosActividades').click()">
-            <label class="foto-upload-label">
-              <span>📸</span> Tomar foto o elegir de galería
-            </label>
-            <input type="file" id="editFotosActividades" accept="image/*" multiple
-              onchange="previsualizarFotosModal(event, 'editPreviewActividades', 'actividades')">
-          </div>
-          <div class="fotos-preview" id="editPreviewActividades"></div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">Pendientes</label>
+          <label class="form-label">⚠️ Pendientes</label>
           <textarea id="editPendientes"></textarea>
           <label class="form-label" style="margin-top:14px;">📷 Fotos de Pendientes</label>
-          <div class="foto-upload-area" onclick="document.getElementById('editFotosPendientes').click()">
+          <div class="foto-upload-area" onclick="document.getElementById('editFotosPendientesInput').click()">
             <label class="foto-upload-label">
               <span>📸</span> Tomar foto o elegir de galería
             </label>
-            <input type="file" id="editFotosPendientes" accept="image/*" multiple
-              onchange="previsualizarFotosModal(event, 'editPreviewPendientes', 'pendientes')">
+            <input type="file" id="editFotosPendientesInput" accept="image/*" multiple
+              onchange="editSubirFotosPendientes(event)">
           </div>
           <div class="fotos-preview" id="editPreviewPendientes"></div>
         </div>
@@ -1097,11 +1134,11 @@
     // ════════════════════════════════════════
     document.addEventListener('DOMContentLoaded', () => {
       setFechaActual();
+      inicializarAeronaves();
       cargarReportes();
       precargarDesdeURL();
     });
 
-    // Precarga matrícula y pendientes si vienen desde Volaris Ops
     function precargarDesdeURL() {
       const params = new URLSearchParams(window.location.search);
       const matricula = params.get('matricula');
@@ -1109,7 +1146,11 @@
       let hayDatos = false;
 
       if (matricula) {
-        document.getElementById('reportMatricula').value = matricula;
+        const matInput = document.getElementById('mat-0');
+        if (matInput) {
+          matInput.value = matricula;
+          syncAeronaveField(0, 'matricula', matricula);
+        }
         hayDatos = true;
       }
       if (pendientes) {
@@ -1121,34 +1162,17 @@
       }
 
       if (hayDatos) {
-        // Asegurarse de estar en la pestaña de nuevo reporte
         document.querySelector('[onclick*="\'nuevo\'"]')?.click();
-        // Limpiar la URL para que no se vuelva a precargar al recargar/guardar
         history.replaceState(null, '', window.location.pathname);
       }
     }
     
-    // Establecer fecha actual
     function setFechaActual() {
       const hoy = new Date().toISOString().split('T')[0];
       document.getElementById('reportFecha').value = hoy;
       
       const horaActual = new Date().toTimeString().slice(0, 5);
       document.getElementById('reportHora').value = horaActual;
-      
-      // Agregar funcionalidad de auto-emoji en Actividades
-      const textareaActividades = document.getElementById('reportActividades');
-      textareaActividades.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const cursorPos = textareaActividades.selectionStart;
-          const antes = textareaActividades.value.substring(0, cursorPos);
-          const despues = textareaActividades.value.substring(cursorPos);
-          
-          textareaActividades.value = antes + '\n🔹 ' + despues;
-          textareaActividades.selectionStart = textareaActividades.selectionEnd = cursorPos + 3;
-        }
-      });
       
       // Mismo para el modal de edición
       const textareaEditar = document.getElementById('editActividades');
@@ -1188,15 +1212,142 @@
     }
     
     // ════════════════════════════════════════
+    // AERONAVES MÚLTIPLES
+    // ════════════════════════════════════════
+    let aeronavesData = []; // [{id, matricula, actividades, fotosActividades}]
+    let nextAeronaveId = 0;
+    let fotosPendientes = []; // global
+
+    function inicializarAeronaves() {
+      aeronavesData = [];
+      nextAeronaveId = 0;
+      document.getElementById('aeronaves-container').innerHTML = '';
+      agregarAeronave();
+    }
+
+    function agregarAeronave(datos = null) {
+      const id = nextAeronaveId++;
+      const numeral = aeronavesData.length + 1;
+      const obj = { id, matricula: datos?.matricula || '', actividades: datos?.actividades || '', fotos: datos?.fotos || [] };
+      aeronavesData.push(obj);
+
+      const container = document.getElementById('aeronaves-container');
+      const card = document.createElement('div');
+      card.className = 'aeronave-card';
+      card.id = `aeronave-card-${id}`;
+      card.innerHTML = `
+        <div class="aeronave-card-header">
+          <div class="aeronave-card-title">
+            <span class="aeronave-num-badge">${numeral}</span>
+            ✈️ Aeronave
+          </div>
+          ${aeronavesData.length > 1 ? `<button type="button" class="btn-remove-aeronave" onclick="removerAeronave(${id})">✕ Quitar</button>` : ''}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Matrícula</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🛩️</span>
+            <input type="text" id="mat-${id}" placeholder="Ej: XA-VRO"
+              value="${datos?.matricula || ''}"
+              oninput="syncAeronaveField(${id},'matricula',this.value)" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">✨ Actividades Realizadas</label>
+          <textarea id="act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
+            oninput="syncAeronaveField(${id},'actividades',this.value)" required>${datos?.actividades || ''}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">📷 Fotos de Actividades</label>
+          <div class="foto-upload-area" onclick="document.getElementById('fotos-input-${id}').click()">
+            <label class="foto-upload-label">
+              <span>📸</span> Tomar foto o elegir de galería
+            </label>
+            <input type="file" id="fotos-input-${id}" accept="image/*" multiple
+              onchange="previsualizarFotos(event, 'preview-${id}', 'aeronave-${id}')">
+          </div>
+          <div class="fotos-preview" id="preview-${id}"></div>
+        </div>
+      `;
+      container.appendChild(card);
+
+      // Auto-emoji en Enter
+      const ta = document.getElementById(`act-${id}`);
+      ta.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const pos = ta.selectionStart;
+          const antes = ta.value.substring(0, pos);
+          const despues = ta.value.substring(pos);
+          ta.value = antes + '\n🔹 ' + despues;
+          ta.selectionStart = ta.selectionEnd = pos + 3;
+          syncAeronaveField(id, 'actividades', ta.value);
+        }
+      });
+
+      // Si hay fotos pre-cargadas (modo edición futura), renderizarlas
+      if (datos?.fotos?.length) {
+        const preview = document.getElementById(`preview-${id}`);
+        datos.fotos.forEach((url, idx) => {
+          preview.innerHTML += `
+            <div class="foto-thumb-wrapper" data-tipo="aeronave-${id}" data-idx="${idx}">
+              <img src="${url}" onclick="abrirLightbox('${url}')">
+              <button class="foto-thumb-delete" onclick="eliminarFotoPreview(this)">✕</button>
+            </div>`;
+        });
+      }
+
+      actualizarNumerales();
+      actualizarBotonesRemover();
+    }
+
+    function removerAeronave(id) {
+      const idx = aeronavesData.findIndex(a => a.id === id);
+      if (idx === -1) return;
+      aeronavesData.splice(idx, 1);
+      document.getElementById(`aeronave-card-${id}`)?.remove();
+      actualizarNumerales();
+      actualizarBotonesRemover();
+    }
+
+    function syncAeronaveField(id, field, value) {
+      const obj = aeronavesData.find(a => a.id === id);
+      if (obj) obj[field] = value;
+    }
+
+    function actualizarNumerales() {
+      aeronavesData.forEach((a, i) => {
+        const badge = document.querySelector(`#aeronave-card-${a.id} .aeronave-num-badge`);
+        if (badge) badge.textContent = i + 1;
+      });
+    }
+
+    function actualizarBotonesRemover() {
+      document.querySelectorAll('.btn-remove-aeronave').forEach(b => b.remove());
+      if (aeronavesData.length > 1) {
+        aeronavesData.forEach(a => {
+          const header = document.querySelector(`#aeronave-card-${a.id} .aeronave-card-header`);
+          if (header && !header.querySelector('.btn-remove-aeronave')) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-remove-aeronave';
+            btn.textContent = '✕ Quitar';
+            btn.onclick = () => removerAeronave(a.id);
+            header.appendChild(btn);
+          }
+        });
+      }
+    }
+
+    // ════════════════════════════════════════
     // FOTOS — Cloudinary (URLs, sin base64)
     // ════════════════════════════════════════
     const CLD_CLOUD  = 'dwjqvivzl';
     const CLD_PRESET = 'volops_fotos';
 
-    let fotosActividades = []; // array de URLs públicas
-    let fotosPendientes  = []; // array de URLs públicas
+    let fotosActividades = []; // legacy — ya no se usa en el form principal
 
-    // ── Subir a Cloudinary via upload preset (sin firma) ──
+
     async function subirACloudinary(file) {
       const fd = new FormData();
       fd.append('file', file);
@@ -1212,28 +1363,36 @@
       return data.secure_url;
     }
 
-    async function previsualizarFotos(event, previewId) {
+    async function previsualizarFotos(event, previewId, contexto) {
       const files = Array.from(event.target.files);
       const preview = document.getElementById(previewId);
-      const esActividades = previewId === 'previewActividades';
-      const arr = esActividades ? fotosActividades : fotosPendientes;
+
+      const getArr = () => {
+        if (contexto === 'pendientes-global') return fotosPendientes;
+        if (contexto?.startsWith('aeronave-')) {
+          const aid = parseInt(contexto.replace('aeronave-', ''));
+          const obj = aeronavesData.find(a => a.id === aid);
+          return obj ? obj.fotos : [];
+        }
+        return fotosPendientes;
+      };
 
       for (const file of files) {
         const localUrl = URL.createObjectURL(file);
         const wrapper = document.createElement('div');
         wrapper.className = 'foto-thumb-wrapper';
-        wrapper.dataset.tipo = esActividades ? 'actividades' : 'pendientes';
+        wrapper.dataset.tipo = contexto;
+        preview.appendChild(wrapper);
         wrapper.innerHTML = `
           <img src="${localUrl}" style="opacity:0.5;">
           <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:900;color:#fff;text-align:center;background:rgba(0,0,0,0.35);">⬆ Subiendo…</div>
         `;
-        preview.appendChild(wrapper);
 
         try {
           const url = await subirACloudinary(file);
+          const arr = getArr();
           arr.push(url);
-          const idx = arr.length - 1;
-          wrapper.dataset.idx = idx;
+          wrapper.dataset.idx = arr.length - 1;
           wrapper.innerHTML = `
             <img src="${url}" onclick="abrirLightbox('${url}')">
             <button class="foto-thumb-delete" onclick="eliminarFotoPreview(this)">✕</button>
@@ -1251,12 +1410,19 @@
     function eliminarFotoPreview(btn) {
       const wrapper = btn.parentElement;
       const idx = parseInt(wrapper.dataset.idx);
-      const tipo = wrapper.dataset.tipo;
-      if (tipo === 'actividades') fotosActividades.splice(idx, 1);
-      else fotosPendientes.splice(idx, 1);
-      wrapper.remove();
-      const preview = document.getElementById(tipo === 'actividades' ? 'previewActividades' : 'previewPendientes');
-      preview.querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+      const contexto = wrapper.dataset.tipo;
+
+      if (contexto === 'pendientes-global') {
+        fotosPendientes.splice(idx, 1);
+        wrapper.remove();
+        document.getElementById('previewPendientes')?.querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+      } else if (contexto?.startsWith('aeronave-')) {
+        const aid = parseInt(contexto.replace('aeronave-', ''));
+        const obj = aeronavesData.find(a => a.id === aid);
+        if (obj) obj.fotos.splice(idx, 1);
+        wrapper.remove();
+        document.getElementById(`preview-${aid}`)?.querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+      }
     }
 
     function abrirLightbox(src) {
@@ -1273,38 +1439,57 @@
     // ════════════════════════════════════════
     function guardarReporte(e) {
       e.preventDefault();
-      
-      // Crear objeto reporte
+
+      // Sincronizar valores actuales de los textareas/inputs con aeronavesData
+      aeronavesData.forEach(a => {
+        const matInput = document.getElementById(`mat-${a.id}`);
+        const actInput = document.getElementById(`act-${a.id}`);
+        if (matInput) a.matricula = matInput.value.trim();
+        if (actInput) a.actividades = actInput.value.trim();
+      });
+
+      // Validar que todos los campos requeridos estén completos
+      for (const a of aeronavesData) {
+        if (!a.matricula || !a.actividades) {
+          mostrarToast('⚠️ Completa matrícula y actividades en todas las aeronaves', 'error');
+          return;
+        }
+      }
+
+      // Construir objeto reporte con array de aeronaves
       const reporte = {
         id: Date.now(),
         fecha: document.getElementById('reportFecha').value,
         hora: document.getElementById('reportHora').value,
-        matricula: document.getElementById('reportMatricula').value,
-        actividades: document.getElementById('reportActividades').value,
+        // Compatibilidad legacy: primera matrícula como matricula principal
+        matricula: aeronavesData.map(a => a.matricula).join(', '),
+        aeronaves: aeronavesData.map(a => ({
+          matricula: a.matricula,
+          actividades: a.actividades,
+          fotosActividades: [...a.fotos]
+        })),
         pendientes: document.getElementById('reportPendientes').value,
         personal: document.getElementById('reportPersonal').value,
-        fotosActividades: [...fotosActividades],
         fotosPendientes: [...fotosPendientes],
         timestamp: new Date().toLocaleString('es-MX')
       };
-      
+
       // Guardar en localStorage
       let reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
       reportes.unshift(reporte);
       localStorage.setItem('reportesTurno', JSON.stringify(reportes));
-      
-      // Limpiar y mostrar confirmación
-      document.getElementById('formReporte').reset();
-      fotosActividades = [];
-      fotosPendientes  = [];
-      document.getElementById('previewActividades').innerHTML = '';
+
+      // Limpiar
+      fotosPendientes = [];
       document.getElementById('previewPendientes').innerHTML = '';
+      document.getElementById('reportPendientes').value = '';
+      document.getElementById('reportPersonal').value = 'Laraclv';
+      inicializarAeronaves();
       setFechaActual();
       mostrarToast('✅ Reporte guardado exitosamente', 'success');
-      
-      // Cambiar a historial
+
       setTimeout(() => {
-        document.querySelector('[onclick="switchTab(event, \'historial\')"]').click();
+        document.querySelector('[onclick*="\'historial\'"]').click();
       }, 1000);
     }
     
@@ -1337,6 +1522,46 @@
     // ════════════════════════════════════════
     // CARGAR REPORTES
     // ════════════════════════════════════════
+    function totalFotosReporte(r) {
+      if (r.aeronaves) {
+        return r.aeronaves.reduce((sum, a) => sum + (a.fotosActividades?.length || 0), 0) + (r.fotosPendientes?.length || 0);
+      }
+      return (r.fotosActividades?.length || 0) + (r.fotosPendientes?.length || 0);
+    }
+
+    function renderAeronavesHistorial(r) {
+      // Nuevo formato: array de aeronaves
+      if (r.aeronaves && r.aeronaves.length) {
+        return r.aeronaves.map((a, idx) => `
+          <div class="report-field" style="${idx > 0 ? 'margin-top:12px; padding-top:12px; border-top:1px solid var(--border);' : ''}">
+            <div class="report-label">✈️ Aeronave ${r.aeronaves.length > 1 ? idx + 1 + ' — ' : ''}${a.matricula}</div>
+            ${formatearActividades(a.actividades)}
+            ${a.fotosActividades?.length ? `
+              <div class="report-fotos">
+                ${a.fotosActividades.map(src => `
+                  <img class="report-foto-thumb" src="${src}" onclick="event.stopPropagation(); abrirLightbox('${src}')" alt="Foto actividad">
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      }
+      // Legado: un solo campo de matricula + actividades
+      return `
+        <div class="report-field">
+          <div class="report-label">✨ Actividades</div>
+          ${formatearActividades(r.actividades)}
+          ${r.fotosActividades?.length ? `
+            <div class="report-fotos">
+              ${r.fotosActividades.map(src => `
+                <img class="report-foto-thumb" src="${src}" onclick="event.stopPropagation(); abrirLightbox('${src}')" alt="Foto actividad">
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
     function cargarReportes() {
       const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
       const container = document.getElementById('reportsContainer');
@@ -1352,38 +1577,29 @@
         return;
       }
       
-      container.innerHTML = reportes.map(r => `
+      container.innerHTML = reportes.map(r => {
+        const numAeronaves = r.aeronaves ? r.aeronaves.length : 1;
+        const totalFotos = totalFotosReporte(r);
+        return `
         <div class="report-card" onclick="toggleReporte(this)">
           <div class="report-header">
             <div>
-              <div class="report-title">✈️ ${r.matricula}</div>
+              <div class="report-title">✈️ ${r.matricula}${numAeronaves > 1 ? ` <span style="font-size:12px;color:var(--accent-light);font-weight:700;">(${numAeronaves} aeronaves)</span>` : ''}</div>
               <div class="report-date">${r.fecha} • ${r.hora}
-                ${(r.fotosActividades?.length || 0) + (r.fotosPendientes?.length || 0) > 0
-                  ? `<span class="foto-count-badge">📷 ${(r.fotosActividades?.length||0)+(r.fotosPendientes?.length||0)} foto(s)</span>`
-                  : ''}
+                ${totalFotos > 0 ? `<span class="foto-count-badge">📷 ${totalFotos} foto(s)</span>` : ''}
               </div>
             </div>
             <div class="report-badge">Guardado</div>
           </div>
           
           <div class="report-content">
-            <div class="report-field">
-              <div class="report-label">✨ Actividades</div>
-              ${formatearActividades(r.actividades)}
-              ${r.fotosActividades && r.fotosActividades.length ? `
-                <div class="report-fotos">
-                  ${r.fotosActividades.map(src => `
-                    <img class="report-foto-thumb" src="${src}" onclick="event.stopPropagation(); abrirLightbox('${src}')" alt="Foto actividad">
-                  `).join('')}
-                </div>
-              ` : ''}
-            </div>
+            ${renderAeronavesHistorial(r)}
             
             ${r.pendientes ? `
-              <div class="report-field">
+              <div class="report-field" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
                 <div class="report-label">⚠️ Pendientes</div>
                 <div class="report-value">${r.pendientes}</div>
-                ${r.fotosPendientes && r.fotosPendientes.length ? `
+                ${r.fotosPendientes?.length ? `
                   <div class="report-fotos">
                     ${r.fotosPendientes.map(src => `
                       <img class="report-foto-thumb" src="${src}" onclick="event.stopPropagation(); abrirLightbox('${src}')" alt="Foto pendiente">
@@ -1393,7 +1609,7 @@
               </div>
             ` : ''}
             
-            <div class="report-field">
+            <div class="report-field" style="margin-top:12px;">
               <div class="report-label">👤 Personal</div>
               <div class="report-value">${r.personal}</div>
             </div>
@@ -1414,7 +1630,7 @@
             </div>
           </div>
         </div>
-      `).join('');
+      `}).join('');
     }
     
     // ════════════════════════════════════════
@@ -1425,6 +1641,53 @@
     }
     
     // ════════════════════════════════════════
+    // TEXTO DEL REPORTE (multi-aeronave)
+    // ════════════════════════════════════════
+    function generarTextoReporte(reporte, incluirFotos = false) {
+      const aeronaves = reporte.aeronaves || [{
+        matricula: reporte.matricula,
+        actividades: reporte.actividades,
+        fotosActividades: reporte.fotosActividades || []
+      }];
+
+      const bloques = aeronaves.map(a => {
+        let bloque = `✈️ *Aeronave: ${a.matricula}*\n`;
+        if (a.actividades) {
+          a.actividades.split('\n').filter(l => l.trim()).forEach(l => {
+            bloque += `• ${l.replace(/^[🔹🔸▪️•\-*\s]+/, '')}\n`;
+          });
+        }
+        if (incluirFotos && a.fotosActividades?.length) {
+          a.fotosActividades.forEach((url, i) => {
+            bloque += `📷 Foto actividad ${i+1}: ${url}\n`;
+          });
+        }
+        return bloque.trim();
+      }).join('\n\n');
+
+      const pendientesBloque = reporte.pendientes
+        ? `\n⚠️ *PENDIENTES:*\n${reporte.pendientes}`
+        : '';
+
+      const fotasPendBloque = (incluirFotos && reporte.fotosPendientes?.length)
+        ? '\n' + reporte.fotosPendientes.map((url, i) => `📷 Pendiente ${i+1}: ${url}`).join('\n')
+        : '';
+
+      return `📋 *REPORTE DE TURNO*
+━━━━━━━━━━━━━━━━━━━━━
+📅 *Fecha:* ${reporte.fecha}
+🕐 *Hora:* ${reporte.hora}
+━━━━━━━━━━━━━━━━━━━━━
+
+${bloques}${pendientesBloque}${fotasPendBloque}
+
+━━━━━━━━━━━━━━━━━━━━━
+👤 *Personal:* ${reporte.personal}
+✅ *Estatus:* Finalizado y verificado
+━━━━━━━━━━━━━━━━━━━━━`.trim();
+    }
+
+    // ════════════════════════════════════════
     // COPIAR A PORTAPAPELES
     // ════════════════════════════════════════
     function copiarAlPortapapeles(e, id) {
@@ -1432,30 +1695,9 @@
       
       const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
       const reporte = reportes.find(r => r.id === id);
-      
       if (!reporte) return;
       
-      // Formato para WhatsApp
-      const texto = `
-📋 *REPORTE DE TURNO*
-━━━━━━━━━━━━━━━━━━━━━
-📅 *Fecha:* ${reporte.fecha}
-🕐 *Hora:* ${reporte.hora}
-✈️ *Aeronave:* ${reporte.matricula}
-━━━━━━━━━━━━━━━━━━━━━
-
-✨ *ACTIVIDADES:*
-${reporte.actividades}
-
-${reporte.pendientes ? `⚠️ *PENDIENTES:*
-${reporte.pendientes}` : ''}
-
-━━━━━━━━━━━━━━━━━━━━━
-👤 *Personal:* ${reporte.personal}
-✅ *Estatus:* Finalizado y verificado
-━━━━━━━━━━━━━━━━━━━━━
-`.trim();
-      
+      const texto = generarTextoReporte(reporte, false);
       navigator.clipboard.writeText(texto).then(() => {
         mostrarToast('✅ Copiado al portapapeles', 'success');
       }).catch(() => {
@@ -1473,32 +1715,7 @@ ${reporte.pendientes}` : ''}
       const reporte = reportes.find(r => r.id === id);
       if (!reporte) return;
 
-      const totalFotos = (reporte.fotosActividades?.length || 0) + (reporte.fotosPendientes?.length || 0);
-
-      // Construir lista de URLs de fotos
-      const urlsFotos = [
-        ...(reporte.fotosActividades || []).map((url, i) => `📷 Actividad ${i+1}: ${url}`),
-        ...(reporte.fotosPendientes  || []).map((url, i) => `📷 Pendiente ${i+1}: ${url}`)
-      ];
-
-      const texto = `📋 *REPORTE DE TURNO*
-━━━━━━━━━━━━━━━━━━━━━
-📅 *Fecha:* ${reporte.fecha}
-🕐 *Hora:* ${reporte.hora}
-✈️ *Aeronave:* ${reporte.matricula}
-━━━━━━━━━━━━━━━━━━━━━
-
-✨ *ACTIVIDADES:*
-${reporte.actividades}
-
-${reporte.pendientes ? `⚠️ *PENDIENTES:\n${reporte.pendientes}` : ''}
-
-━━━━━━━━━━━━━━━━━━━━━
-👤 *Personal:* ${reporte.personal}
-✅ *Estatus:* Finalizado y verificado
-${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
-━━━━━━━━━━━━━━━━━━━━━`.trim();
-
+      const texto = generarTextoReporte(reporte, true);
       const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
       window.open(url, '_blank');
     }
@@ -1522,142 +1739,288 @@ ${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
     }
     
     // ════════════════════════════════════════
-    // EDITAR REPORTE
+    // EDITAR REPORTE — sistema multi-aeronave
     // ════════════════════════════════════════
     let reporteEditando = null;
-    let editFotosActividades = [];
-    let editFotosPendientes  = [];
+    let editAeronavesData = [];   // [{id, matricula, actividades, fotos}]
+    let editNextId = 0;
+    let editFotosPendientes = [];
 
-    async function previsualizarFotosModal(event, previewId, tipo) {
+    function editAgregarAeronave(datos = null) {
+      const id = editNextId++;
+      const numeral = editAeronavesData.length + 1;
+      const obj = { id, matricula: datos?.matricula || '', actividades: datos?.actividades || '', fotos: datos?.fotos || [] };
+      editAeronavesData.push(obj);
+
+      const container = document.getElementById('editAeronavesContainer');
+      const card = document.createElement('div');
+      card.className = 'aeronave-card';
+      card.id = `edit-aeronave-card-${id}`;
+      card.innerHTML = `
+        <div class="aeronave-card-header">
+          <div class="aeronave-card-title">
+            <span class="aeronave-num-badge edit-num-${id}">${numeral}</span>
+            ✈️ Aeronave
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Matrícula</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🛩️</span>
+            <input type="text" id="edit-mat-${id}" placeholder="Ej: XA-VRO"
+              value="${obj.matricula}"
+              oninput="editSyncField(${id},'matricula',this.value)" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">✨ Actividades Realizadas</label>
+          <textarea id="edit-act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
+            oninput="editSyncField(${id},'actividades',this.value)">${obj.actividades}</textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">📷 Fotos de Actividades</label>
+          <div class="foto-upload-area" onclick="document.getElementById('edit-fotos-input-${id}').click()">
+            <label class="foto-upload-label"><span>📸</span> Tomar foto o elegir de galería</label>
+            <input type="file" id="edit-fotos-input-${id}" accept="image/*" multiple
+              onchange="editSubirFotosAeronave(event, ${id})">
+          </div>
+          <div class="fotos-preview" id="edit-preview-${id}"></div>
+        </div>
+      `;
+      container.appendChild(card);
+
+      // Renderizar fotos existentes
+      if (obj.fotos.length) {
+        const preview = document.getElementById(`edit-preview-${id}`);
+        obj.fotos.forEach((url, idx) => {
+          preview.innerHTML += `
+            <div class="foto-thumb-wrapper" data-tipo="edit-aeronave-${id}" data-idx="${idx}">
+              <img src="${url}" onclick="abrirLightbox('${url}')">
+              <button class="foto-thumb-delete" onclick="editEliminarFoto(this)">✕</button>
+            </div>`;
+        });
+      }
+
+      // Auto-emoji Enter
+      const ta = document.getElementById(`edit-act-${id}`);
+      ta.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const pos = ta.selectionStart;
+          ta.value = ta.value.substring(0, pos) + '\n🔹 ' + ta.value.substring(pos);
+          ta.selectionStart = ta.selectionEnd = pos + 3;
+          editSyncField(id, 'actividades', ta.value);
+        }
+      });
+
+      editActualizarNumeralesYBotones();
+    }
+
+    function editSyncField(id, field, value) {
+      const obj = editAeronavesData.find(a => a.id === id);
+      if (obj) obj[field] = value;
+    }
+
+    function editRemoverAeronave(id) {
+      const idx = editAeronavesData.findIndex(a => a.id === id);
+      if (idx === -1) return;
+      editAeronavesData.splice(idx, 1);
+      document.getElementById(`edit-aeronave-card-${id}`)?.remove();
+      editActualizarNumeralesYBotones();
+    }
+
+    function editActualizarNumeralesYBotones() {
+      // Actualizar numerales
+      editAeronavesData.forEach((a, i) => {
+        const badge = document.querySelector(`.edit-num-${a.id}`);
+        if (badge) badge.textContent = i + 1;
+      });
+      // Botones quitar: solo si hay más de 1
+      document.querySelectorAll('#editAeronavesContainer .btn-remove-aeronave').forEach(b => b.remove());
+      if (editAeronavesData.length > 1) {
+        editAeronavesData.forEach(a => {
+          const header = document.querySelector(`#edit-aeronave-card-${a.id} .aeronave-card-header`);
+          if (header) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-remove-aeronave';
+            btn.textContent = '✕ Quitar';
+            btn.onclick = () => editRemoverAeronave(a.id);
+            header.appendChild(btn);
+          }
+        });
+      }
+    }
+
+    async function editSubirFotosAeronave(event, aeronaveId) {
       const files = Array.from(event.target.files);
-      const preview = document.getElementById(previewId);
-      const arr = tipo === 'actividades' ? editFotosActividades : editFotosPendientes;
+      const obj = editAeronavesData.find(a => a.id === aeronaveId);
+      const preview = document.getElementById(`edit-preview-${aeronaveId}`);
+      if (!obj || !preview) return;
 
       for (const file of files) {
         const localUrl = URL.createObjectURL(file);
         const wrapper = document.createElement('div');
         wrapper.className = 'foto-thumb-wrapper';
-        wrapper.dataset.tipo = `edit-${tipo}`;
-        wrapper.innerHTML = `
-          <img src="${localUrl}" style="opacity:0.5;">
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:900;color:#fff;text-align:center;background:rgba(0,0,0,0.35);">⬆ Subiendo…</div>
-        `;
+        wrapper.dataset.tipo = `edit-aeronave-${aeronaveId}`;
         preview.appendChild(wrapper);
-
+        wrapper.innerHTML = `<img src="${localUrl}" style="opacity:0.5;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:900;color:#fff;text-align:center;background:rgba(0,0,0,0.35);">⬆ Subiendo…</div>`;
         try {
           const url = await subirACloudinary(file);
-          arr.push(url);
-          const idx = arr.length - 1;
-          wrapper.dataset.idx = idx;
-          wrapper.innerHTML = `
-            <img src="${url}" onclick="abrirLightbox('${url}')">
-            <button class="foto-thumb-delete" onclick="eliminarFotoModalPreview(this)">✕</button>
-          `;
+          obj.fotos.push(url);
+          wrapper.dataset.idx = obj.fotos.length - 1;
+          wrapper.innerHTML = `<img src="${url}" onclick="abrirLightbox('${url}')"><button class="foto-thumb-delete" onclick="editEliminarFoto(this)">✕</button>`;
           URL.revokeObjectURL(localUrl);
         } catch(err) {
-          console.error('Error subiendo foto:', err);
           wrapper.remove();
-          mostrarToast('❌ Error al subir foto. Verifica tu conexión.', 'error');
+          mostrarToast('❌ Error al subir foto', 'error');
         }
       }
       event.target.value = '';
     }
 
-    function eliminarFotoModalPreview(btn) {
+    async function editSubirFotosPendientes(event) {
+      const files = Array.from(event.target.files);
+      const preview = document.getElementById('editPreviewPendientes');
+      for (const file of files) {
+        const localUrl = URL.createObjectURL(file);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'foto-thumb-wrapper';
+        wrapper.dataset.tipo = 'edit-pendientes';
+        preview.appendChild(wrapper);
+        wrapper.innerHTML = `<img src="${localUrl}" style="opacity:0.5;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:900;color:#fff;text-align:center;background:rgba(0,0,0,0.35);">⬆ Subiendo…</div>`;
+        try {
+          const url = await subirACloudinary(file);
+          editFotosPendientes.push(url);
+          wrapper.dataset.idx = editFotosPendientes.length - 1;
+          wrapper.innerHTML = `<img src="${url}" onclick="abrirLightbox('${url}')"><button class="foto-thumb-delete" onclick="editEliminarFoto(this)">✕</button>`;
+          URL.revokeObjectURL(localUrl);
+        } catch(err) {
+          wrapper.remove();
+          mostrarToast('❌ Error al subir foto', 'error');
+        }
+      }
+      event.target.value = '';
+    }
+
+    function editEliminarFoto(btn) {
       const wrapper = btn.parentElement;
       const idx = parseInt(wrapper.dataset.idx);
       const tipo = wrapper.dataset.tipo;
-      if (tipo === 'edit-actividades') editFotosActividades.splice(idx, 1);
-      else editFotosPendientes.splice(idx, 1);
-      wrapper.remove();
-      const previewId = tipo === 'edit-actividades' ? 'editPreviewActividades' : 'editPreviewPendientes';
-      document.getElementById(previewId).querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+      if (tipo === 'edit-pendientes') {
+        editFotosPendientes.splice(idx, 1);
+        wrapper.remove();
+        document.getElementById('editPreviewPendientes')?.querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+      } else if (tipo?.startsWith('edit-aeronave-')) {
+        const aid = parseInt(tipo.replace('edit-aeronave-', ''));
+        const obj = editAeronavesData.find(a => a.id === aid);
+        if (obj) obj.fotos.splice(idx, 1);
+        wrapper.remove();
+        document.getElementById(`edit-preview-${aid}`)?.querySelectorAll('.foto-thumb-wrapper').forEach((w, i) => w.dataset.idx = i);
+      }
     }
-    
+
     function abrirModalEditar(e, id) {
       e.stopPropagation();
       
       const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
       const reporte = reportes.find(r => r.id === id);
-      
       if (!reporte) return;
       
       reporteEditando = id;
-      
-      // Llenar formulario con datos del reporte
+      editAeronavesData = [];
+      editNextId = 0;
+      editFotosPendientes = [...(reporte.fotosPendientes || [])];
+      document.getElementById('editAeronavesContainer').innerHTML = '';
+
+      // Llenar datos base
       document.getElementById('editFecha').value = reporte.fecha;
       document.getElementById('editHora').value = reporte.hora;
-      document.getElementById('editMatricula').value = reporte.matricula;
-      document.getElementById('editActividades').value = reporte.actividades;
-      document.getElementById('editPendientes').value = reporte.pendientes;
-      document.getElementById('editPersonal').value = reporte.personal;
+      document.getElementById('editPendientes').value = reporte.pendientes || '';
+      document.getElementById('editPersonal').value = reporte.personal || '';
 
-      // Inicializar arrays de fotos del modal con las fotos existentes
-      editFotosActividades = [...(reporte.fotosActividades || [])];
-      editFotosPendientes  = [...(reporte.fotosPendientes  || [])];
+      // Cargar aeronaves (nuevo formato o legado)
+      const aeronaves = reporte.aeronaves || [{
+        matricula: reporte.matricula || '',
+        actividades: reporte.actividades || '',
+        fotosActividades: reporte.fotosActividades || []
+      }];
 
-      // Renderizar fotos existentes en los previews del modal
-      const previewAct = document.getElementById('editPreviewActividades');
-      const previewPen = document.getElementById('editPreviewPendientes');
-      previewAct.innerHTML = '';
-      previewPen.innerHTML = '';
-
-      editFotosActividades.forEach((url, idx) => {
-        previewAct.innerHTML += `
-          <div class="foto-thumb-wrapper" data-tipo="edit-actividades" data-idx="${idx}">
-            <img src="${url}" onclick="abrirLightbox('${url}')">
-            <button class="foto-thumb-delete" onclick="eliminarFotoModalPreview(this)">✕</button>
-          </div>`;
+      aeronaves.forEach(a => {
+        editAgregarAeronave({
+          matricula: a.matricula,
+          actividades: a.actividades,
+          fotos: a.fotosActividades || []
+        });
       });
+
+      // Fotos pendientes
+      const previewPen = document.getElementById('editPreviewPendientes');
+      previewPen.innerHTML = '';
       editFotosPendientes.forEach((url, idx) => {
         previewPen.innerHTML += `
           <div class="foto-thumb-wrapper" data-tipo="edit-pendientes" data-idx="${idx}">
             <img src="${url}" onclick="abrirLightbox('${url}')">
-            <button class="foto-thumb-delete" onclick="eliminarFotoModalPreview(this)">✕</button>
+            <button class="foto-thumb-delete" onclick="editEliminarFoto(this)">✕</button>
           </div>`;
       });
 
-      // Abrir modal
       document.getElementById('modalEditar').classList.add('active');
     }
     
     function cerrarModal() {
       document.getElementById('modalEditar').classList.remove('active');
       reporteEditando = null;
+      editAeronavesData = [];
+      editNextId = 0;
+      editFotosPendientes = [];
+      document.getElementById('editAeronavesContainer').innerHTML = '';
+      document.getElementById('editPreviewPendientes').innerHTML = '';
       document.getElementById('formEditar').reset();
-      editFotosActividades = [];
-      editFotosPendientes  = [];
-      document.getElementById('editPreviewActividades').innerHTML = '';
-      document.getElementById('editPreviewPendientes').innerHTML  = '';
     }
     
     function guardarEdicion(e) {
       e.preventDefault();
-      
       if (!reporteEditando) return;
 
-      // Actualizar en localStorage
+      // Sincronizar valores actuales de inputs con editAeronavesData
+      editAeronavesData.forEach(a => {
+        const m = document.getElementById(`edit-mat-${a.id}`);
+        const act = document.getElementById(`edit-act-${a.id}`);
+        if (m) a.matricula = m.value.trim();
+        if (act) a.actividades = act.value.trim();
+      });
+
+      // Validar
+      for (const a of editAeronavesData) {
+        if (!a.matricula || !a.actividades) {
+          mostrarToast('⚠️ Completa matrícula y actividades en todas las aeronaves', 'error');
+          return;
+        }
+      }
+
       let reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
       const indice = reportes.findIndex(r => r.id === reporteEditando);
       
-      // Obtener datos editados (usar los arrays de fotos actualizados en el modal)
       const reporteActualizado = {
         id: reporteEditando,
         fecha: document.getElementById('editFecha').value,
         hora: document.getElementById('editHora').value,
-        matricula: document.getElementById('editMatricula').value,
-        actividades: document.getElementById('editActividades').value,
+        matricula: editAeronavesData.map(a => a.matricula).join(', '),
+        aeronaves: editAeronavesData.map(a => ({
+          matricula: a.matricula,
+          actividades: a.actividades,
+          fotosActividades: [...a.fotos]
+        })),
         pendientes: document.getElementById('editPendientes').value,
         personal: document.getElementById('editPersonal').value,
-        fotosActividades: [...editFotosActividades],
-        fotosPendientes:  [...editFotosPendientes],
+        fotosPendientes: [...editFotosPendientes],
         timestamp: new Date().toLocaleString('es-MX')
       };
       
       if (indice !== -1) {
         reportes[indice] = reporteActualizado;
         localStorage.setItem('reportesTurno', JSON.stringify(reportes));
-        
         cargarReportes();
         cerrarModal();
         mostrarToast('✅ Reporte actualizado correctamente', 'success');
@@ -1667,9 +2030,7 @@ ${urlsFotos.length > 0 ? `\n📷 *Fotos:*\n${urlsFotos.join('\n')}` : ''}
     // Cerrar modal al hacer click fuera
     document.addEventListener('click', (e) => {
       const modal = document.getElementById('modalEditar');
-      if (e.target === modal) {
-        cerrarModal();
-      }
+      if (e.target === modal) cerrarModal();
     });
     
     // ════════════════════════════════════════
