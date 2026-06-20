@@ -344,6 +344,50 @@ main{display:grid;gap:14px}
 }
 
 
+/* ═════ Firma Laraclv ═════ */
+.app-signature,
+.auth-signature{
+  text-align:center;
+  pointer-events:none;
+  user-select:none;
+}
+.app-signature{
+  padding:26px 12px calc(18px + env(safe-area-inset-bottom));
+}
+.auth-signature{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:calc(18px + env(safe-area-inset-bottom));
+  z-index:1;
+}
+.signature-inner{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.22rem;
+  opacity:.32;
+}
+.signature-by{
+  font-style:italic;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:.76rem;
+  letter-spacing:.06em;
+  color:var(--text);
+}
+.signature-version{
+  font-size:.52rem;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--text);
+}
+@media(max-width:430px){
+  .auth-signature{bottom:calc(10px + env(safe-area-inset-bottom));}
+  .app-signature{padding-top:20px;}
+}
+
+
 /* ═════ Login central + administración ═════ */
 body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-select:none}
 .auth-screen{
@@ -412,6 +456,12 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
       </form>
       <div id="authError" class="auth-error"></div>
       <p class="auth-note">Los embajadores solo pueden consultar y editar su propio calendario.</p>
+    </div>
+    <div class="auth-signature" aria-label="Firma de la app">
+      <div class="signature-inner">
+        <span class="signature-by">by laraclv</span>
+        <span class="signature-version">v 2.4.0</span>
+      </div>
     </div>
   </section>
 
@@ -521,6 +571,12 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
         <div id="usersList" class="users-list"></div>
       </section>
     </main>
+    <footer class="app-signature" aria-label="Firma de la app">
+      <div class="signature-inner">
+        <span class="signature-by">by laraclv</span>
+        <span class="signature-version">v 2.4.0</span>
+      </div>
+    </footer>
   </div>
 
   <dialog id="dayDialog" class="dialog">
