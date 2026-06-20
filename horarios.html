@@ -342,9 +342,80 @@ main{display:grid;gap:14px}
   .badge .dot{display:none}
   .more{display:none}
 }
+
+
+/* ═════ Login central + administración ═════ */
+body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-select:none}
+.auth-screen{
+  position:fixed;inset:0;z-index:9999;
+  display:grid;place-items:center;
+  padding:22px;
+  background:
+    radial-gradient(circle at 30% 12%,rgba(176,92,255,.30),transparent 28%),
+    radial-gradient(circle at 80% 72%,rgba(139,47,201,.22),transparent 28%),
+    linear-gradient(180deg,rgba(7,4,17,.92),rgba(5,3,12,.98));
+  backdrop-filter:blur(26px) saturate(1.2);
+}
+.auth-card{
+  width:min(440px,100%);
+  border-radius:34px;
+  padding:22px;
+  background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.09);
+}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.auth-mark{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#9d45ea,#6427ef);box-shadow:0 16px 36px rgba(118,59,243,.34);font-size:24px}
+.auth-card h2{margin:0;font-size:30px;letter-spacing:-.04em;line-height:1}
+.auth-card p{color:var(--muted);line-height:1.5;font-size:13.5px}
+.auth-form{display:grid;gap:12px;margin-top:16px}
+.auth-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:2px}
+.auth-note{font-size:12px;color:var(--muted-2);line-height:1.45;margin-top:12px}
+.auth-error{display:none;margin-top:12px;padding:11px 12px;border-radius:16px;color:#ffd4d4;background:rgba(239,68,68,.13);border:1px solid rgba(248,113,113,.18);font-size:12.5px;line-height:1.4}
+.auth-error.show{display:block}
+.session-badge{border-radius:999px;padding:8px 11px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.09);font-size:11px;color:var(--muted);font-weight:850;white-space:nowrap}
+.role-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;margin-left:6px;background:rgba(176,92,255,.16);border:1px solid rgba(176,92,255,.22);font-size:10px;color:#e9d5ff;text-transform:uppercase;letter-spacing:.08em;font-weight:900}
+.locked-card{opacity:.55;filter:saturate(.7)}
+.admin-tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.admin-tools button{padding:9px 10px;font-size:11.5px;border-radius:13px}
+.user-card.owner-card{border-color:rgba(176,92,255,.34);box-shadow:0 0 0 1px rgba(176,92,255,.12),var(--shadow-soft)}
+.tabs.staff-mode{grid-template-columns:repeat(3,1fr)}
+.config-warning{padding:12px 13px;border-radius:18px;background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.22);color:#fde68a;font-size:12.5px;line-height:1.45;margin-top:12px}
+
+@media(max-width:430px){
+  .auth-screen{padding:14px}.auth-card{padding:18px;border-radius:30px}.auth-card h2{font-size:27px}.session-badge{display:none}
+}
+
 </style>
 </head>
-<body>
+<body class="locked">
+
+  <section id="authScreen" class="auth-screen" aria-label="Inicio de sesión">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-mark">✈</div>
+        <div>
+          <span class="airline-name">VOLARIS</span>
+          <h2>Horarios</h2>
+        </div>
+      </div>
+      <p>Acceso compartido para consultar y actualizar turnos, cursos, vacaciones, permisos y tiempo extra.</p>
+      <div id="configWarning" class="config-warning hidden">
+        Falta configurar Firebase y tu número de empleado propietario dentro del archivo. La app está lista, pero primero debes pegar esos datos.
+      </div>
+      <form id="loginForm" class="auth-form">
+        <label class="field"><span>Número de empleado</span><input id="loginEmployee" type="text" inputmode="numeric" autocomplete="username" placeholder="Ej. 123456" required></label>
+        <label class="field"><span>PIN</span><input id="loginPin" type="password" autocomplete="current-password" minlength="6" placeholder="Mínimo 6 caracteres" required></label>
+        <div class="auth-actions">
+          <button class="primary" type="submit">Entrar</button>
+          <button id="setupOwnerBtn" class="soft" type="button">Crear administrador principal</button>
+        </div>
+      </form>
+      <div id="authError" class="auth-error"></div>
+      <p class="auth-note">El administrador principal no puede ser eliminado por otros administradores. Los usuarios normales solo pueden editar su propio calendario.</p>
+    </div>
+  </section>
+
   <div class="app-shell">
     <header class="hero">
       <div class="hero-top">
@@ -361,6 +432,8 @@ main{display:grid;gap:14px}
         </div>
         <div class="top-actions">
           <a class="ghost home-link" href="index.html" aria-label="Volver al centro de control">⌂ Inicio</a>
+          <span id="sessionBadge" class="session-badge hidden"></span>
+          <button id="logoutBtn" class="ghost hidden" type="button">Salir</button>
           <button id="installBtn" class="ghost hidden">&#8595; Instalar</button>
         </div>
       </div>
@@ -436,10 +509,13 @@ main{display:grid;gap:14px}
           <h2>Agregar personal</h2>
           <p class="hint">Elige la fecha base donde el empleado inicia su primer d&#237;a de trabajo. La app calcula autom&#225;ticamente el patr&#243;n 2 trabajo / 2 descanso.</p>
           <form id="userForm" class="user-form">
+            <label class="field"><span>No. empleado</span><input id="employeeId" type="text" inputmode="numeric" placeholder="Ej. 123456" required /></label>
             <label class="field"><span>Nombre</span><input id="userName" type="text" placeholder="Ej. David" required /></label>
             <label class="field"><span>Puesto o &#225;rea</span><input id="userRole" type="text" placeholder="Ej. Turno nocturno" /></label>
             <label class="field"><span>Fecha base</span><input id="baseDate" type="date" required /></label>
             <label class="field"><span>Color</span><input id="userColor" type="color" value="#8b2fc9" /></label>
+            <label class="field"><span>Rol</span><select id="accessRole"><option value="user">Usuario</option><option value="admin">Administrador</option></select></label>
+            <label class="field"><span>PIN inicial</span><input id="userPin" type="password" minlength="6" placeholder="Mín. 6" required /></label>
             <button class="primary" type="submit">Agregar</button>
           </form>
         </div>
@@ -501,15 +577,59 @@ main{display:grid;gap:14px}
     </div>
   </template>
 
-  <script>
+  <script type="module">
 /* ══════════════════════════════════════════════════════
    Turno Nocturno · Volaris
-   Persistencia: IndexedDB (principal) + localStorage (respaldo)
+   Versión compartida: Firebase Auth + Firestore
+   Roles: propietario / administrador / usuario
    ══════════════════════════════════════════════════════ */
+
+import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+  serverTimestamp,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* ─────────────────────────────────────────────────────
+   CONFIGURACIÓN NECESARIA
+   1) Crea un Firebase NUEVO solo para Horarios.
+   2) Pega aquí la configuración web de Firebase.
+   3) Cambia OWNER_EMPLOYEE_ID por TU número de empleado.
+   4) Cambia OWNER_BOOTSTRAP_PIN antes de subirlo a GitHub.
+   ───────────────────────────────────────────────────── */
+const APP_CONFIG = {
+  firebase: {
+    apiKey: "PEGA_AQUI_API_KEY",
+    authDomain: "PEGA_AQUI_AUTH_DOMAIN",
+    projectId: "PEGA_AQUI_PROJECT_ID",
+    storageBucket: "PEGA_AQUI_STORAGE_BUCKET",
+    messagingSenderId: "PEGA_AQUI_MESSAGING_SENDER_ID",
+    appId: "PEGA_AQUI_APP_ID"
+  },
+  OWNER_EMPLOYEE_ID: "PEGA_TU_NUMERO_DE_EMPLEADO",
+  OWNER_BOOTSTRAP_PIN: "CambiaEstePin2026"
+};
 
 const $ = (q) => document.querySelector(q);
 const $$ = (q) => [...document.querySelectorAll(q)];
-const STORAGE_KEY = "turnos_volaris_v2";
 
 const STATUS = {
   work:       { label: "Turno noche",  short: "N",   css: "status-work",       color: "#ef4444", time: "20:30 – 08:00 hrs" },
@@ -520,98 +640,157 @@ const STATUS = {
   permission: { label: "Permiso",      short: "PER", css: "status-permission", color: "#94a3b8", time: "Autorizado" },
 };
 
-/* ─── Estado global ─── */
-let state = {
-  users: [],
-  overrides: {}
-};
-let current = startOfMonth(new Date());
+let app = null;
+let auth = null;
+let db = null;
+let firebaseReady = false;
+let currentUser = null;
+let currentProfile = null;
+let unsubProfiles = null;
+let unsubOverrides = null;
 let selectedDate = null;
+let current = startOfMonth(new Date());
 let deferredPrompt = null;
-let dbReady = false;
+let isBootstrappingOwner = false;
+let state = { users: [], overrides: {} };
+
+function firebaseConfigured() {
+  const f = APP_CONFIG.firebase;
+  return Object.values(f).every(v => v && !String(v).includes("PEGA_AQUI")) &&
+    APP_CONFIG.OWNER_EMPLOYEE_ID && !APP_CONFIG.OWNER_EMPLOYEE_ID.includes("PEGA_TU");
+}
+
+function initFirebase() {
+  if (!firebaseConfigured()) {
+    $("#configWarning").classList.remove("hidden");
+    authError("Configura Firebase y el número de empleado propietario dentro del archivo antes de usar la app.");
+    return false;
+  }
+  app = initializeApp(APP_CONFIG.firebase);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  firebaseReady = true;
+  return true;
+}
+
+function employeeToEmail(employeeId) {
+  const clean = normalizeEmployee(employeeId);
+  return `emp${clean}@horarios.volapp.app`;
+}
+function normalizeEmployee(v="") { return String(v).trim().replace(/\s+/g, "").toLowerCase(); }
+function roleLabel(role) { return role === "owner" ? "Propietario" : role === "admin" ? "Admin" : "Usuario"; }
+function isOwner() { return currentProfile?.accessRole === "owner"; }
+function isAdmin() { return ["owner","admin"].includes(currentProfile?.accessRole); }
+function canManageUsers() { return isAdmin(); }
+function canEditUser(userId) { return isAdmin() || currentUser?.uid === userId; }
+function visibleUsers() { return state.users.filter(u => u.active !== false); }
+
+function authError(msg="") {
+  const box = $("#authError");
+  box.textContent = msg;
+  box.classList.toggle("show", !!msg);
+}
+function setBusy(btn, busy, label="Procesando...") {
+  if (!btn) return;
+  if (busy) { btn.dataset.oldText = btn.textContent; btn.textContent = label; btn.disabled = true; }
+  else { btn.textContent = btn.dataset.oldText || btn.textContent; btn.disabled = false; }
+}
 
 /* ══════════════════════════════════
-   PERSISTENCIA con IndexedDB
+   AUTENTICACIÓN
    ══════════════════════════════════ */
-let db;
-const DB_NAME = "VolarisHorarios";
-const DB_VERSION = 1;
-const STORE = "datos";
-
-function initDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = (e) => {
-      const database = e.target.result;
-      if (!database.objectStoreNames.contains(STORE)) {
-        database.createObjectStore(STORE, { keyPath: "id" });
-      }
-    };
-    req.onsuccess = (e) => { db = e.target.result; resolve(); };
-    req.onerror = () => reject(req.error);
-  });
+function pinToFirebasePassword(pin) {
+  const cleanPin = String(pin || "").trim();
+  return `Horarios-${cleanPin}-V1!`;
 }
 
-async function dbSave(data) {
-  return new Promise((resolve) => {
-    if (!db) { resolve(); return; }
-    const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put({ id: STORAGE_KEY, ...data });
-    tx.oncomplete = resolve;
-    tx.onerror = resolve;
-  });
+async function login(employeeId, pin) {
+  if (!firebaseReady) return;
+  await signInWithEmailAndPassword(auth, employeeToEmail(employeeId), pinToFirebasePassword(pin));
 }
 
-async function dbLoad() {
-  return new Promise((resolve) => {
-    if (!db) { resolve(null); return; }
-    const tx = db.transaction(STORE, "readonly");
-    const req = tx.objectStore(STORE).get(STORAGE_KEY);
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror = () => resolve(null);
-  });
-}
-
-/* ─── Carga inicial ─── */
-async function loadState() {
-  let data = null;
-
-  // 1. Intentar IndexedDB
+async function setupOwner(employeeId, pin) {
+  const clean = normalizeEmployee(employeeId);
+  if (clean !== normalizeEmployee(APP_CONFIG.OWNER_EMPLOYEE_ID)) throw new Error("Este número no coincide con el propietario configurado.");
+  if (pin !== APP_CONFIG.OWNER_BOOTSTRAP_PIN) throw new Error("PIN inicial incorrecto.");
+  isBootstrappingOwner = true;
   try {
-    data = await dbLoad();
-    if (data) {
-      state.users = data.users || [];
-      state.overrides = data.overrides || {};
-      dbReady = true;
-      return;
-    }
-  } catch(e) { /* sigue al respaldo */ }
-
-  // 2. Respaldo: localStorage
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      state.users = parsed.users || [];
-      state.overrides = parsed.overrides || {};
-      // Migrar a IndexedDB
-      await dbSave({ users: state.users, overrides: state.overrides });
-      dbReady = true;
-      return;
-    }
-  } catch(e) { /* nada */ }
-
-  // 3. Estado vacío con usuario por defecto
-  const today = ymd(new Date());
-  state.users = [{ id: crypto.randomUUID(), name: "David", role: "Turno nocturno", baseDate: today, color: "#FF6600" }];
-  state.overrides = {};
-  dbReady = true;
+    const cred = await createUserWithEmailAndPassword(auth, employeeToEmail(clean), pinToFirebasePassword(pin));
+    await setDoc(doc(db, "profiles", cred.user.uid), {
+      uid: cred.user.uid,
+      employeeId: clean,
+      name: "Administrador Principal",
+      area: "Propietario",
+      baseDate: ymd(new Date()),
+      color: "#8b2fc9",
+      accessRole: "owner",
+      active: true,
+      protected: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    currentUser = cred.user;
+    currentProfile = await loadProfile(cred.user);
+    showApp();
+    startRealtime();
+  } finally {
+    isBootstrappingOwner = false;
+  }
 }
 
-async function save() {
-  // Guardar en ambos lugares
-  try { await dbSave({ users: state.users, overrides: state.overrides }); } catch(e) {}
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ users: state.users, overrides: state.overrides })); } catch(e) {}
+async function loadProfile(user) {
+  const snap = await getDoc(doc(db, "profiles", user.uid));
+  if (!snap.exists()) throw new Error("Tu usuario no tiene perfil activo en Horarios.");
+  const profile = { id: snap.id, ...snap.data() };
+  if (profile.active === false) throw new Error("Tu acceso fue desactivado. Contacta al administrador.");
+  return profile;
+}
+
+function startRealtime() {
+  stopRealtime();
+  unsubProfiles = onSnapshot(collection(db, "profiles"), (snap) => {
+    state.users = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .filter(u => u.active !== false)
+      .sort((a,b) => (a.name || "").localeCompare(b.name || "", "es"));
+    render();
+  }, (err) => console.warn("profiles", err));
+
+  unsubOverrides = onSnapshot(collection(db, "overrides"), (snap) => {
+    const data = {};
+    snap.docs.forEach(d => {
+      const ov = d.data();
+      if (ov.userId && ov.date) data[overrideKey(ov.userId, ov.date)] = ov;
+    });
+    state.overrides = data;
+    render();
+  }, (err) => console.warn("overrides", err));
+}
+function stopRealtime() {
+  if (unsubProfiles) unsubProfiles();
+  if (unsubOverrides) unsubOverrides();
+  unsubProfiles = null; unsubOverrides = null;
+}
+
+function showApp() {
+  document.body.classList.remove("locked");
+  $("#authScreen").classList.add("hidden");
+  $("#logoutBtn").classList.remove("hidden");
+  $("#sessionBadge").classList.remove("hidden");
+  updateRoleUI();
+}
+function showLogin() {
+  document.body.classList.add("locked");
+  $("#authScreen").classList.remove("hidden");
+  $("#logoutBtn").classList.add("hidden");
+  $("#sessionBadge").classList.add("hidden");
+}
+function updateRoleUI() {
+  if (!currentProfile) return;
+  $("#sessionBadge").textContent = `${currentProfile.name || currentProfile.employeeId} · ${roleLabel(currentProfile.accessRole)}`;
+  const usersTab = document.querySelector('[data-view="users"]');
+  if (usersTab) usersTab.classList.toggle("hidden", !canManageUsers());
+  $(".tabs").classList.toggle("staff-mode", !canManageUsers());
+  if (!canManageUsers() && activeView() === "users") switchView("calendar");
 }
 
 /* ══════════════════════════════════
@@ -633,14 +812,22 @@ function longDate(d) { return d.toLocaleDateString("es-MX",{weekday:"long",day:"
    ══════════════════════════════════ */
 function activeView() { return $(".tab.active")?.dataset.view || "calendar"; }
 function selectedUserId() { return $("#userFilter").value; }
-function getUsersForView() { const id=selectedUserId(); return id==="all" ? state.users : state.users.filter(u=>u.id===id); }
+function getUsersForView() {
+  const users = visibleUsers();
+  const id = selectedUserId();
+  return id === "all" ? users : users.filter(u => u.id === id);
+}
+function getEditableUsersForView() {
+  return getUsersForView().filter(u => canEditUser(u.id));
+}
 function overrideKey(userId,date) { return `${userId}|${date}`; }
+function overrideDocId(userId,date) { return `${userId}_${date}`.replace(/[^a-zA-Z0-9_-]/g,"_"); }
 
 function autoStatus(user,date) {
+  if (!user?.baseDate) return "work";
   const idx = ((diffDays(parseYMD(date), parseYMD(user.baseDate)) % 4) + 4) % 4;
   return idx === 0 || idx === 1 ? "work" : "rest";
 }
-
 function dayRecord(user,date) {
   const ov = state.overrides[overrideKey(user.id,date)];
   const status = ov?.status && ov.status !== "auto" ? ov.status : autoStatus(user,date);
@@ -651,29 +838,28 @@ function dayRecord(user,date) {
    RENDERIZADO
    ══════════════════════════════════ */
 function render() {
-  save();
+  if (!currentProfile) return;
+  updateRoleUI();
   renderMonthHeader(); renderUserFilter(); renderCalendar(); renderAgenda(); renderSummary(); renderUsers();
 }
-
 function renderMonthHeader() {
   $("#monthLabel").textContent = monthName(current);
   $("#todayLabel").textContent = `Hoy: ${new Date().toLocaleDateString("es-MX",{day:"numeric",month:"short",year:"numeric"})}`;
 }
-
 function renderUserFilter() {
   const filter = $("#userFilter"); const prev = filter.value || "all";
-  filter.innerHTML = `<option value="all">Todo el personal</option>` + state.users.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}</option>`).join("");
-  filter.value = state.users.some(u=>u.id===prev) ? prev : "all";
+  const users = visibleUsers();
+  filter.innerHTML = `<option value="all">Todo el personal</option>` + users.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}${u.accessRole === "admin" ? " · Admin" : u.accessRole === "owner" ? " · Propietario" : ""}</option>`).join("");
+  filter.value = users.some(u=>u.id===prev) ? prev : "all";
 }
-
 function renderCalendar() {
   const grid = $("#calendarGrid"); grid.innerHTML="";
-  if (!state.users.length) { grid.append(emptyNode()); return; }
+  if (!visibleUsers().length) { grid.append(emptyNode()); return; }
   const first = startOfMonth(current); const start = addDays(first, -first.getDay());
   const today = ymd(new Date());
   for (let i=0; i<42; i++) {
     const d=addDays(start,i); const date=ymd(d); const records=getUsersForView().map(u=>dayRecord(u,date));
-    const cell=document.createElement("button"); 
+    const cell=document.createElement("button");
     cell.className=`day ${d.getMonth()!==current.getMonth()?"other":""} ${date===today?"today":""}`;
     cell.dataset.date=date;
     const max = selectedUserId()==="all" ? 3 : 5;
@@ -683,15 +869,13 @@ function renderCalendar() {
     grid.append(cell);
   }
 }
-
 function recordBadge(r) {
-  const s=STATUS[r.status];
-  return `<div class="badge ${s.css}" title="${escapeHtml(r.user.name)} · ${s.label}"><span class="dot" style="background:${r.user.color}"></span><div><strong>${escapeHtml(r.user.name)}</strong><small>${s.short} · ${r.note?escapeHtml(r.note):s.time}</small></div></div>`;
+  const s=STATUS[r.status] || STATUS.work;
+  return `<div class="badge ${s.css}" title="${escapeHtml(r.user.name)} · ${s.label}"><span class="dot" style="background:${r.user.color || "#8b2fc9"}"></span><div><strong>${escapeHtml(r.user.name)}</strong><small>${s.short} · ${r.note?escapeHtml(r.note):s.time}</small></div></div>`;
 }
-
 function renderAgenda() {
   const box=$("#agendaList"); box.innerHTML="";
-  if (!state.users.length) { box.append(emptyNode()); return; }
+  if (!visibleUsers().length) { box.append(emptyNode()); return; }
   const days = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
   for (let n=1; n<=days; n++) {
     const d=new Date(current.getFullYear(), current.getMonth(), n); const date=ymd(d);
@@ -703,10 +887,9 @@ function renderAgenda() {
   }
   if (!box.children.length) box.innerHTML=`<div class="empty glass"><h2>Sin eventos especiales</h2><p>Este mes solo hay descansos o no hay registros para la vista elegida.</p></div>`;
 }
-
 function renderSummary() {
   const box=$("#summaryCards"); box.innerHTML="";
-  if (!state.users.length) { box.append(emptyNode()); return; }
+  if (!visibleUsers().length) { box.append(emptyNode()); return; }
   const days = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
   getUsersForView().forEach(u=>{
     const counts = Object.keys(STATUS).reduce((a,k)=>(a[k]=0,a),{});
@@ -715,79 +898,197 @@ function renderSummary() {
       counts[dayRecord(u,date).status]++;
     }
     const card=document.createElement("div"); card.className="summary-card glass";
-    card.innerHTML=`<h3><span class="dot" style="display:inline-block;background:${u.color};width:11px;height:11px;border-radius:50%;margin-right:7px"></span>${escapeHtml(u.name)}</h3>`+
+    card.innerHTML=`<h3><span class="dot" style="display:inline-block;background:${u.color || "#8b2fc9"};width:11px;height:11px;border-radius:50%;margin-right:7px"></span>${escapeHtml(u.name)} <span class="role-pill">${roleLabel(u.accessRole)}</span></h3>`+
       Object.entries(STATUS).map(([k,s])=>`<div class="metric"><span>${s.label}</span><strong>${counts[k]}</strong></div>`).join("");
     box.append(card);
   });
 }
-
 function renderUsers() {
   const list=$("#usersList"); list.innerHTML="";
+  if (!canManageUsers()) return;
   $("#baseDate").value ||= ymd(new Date());
-  state.users.forEach(u=>{
-    const card=document.createElement("div"); card.className="user-card";
+  visibleUsers().forEach(u=>{
+    const protectedOwner = u.accessRole === "owner";
+    const isSelf = currentUser?.uid === u.id;
+    const canModifyRole = !protectedOwner && !isSelf;
+    const card=document.createElement("div");
+    card.className=`user-card ${protectedOwner ? "owner-card" : ""}`;
     card.innerHTML=`
       <div class="user-card-top">
         <div style="display:flex;gap:11px;align-items:center">
-          <div class="avatar" style="background:${u.color}">${escapeHtml(u.name[0]||"U")}</div>
+          <div class="avatar" style="background:${u.color || "#8b2fc9"}">${escapeHtml((u.name||"U")[0])}</div>
           <div>
-            <h3>${escapeHtml(u.name)}</h3>
-            <p>${escapeHtml(u.role||"Sin área")} · Base ${u.baseDate}</p>
+            <h3>${escapeHtml(u.name)} <span class="role-pill">${roleLabel(u.accessRole)}</span></h3>
+            <p>No. ${escapeHtml(u.employeeId || "—")} · ${escapeHtml(u.area || "Sin área")} · Base ${u.baseDate || "—"}</p>
           </div>
         </div>
       </div>
       <div class="card-actions">
         <button class="soft view-user" data-id="${u.id}">Ver individual</button>
-        <button class="danger delete-user" data-id="${u.id}">Eliminar</button>
+        ${(isOwner() || !protectedOwner) ? `<button class="soft edit-user" data-id="${u.id}">Editar datos</button>` : ""}
+        ${canModifyRole && u.accessRole === "user" ? `<button class="soft make-admin" data-id="${u.id}">Hacer admin</button>` : ""}
+        ${canModifyRole && u.accessRole === "admin" ? `<button class="soft make-user" data-id="${u.id}">Quitar admin</button>` : ""}
+        ${protectedOwner ? `<button class="danger" disabled>Protegido</button>` : `<button class="danger delete-user" data-id="${u.id}">Eliminar</button>`}
       </div>`;
     list.append(card);
   });
   $$(".view-user").forEach(b=>b.addEventListener("click",()=>{ $("#userFilter").value=b.dataset.id; switchView("calendar"); render(); }));
-  $$(".delete-user").forEach(b=>b.addEventListener("click",()=>{
-    if (confirm("¿Eliminar este empleado y sus modificaciones?")) {
-      state.users=state.users.filter(u=>u.id!==b.dataset.id);
-      Object.keys(state.overrides).forEach(k=>{ if(k.startsWith(b.dataset.id+"|")) delete state.overrides[k]; });
-      render();
-    }
-  }));
+  $$(".edit-user").forEach(b=>b.addEventListener("click",()=>editUserProfile(b.dataset.id)));
+  $$(".make-admin").forEach(b=>b.addEventListener("click",()=>changeAccessRole(b.dataset.id,"admin")));
+  $$(".make-user").forEach(b=>b.addEventListener("click",()=>changeAccessRole(b.dataset.id,"user")));
+  $$(".delete-user").forEach(b=>b.addEventListener("click",()=>deactivateUser(b.dataset.id)));
 }
-
 function emptyNode() {
   const node=$("#emptyTemplate").content.cloneNode(true);
-  node.querySelector(".go-users").addEventListener("click",()=>switchView("users"));
+  const btn=node.querySelector(".go-users");
+  if (btn) btn.addEventListener("click",()=> canManageUsers() ? switchView("users") : alert("Solo administradores pueden agregar personal."));
   return node;
 }
 
 /* ══════════════════════════════════
-   INTERACCIONES
+   ADMINISTRACIÓN
+   ══════════════════════════════════ */
+async function employeeExists(employeeId) {
+  const q = query(collection(db, "profiles"), where("employeeId", "==", normalizeEmployee(employeeId)));
+  const snap = await getDocs(q);
+  return !snap.empty;
+}
+async function createStaff({ employeeId, name, area, baseDate, color, accessRole, pin }) {
+  if (!canManageUsers()) throw new Error("Solo administradores pueden agregar personal.");
+  const clean = normalizeEmployee(employeeId);
+  if (!clean || !name || !pin) throw new Error("Completa número de empleado, nombre y PIN.");
+  if (pin.length < 4) throw new Error("El PIN debe tener mínimo 4 caracteres.");
+  if (clean === normalizeEmployee(APP_CONFIG.OWNER_EMPLOYEE_ID) && !isOwner()) throw new Error("Solo el propietario puede administrar su propio número.");
+  if (await employeeExists(clean)) throw new Error("Ese número de empleado ya existe.");
+
+  const secondary = initializeApp(APP_CONFIG.firebase, `secondary-${Date.now()}`);
+  const secondaryAuth = getAuth(secondary);
+  try {
+    const cred = await createUserWithEmailAndPassword(secondaryAuth, employeeToEmail(clean), pinToFirebasePassword(pin));
+    await setDoc(doc(db, "profiles", cred.user.uid), {
+      uid: cred.user.uid,
+      employeeId: clean,
+      name,
+      area,
+      baseDate,
+      color,
+      accessRole: accessRole === "admin" ? "admin" : "user",
+      active: true,
+      protected: false,
+      createdBy: currentUser.uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    await signOut(secondaryAuth).catch(()=>{});
+  } finally {
+    await deleteApp(secondary).catch(()=>{});
+  }
+}
+async function editUserProfile(userId) {
+  const target = state.users.find(u=>u.id===userId);
+  if (!target) return;
+  const protectedOwner = target.accessRole === "owner";
+
+  if (protectedOwner && !isOwner()) {
+    alert("El administrador principal está protegido. Solo el propietario puede modificar sus propios datos.");
+    return;
+  }
+  if (!isOwner() && !isAdmin()) {
+    alert("Solo administradores pueden editar datos de personal.");
+    return;
+  }
+
+  const name = prompt("Nombre que aparecerá en el calendario:", target.name || "");
+  if (name === null) return;
+  const cleanName = name.trim();
+  if (!cleanName) { alert("El nombre no puede quedar vacío."); return; }
+
+  const area = prompt("Puesto o área:", target.area || "");
+  if (area === null) return;
+
+  const baseDate = prompt("Fecha base del patrón 2x2 (AAAA-MM-DD):", target.baseDate || ymd(new Date()));
+  if (baseDate === null) return;
+  const cleanBaseDate = baseDate.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(cleanBaseDate)) {
+    alert("La fecha base debe tener formato AAAA-MM-DD, por ejemplo 2026-06-19.");
+    return;
+  }
+
+  const color = prompt("Color del usuario en hexadecimal:", target.color || "#8b2fc9");
+  if (color === null) return;
+  const cleanColor = color.trim() || (target.color || "#8b2fc9");
+  if (!/^#[0-9a-fA-F]{6}$/.test(cleanColor)) {
+    alert("El color debe tener formato hexadecimal, por ejemplo #8b2fc9.");
+    return;
+  }
+
+  const updates = {
+    name: cleanName,
+    area: area.trim(),
+    baseDate: cleanBaseDate,
+    color: cleanColor,
+    updatedAt: serverTimestamp(),
+    updatedBy: currentUser.uid
+  };
+
+  await updateDoc(doc(db,"profiles",userId), updates);
+  if (currentUser?.uid === userId && currentProfile) {
+    currentProfile = { ...currentProfile, ...updates, updatedAt: new Date() };
+    updateRoleUI();
+  }
+}
+
+async function changeAccessRole(userId, accessRole) {
+  const target = state.users.find(u=>u.id===userId);
+  if (!target) return;
+  if (target.accessRole === "owner") { alert("El administrador principal no se puede modificar."); return; }
+  if (target.id === currentUser.uid) { alert("No puedes cambiar tu propio rol."); return; }
+  if (!confirm(accessRole === "admin" ? `¿Hacer administrador a ${target.name}?` : `¿Quitar permisos de administrador a ${target.name}?`)) return;
+  await updateDoc(doc(db,"profiles",userId), { accessRole, updatedAt: serverTimestamp(), updatedBy: currentUser.uid });
+}
+async function deactivateUser(userId) {
+  const target = state.users.find(u=>u.id===userId);
+  if (!target) return;
+  if (target.accessRole === "owner") { alert("El administrador principal está protegido y no se puede eliminar."); return; }
+  if (target.id === currentUser.uid) { alert("No puedes eliminar tu propio usuario."); return; }
+  if (!confirm(`¿Eliminar/desactivar a ${target.name}? Ya no podrá entrar a la app.`)) return;
+  await updateDoc(doc(db,"profiles",userId), { active:false, deletedAt: serverTimestamp(), deletedBy: currentUser.uid });
+}
+
+/* ══════════════════════════════════
+   INTERACCIONES DE CALENDARIO
    ══════════════════════════════════ */
 function handleDayClick(date) {
   const quick=$("#quickStatus").value;
-  const users=getUsersForView();
+  const users=getEditableUsersForView();
+  if (!users.length) { alert("No tienes permiso para editar este día de otra persona."); return; }
   if (quick) {
-    users.forEach(u=>{ 
-      const key=overrideKey(u.id,date);
-      if(quick==="clear") delete state.overrides[key];
-      else state.overrides[key]={status:quick,note:state.overrides[key]?.note||""};
-    });
-    $("#quickStatus").value=""; render(); return;
+    applyQuickStatus(users,date,quick);
+    $("#quickStatus").value="";
+    return;
   }
   selectedDate=date; openDialog(date);
 }
-
+async function applyQuickStatus(users,date,quick) {
+  const batch = writeBatch(db);
+  users.forEach(u=>{
+    const ref = doc(db,"overrides",overrideDocId(u.id,date));
+    if (quick === "clear") batch.delete(ref);
+    else batch.set(ref,{ userId:u.id, date, status:quick, note:state.overrides[overrideKey(u.id,date)]?.note || "", updatedBy: currentUser.uid, updatedAt: serverTimestamp() }, { merge:true });
+  });
+  await batch.commit();
+}
 function openDialog(date) {
   $("#dialogDate").textContent=longDate(parseYMD(date));
-  const sel=$("#dialogUser"); const users=getUsersForView();
+  const sel=$("#dialogUser"); const users=getEditableUsersForView();
   sel.innerHTML=users.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}</option>`).join("");
   if (users[0]) sel.value=users[0].id;
-  // Pre-fill range with the clicked date
   $("#rangeFrom").value=date;
   $("#rangeTo").value=date;
   updateRangeInfo();
   loadDialogUser();
   $("#dayDialog").showModal();
 }
-
 function loadDialogUser() {
   const uid=$("#dialogUser").value; const ov=state.overrides[overrideKey(uid,selectedDate)];
   const status=ov?.status || "auto";
@@ -795,30 +1096,26 @@ function loadDialogUser() {
   $("#dialogNote").value=ov?.note || "";
   toggleRangeSection(status);
 }
-
 function toggleRangeSection(status) {
-  // Show range section for types that make sense as multi-day blocks
   const multiDay=["vacation","course","overtime","permission","rest","work"];
   const rs=$("#rangeSection");
   rs.style.display=multiDay.includes(status) ? "block" : "none";
   updateRangeInfo();
 }
-
 function updateRangeInfo() {
   const from=$("#rangeFrom").value; const to=$("#rangeTo").value;
   if (!from||!to) { $("#rangeInfo").textContent=""; return; }
   const d1=parseYMD(from); const d2=parseYMD(to);
   if (d2<d1) { $("#rangeInfo").textContent="⚠ La fecha fin debe ser igual o mayor a inicio"; return; }
-  const days=diffDays(d1,d2)+1;
+  const days=diffDays(d2,d1)+1;
   $("#rangeInfo").textContent=days===1?"Se aplica a 1 día":`Se aplica a ${days} días (${from} → ${to})`;
 }
-
 function switchView(view) {
+  if (view === "users" && !canManageUsers()) { alert("Solo administradores pueden administrar personal."); return; }
   $$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===view));
   $$(".view").forEach(v=>v.classList.remove("active"));
   $(`#${view}View`).classList.add("active");
 }
-
 function escapeHtml(str="") {
   return String(str).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
 }
@@ -826,23 +1123,45 @@ function escapeHtml(str="") {
 /* ══════════════════════════════════
    EVENT LISTENERS
    ══════════════════════════════════ */
+$("#loginForm").addEventListener("submit", async e=>{
+  e.preventDefault(); authError("");
+  const btn=e.submitter;
+  try { setBusy(btn,true,"Entrando..."); await login($("#loginEmployee").value,$("#loginPin").value); }
+  catch(err) { authError("No se pudo entrar. Revisa número de empleado y PIN."); console.warn(err); }
+  finally { setBusy(btn,false); }
+});
+$("#setupOwnerBtn").addEventListener("click", async ()=>{
+  authError("");
+  const btn=$("#setupOwnerBtn");
+  try { setBusy(btn,true,"Creando..."); await setupOwner($("#loginEmployee").value,$("#loginPin").value); }
+  catch(err) { authError(err.message || "No se pudo crear el administrador principal."); console.warn(err); }
+  finally { setBusy(btn,false); }
+});
+$("#logoutBtn").addEventListener("click",()=>signOut(auth));
+
 $("#prevMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()-1,1); render(); });
 $("#nextMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()+1,1); render(); });
 $("#todayBtn").addEventListener("click",()=>{ current=startOfMonth(new Date()); render(); });
 $("#userFilter").addEventListener("change",render);
 $$(".tab").forEach(t=>t.addEventListener("click",()=>{ switchView(t.dataset.view); render(); }));
 
-$("#userForm").addEventListener("submit",e=>{
+$("#userForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  const name=$("#userName").value.trim();
-  if(!name) return;
-  state.users.push({
-    id:crypto.randomUUID(), name,
-    role:$("#userRole").value.trim(),
-    baseDate:$("#baseDate").value,
-    color:$("#userColor").value
-  });
-  e.target.reset(); $("#baseDate").value=ymd(new Date()); render();
+  const btn=e.submitter;
+  try {
+    setBusy(btn,true,"Agregando...");
+    await createStaff({
+      employeeId: $("#employeeId").value,
+      name: $("#userName").value.trim(),
+      area: $("#userRole").value.trim(),
+      baseDate: $("#baseDate").value,
+      color: $("#userColor").value,
+      accessRole: $("#accessRole").value,
+      pin: $("#userPin").value
+    });
+    e.target.reset(); $("#baseDate").value=ymd(new Date()); $("#userColor").value="#8b2fc9";
+  } catch(err) { alert(err.message || "No se pudo agregar el usuario."); console.warn(err); }
+  finally { setBusy(btn,false); }
 });
 
 $("#dialogUser").addEventListener("change",loadDialogUser);
@@ -850,42 +1169,40 @@ $("#dialogStatus").addEventListener("change",()=>toggleRangeSection($("#dialogSt
 $("#rangeFrom").addEventListener("change",updateRangeInfo);
 $("#rangeTo").addEventListener("change",updateRangeInfo);
 
-$("#saveDay").addEventListener("click",()=>{
+$("#saveDay").addEventListener("click",async()=>{
   const uid=$("#dialogUser").value; const status=$("#dialogStatus").value;
+  if (!canEditUser(uid)) { alert("No tienes permiso para editar este registro."); return; }
   const note=$("#dialogNote").value.trim();
   const from=$("#rangeFrom").value; const to=$("#rangeTo").value;
-
-  // Build list of dates to apply
   let dates=[];
   if (from && to && $("#rangeSection").style.display!=="none") {
     const d1=parseYMD(from); const d2=parseYMD(to);
-    if (d2>=d1) {
-      for (let d=new Date(d1); d<=d2; d=addDays(d,1)) dates.push(ymd(d));
-    }
+    if (d2>=d1) for (let d=new Date(d1); d<=d2; d=addDays(d,1)) dates.push(ymd(d));
   }
   if (!dates.length) dates=[selectedDate];
-
+  const batch=writeBatch(db);
   dates.forEach(date=>{
-    const key=overrideKey(uid,date);
-    if(status==="auto" && !note) delete state.overrides[key];
-    else state.overrides[key]={status,note};
+    const ref=doc(db,"overrides",overrideDocId(uid,date));
+    if(status==="auto" && !note) batch.delete(ref);
+    else batch.set(ref,{ userId:uid, date, status, note, updatedBy: currentUser.uid, updatedAt: serverTimestamp() }, { merge:true });
   });
-
-  $("#dayDialog").close(); render();
+  await batch.commit();
+  $("#dayDialog").close();
 });
-$("#deleteOverride").addEventListener("click",()=>{
+$("#deleteOverride").addEventListener("click",async()=>{
   const uid=$("#dialogUser").value;
+  if (!canEditUser(uid)) { alert("No tienes permiso para borrar este registro."); return; }
   const from=$("#rangeFrom").value; const to=$("#rangeTo").value;
   let dates=[];
   if (from && to && $("#rangeSection").style.display!=="none") {
     const d1=parseYMD(from); const d2=parseYMD(to);
-    if (d2>=d1) {
-      for (let d=new Date(d1); d<=d2; d=addDays(d,1)) dates.push(ymd(d));
-    }
+    if (d2>=d1) for (let d=new Date(d1); d<=d2; d=addDays(d,1)) dates.push(ymd(d));
   }
   if (!dates.length) dates=[selectedDate];
-  dates.forEach(date=>delete state.overrides[overrideKey(uid,date)]);
-  $("#dayDialog").close(); render();
+  const batch=writeBatch(db);
+  dates.forEach(date=>batch.delete(doc(db,"overrides",overrideDocId(uid,date))));
+  await batch.commit();
+  $("#dayDialog").close();
 });
 
 window.addEventListener("beforeinstallprompt",e=>{
@@ -897,14 +1214,28 @@ $("#installBtn").addEventListener("click",async()=>{
 });
 
 /* ══════════════════════════════════
-   ARRANQUE con IndexedDB
+   ARRANQUE
    ══════════════════════════════════ */
-(async () => {
-  try { await initDB(); } catch(e) { console.warn("IndexedDB no disponible, usando localStorage"); }
-  await loadState();
-  render();
-})();
-
+if (initFirebase()) {
+  onAuthStateChanged(auth, async (user)=>{
+    if (isBootstrappingOwner) return;
+    stopRealtime();
+    currentUser = user;
+    currentProfile = null;
+    state = { users: [], overrides: {} };
+    if (!user) { showLogin(); return; }
+    try {
+      currentProfile = await loadProfile(user);
+      showApp();
+      startRealtime();
+    } catch(err) {
+      console.warn(err);
+      await signOut(auth);
+      authError(err.message || "No tienes acceso activo.");
+      showLogin();
+    }
+  });
+}
   </script>
 </body>
 </html>
