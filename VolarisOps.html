@@ -1258,20 +1258,17 @@ body::before{
       <div class="sec-label">Acciones rápidas</div>
       <div class="quick-grid">
         <button class="quick-btn card-red" style="position:relative;overflow:visible;background:rgba(170,34,255,.12);border:1px solid rgba(170,34,255,.22);" onclick="window.showSection('Notas');openModal('new')">
-          <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(140,60,255,.85);color:#f0d8ff;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(200,120,255,.35);z-index:3;animation:bounce 2s ease-in-out infinite;">12 pendientes</span>
           <span class="quick-icon">＋</span>
           <span class="quick-label" style="color:#cc88ff;">Nueva nota</span>
-          <span style="position:absolute;top:0.5rem;right:0.5rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff;background:linear-gradient(135deg,#ff4444,#ff6666);box-shadow:0 0 8px rgba(255,68,68,0.7);z-index:2;">12</span>
-          <div style="margin-top:0.6rem;background:rgba(255,80,80,0.2);border-radius:4px;height:4px;overflow:hidden;width:100%;"><div style="background:linear-gradient(90deg,#ff4444,#ff8888);height:100%;width:0%;border-radius:4px;"></div></div>
-          <p style="margin:0.3rem 0 0;font-size:0.58rem;color:rgba(255,100,100,0.6);font-weight:600;">0% completado</p>
+          <p style="margin:0.4rem 0 0;font-size:0.58rem;color:rgba(220,170,255,0.62);font-weight:700;">Crear pendiente</p>
         </button>
         <button class="quick-btn card-blue" style="position:relative;overflow:visible;background:rgba(85,200,255,.08);border:1px solid rgba(85,200,255,.18);" onclick="window.showSection('Notas')">
-          <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(60,120,255,.8);color:#d0e8ff;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(130,180,255,.3);z-index:3;animation:bounce 2s ease-in-out infinite 0.15s;">8 activas</span>
+          <span id="homeMatBadge" style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(60,120,255,.8);color:#d0e8ff;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(130,180,255,.3);z-index:3;animation:bounce 2s ease-in-out infinite 0.15s;">0 pendientes</span>
           <span class="quick-icon">📋</span>
           <span class="quick-label" style="color:#55ccff;">Matrículas</span>
-          <span style="position:absolute;top:0.5rem;right:0.5rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff;background:linear-gradient(135deg,#5588ff,#7799ff);box-shadow:0 0 8px rgba(85,136,255,.7);z-index:2;">8</span>
-          <div style="margin-top:0.6rem;background:rgba(100,180,255,0.2);border-radius:4px;height:4px;overflow:hidden;width:100%;"><div style="background:linear-gradient(90deg,#5588ff,#88aaff);height:100%;width:85%;border-radius:4px;"></div></div>
-          <p style="margin:0.3rem 0 0;font-size:0.58rem;color:rgba(100,180,255,0.6);font-weight:600;">85% completado</p>
+          <span id="homeMatCount" style="position:absolute;top:0.5rem;right:0.5rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#fff;background:linear-gradient(135deg,#5588ff,#7799ff);box-shadow:0 0 8px rgba(85,136,255,.7);z-index:2;">0</span>
+          <div style="margin-top:0.6rem;background:rgba(100,180,255,0.2);border-radius:4px;height:4px;overflow:hidden;width:100%;"><div id="homeMatProgress" style="background:linear-gradient(90deg,#5588ff,#88aaff);height:100%;width:0%;border-radius:4px;transition:width .25s ease;"></div></div>
+          <p id="homeMatProgressText" style="margin:0.3rem 0 0;font-size:0.58rem;color:rgba(100,180,255,0.6);font-weight:600;">0% completado</p>
         </button>
         <button class="quick-btn card-blue" style="position:relative;overflow:visible;background:rgba(85,150,255,.08);border:1px solid rgba(85,150,255,.18);" onclick="window.open('https://www.flightradar24.com/', '_blank')">
           <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(33,130,200,.8);color:#d0eeff;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(100,180,255,.3);z-index:3;animation:bounce 2s ease-in-out infinite 0.3s;">En vivo</span>
@@ -1281,12 +1278,12 @@ body::before{
           <p style="margin:0.4rem 0 0;font-size:0.58rem;color:rgba(85,150,255,0.6);font-weight:700;">Vuelos en tiempo real</p>
         </button>
         <button class="quick-btn card-cyan" style="position:relative;overflow:visible;background:rgba(136,238,68,.07);border:1px solid rgba(136,238,68,.15);" onclick="window.showSection('Global')">
-          <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(30,140,70,.8);color:#c0ffd8;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(80,220,130,.3);z-index:3;animation:bounce 2s ease-in-out infinite 0.45s;">24 registros</span>
+          <span id="homeGlobalBadge" style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(30,140,70,.8);color:#c0ffd8;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(80,220,130,.3);z-index:3;animation:bounce 2s ease-in-out infinite 0.45s;">0 registros</span>
           <span class="quick-icon">🌐</span>
           <span class="quick-label" style="color:#88ee44;">Global</span>
-          <span style="position:absolute;top:0.5rem;right:0.5rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#000;background:linear-gradient(135deg,#44dd88,#66ffaa);box-shadow:0 0 8px rgba(68,255,136,.7);z-index:2;">24</span>
-          <div style="margin-top:0.6rem;background:rgba(85,200,255,0.2);border-radius:4px;height:4px;overflow:hidden;width:100%;"><div style="background:linear-gradient(90deg,#44dd88,#66ffaa);height:100%;width:100%;border-radius:4px;"></div></div>
-          <p style="margin:0.3rem 0 0;font-size:0.58rem;color:rgba(85,200,255,0.6);font-weight:600;">100% completado</p>
+          <span id="homeGlobalCount" style="position:absolute;top:0.5rem;right:0.5rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:#000;background:linear-gradient(135deg,#44dd88,#66ffaa);box-shadow:0 0 8px rgba(68,255,136,.7);z-index:2;">0</span>
+          <div style="margin-top:0.6rem;background:rgba(85,200,255,0.2);border-radius:4px;height:4px;overflow:hidden;width:100%;"><div id="homeGlobalProgress" style="background:linear-gradient(90deg,#44dd88,#66ffaa);height:100%;width:0%;border-radius:4px;transition:width .25s ease;"></div></div>
+          <p id="homeGlobalProgressText" style="margin:0.3rem 0 0;font-size:0.58rem;color:rgba(85,200,255,0.6);font-weight:600;">0% completado</p>
         </button>
       </div>
       <div class="info-strip">
@@ -1677,11 +1674,13 @@ function startNotasListener(){
     setSyncOk();
     renderFolders(document.getElementById('searchNotas').value);
     renderGlobal();
+    updateHomeQuickStats();
   }, err => { console.error(err); setSyncOff(); });
 }
 function stopNotasListener(){
   if(unsubscribeNotas){ unsubscribeNotas(); unsubscribeNotas=null; }
   globalData = {};
+  updateHomeQuickStats();
 }
 function startRealtimeListeners(){ startUsersListener(); startNotasListener(); }
 function stopRealtimeListeners(){ stopUsersListener(); stopNotasListener(); }
@@ -1706,6 +1705,48 @@ async function fbUpdateEntry(mat,entryId,fields){ await update(ref(db,'volaris_n
 async function fbUpdateMat(mat,fields){ await update(ref(db,'volaris_notas/'+matKey(mat)),fields); }
 function getEntries(md){ const e=md.entries||{}; if(Array.isArray(e)){const o={};e.forEach(en=>{if(en?.id)o[en.id]=en;});return o;} return e; }
 function findMatKey(nombre){ return Object.keys(globalData).find(k=>globalData[k]?.nombre===nombre||k===matKey(nombre))||matKey(nombre); }
+
+function pluralTxt(n,singular,plural){ return n+' '+(n===1?singular:plural); }
+function computeFleetStats(){
+  const keys=Object.keys(globalData).filter(k=>!globalData[k]?.deleted);
+  let totalItems=0,doneItems=0,totalFotos=0,totalEntries=0;
+  keys.forEach(k=>{
+    const entries=Object.values(getEntries(globalData[k])).filter(e=>!e.deleted);
+    totalEntries+=entries.length;
+    entries.forEach(e=>{
+      if(e.items&&e.items.length){
+        totalItems+=e.items.length;
+        doneItems+=e.items.filter(it=>it.done).length;
+      }else{
+        totalItems+=1;
+        if(e.done)doneItems+=1;
+      }
+      totalFotos+=(e.fotos||[]).length;
+    });
+  });
+  const pendingItems=Math.max(0,totalItems-doneItems);
+  const completion=totalItems?Math.round((doneItems/totalItems)*100):0;
+  return{activeMats:keys.length,totalEntries,totalItems,doneItems,pendingItems,totalFotos,completion};
+}
+function updateHomeQuickStats(){
+  const st=computeFleetStats();
+  const matBadge=document.getElementById('homeMatBadge');
+  const matCount=document.getElementById('homeMatCount');
+  const matProgress=document.getElementById('homeMatProgress');
+  const matProgressText=document.getElementById('homeMatProgressText');
+  if(matBadge)matBadge.textContent=pluralTxt(st.pendingItems,'pendiente','pendientes');
+  if(matCount)matCount.textContent=st.pendingItems;
+  if(matProgress)matProgress.style.width=st.completion+'%';
+  if(matProgressText)matProgressText.textContent=st.completion+'% completado';
+  const globalBadge=document.getElementById('homeGlobalBadge');
+  const globalCount=document.getElementById('homeGlobalCount');
+  const globalProgress=document.getElementById('homeGlobalProgress');
+  const globalProgressText=document.getElementById('homeGlobalProgressText');
+  if(globalBadge)globalBadge.textContent=pluralTxt(st.totalItems,'registro','registros');
+  if(globalCount)globalCount.textContent=st.totalItems;
+  if(globalProgress)globalProgress.style.width=st.completion+'%';
+  if(globalProgressText)globalProgressText.textContent=st.completion+'% completado';
+}
 
 /* ══════════════════════════
    HISTORIAL
@@ -2680,7 +2721,7 @@ async function entrarAlPortalConNumero(numero){
   syncSupervisorMode(false);
   document.getElementById('loginScreen').classList.remove('show');
   document.getElementById('portal').classList.add('show');
-  renderFolders('');renderGlobal();
+  renderFolders('');renderGlobal();updateHomeQuickStats();
 }
 
 function showLoginError(msg){
