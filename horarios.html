@@ -405,7 +405,7 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
       </div>
       <form id="loginForm" class="auth-form">
         <label class="field"><span>Número de empleado</span><input id="loginEmployee" type="text" inputmode="numeric" autocomplete="username" placeholder="Ej. 123456" required></label>
-        <label class="field"><span>PIN</span><input id="loginPin" type="password" autocomplete="current-password" minlength="6" placeholder="Mínimo 6 caracteres" required></label>
+        <label class="field"><span>PIN</span><input id="loginPin" type="password" autocomplete="current-password" minlength="4" inputmode="numeric" placeholder="4 dígitos" required></label>
         <div class="auth-actions">
           <button class="primary" type="submit">Entrar</button>
           <button id="setupOwnerBtn" class="soft" type="button">Crear administrador principal</button>
@@ -515,7 +515,7 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
             <label class="field"><span>Fecha base</span><input id="baseDate" type="date" required /></label>
             <label class="field"><span>Color</span><input id="userColor" type="color" value="#8b2fc9" /></label>
             <label class="field"><span>Rol</span><select id="accessRole"><option value="user">Usuario</option><option value="admin">Administrador</option></select></label>
-            <label class="field"><span>PIN inicial</span><input id="userPin" type="password" minlength="6" placeholder="Mín. 6" required /></label>
+            <label class="field"><span>PIN inicial</span><input id="userPin" type="password" minlength="4" inputmode="numeric" placeholder="Mín. 4" required /></label>
             <button class="primary" type="submit">Agregar</button>
           </form>
         </div>
@@ -617,15 +617,16 @@ import {
    ───────────────────────────────────────────────────── */
 const APP_CONFIG = {
   firebase: {
-    apiKey: "PEGA_AQUI_API_KEY",
-    authDomain: "PEGA_AQUI_AUTH_DOMAIN",
-    projectId: "PEGA_AQUI_PROJECT_ID",
-    storageBucket: "PEGA_AQUI_STORAGE_BUCKET",
-    messagingSenderId: "PEGA_AQUI_MESSAGING_SENDER_ID",
-    appId: "PEGA_AQUI_APP_ID"
+    apiKey: "AIzaSyDgOYh2R6Zv5fICqgVDxmEDs3BOjHKJ9OM",
+    authDomain: "horarios-ac03d.firebaseapp.com",
+    projectId: "horarios-ac03d",
+    storageBucket: "horarios-ac03d.firebasestorage.app",
+    messagingSenderId: "347764954480",
+    appId: "1:347764954480:web:9fb6b6ab6e4b01bed9abb5",
+    measurementId: "G-40V944M9W0"
   },
-  OWNER_EMPLOYEE_ID: "PEGA_TU_NUMERO_DE_EMPLEADO",
-  OWNER_BOOTSTRAP_PIN: "CambiaEstePin2026"
+  OWNER_EMPLOYEE_ID: "2771",
+  OWNER_BOOTSTRAP_PIN: "1006"
 };
 
 const $ = (q) => document.querySelector(q);
