@@ -408,11 +408,10 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
         <label class="field"><span>PIN</span><input id="loginPin" type="password" autocomplete="current-password" minlength="4" inputmode="numeric" placeholder="4 dígitos" required></label>
         <div class="auth-actions">
           <button class="primary" type="submit">Entrar</button>
-          <button id="setupOwnerBtn" class="soft" type="button">Crear administrador principal</button>
         </div>
       </form>
       <div id="authError" class="auth-error"></div>
-      <p class="auth-note">El administrador principal no puede ser eliminado por otros administradores. Los usuarios normales solo pueden editar su propio calendario.</p>
+      <p class="auth-note">Los embajadores solo pueden consultar y editar su propio calendario.</p>
     </div>
   </section>
 
@@ -510,11 +509,11 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
           <p class="hint">Elige la fecha base donde el empleado inicia su primer d&#237;a de trabajo. La app calcula autom&#225;ticamente el patr&#243;n 2 trabajo / 2 descanso.</p>
           <form id="userForm" class="user-form">
             <label class="field"><span>No. empleado</span><input id="employeeId" type="text" inputmode="numeric" placeholder="Ej. 123456" required /></label>
-            <label class="field"><span>Nombre</span><input id="userName" type="text" placeholder="Ej. David" required /></label>
+            <label class="field"><span>Nombre</span><input id="userName" type="text" placeholder="Ej. Embajador" required /></label>
             <label class="field"><span>Puesto o &#225;rea</span><input id="userRole" type="text" placeholder="Ej. Turno nocturno" /></label>
             <label class="field"><span>Fecha base</span><input id="baseDate" type="date" required /></label>
             <label class="field"><span>Color</span><input id="userColor" type="color" value="#8b2fc9" /></label>
-            <label class="field"><span>Rol</span><select id="accessRole"><option value="user">Usuario</option><option value="admin">Administrador</option></select></label>
+            <label class="field"><span>Rol</span><select id="accessRole"><option value="user">Embajador</option><option value="admin">Supervisor</option></select></label>
             <label class="field"><span>PIN inicial</span><input id="userPin" type="password" minlength="4" inputmode="numeric" placeholder="Mín. 4" required /></label>
             <button class="primary" type="submit">Agregar</button>
           </form>
@@ -679,7 +678,7 @@ function employeeToEmail(employeeId) {
   return `emp${clean}@horarios.volapp.app`;
 }
 function normalizeEmployee(v="") { return String(v).trim().replace(/\s+/g, "").toLowerCase(); }
-function roleLabel(role) { return role === "owner" ? "Propietario" : role === "admin" ? "Admin" : "Usuario"; }
+function roleLabel(role) { return role === "owner" ? "Propietario" : role === "admin" ? "Supervisor" : "Embajador"; }
 function isOwner() { return currentProfile?.accessRole === "owner"; }
 function isAdmin() { return ["owner","admin"].includes(currentProfile?.accessRole); }
 function canManageUsers() { return isAdmin(); }
@@ -720,7 +719,7 @@ async function setupOwner(employeeId, pin) {
     await setDoc(doc(db, "profiles", cred.user.uid), {
       uid: cred.user.uid,
       employeeId: clean,
-      name: "Administrador Principal",
+      name: "Supervisor Principal",
       area: "Propietario",
       baseDate: ymd(new Date()),
       color: "#8b2fc9",
@@ -789,9 +788,9 @@ function updateRoleUI() {
   if (!currentProfile) return;
   $("#sessionBadge").textContent = `${currentProfile.name || currentProfile.employeeId} · ${roleLabel(currentProfile.accessRole)}`;
   const usersTab = document.querySelector('[data-view="users"]');
-  if (usersTab) usersTab.classList.toggle("hidden", !canManageUsers());
-  $(".tabs").classList.toggle("staff-mode", !canManageUsers());
-  if (!canManageUsers() && activeView() === "users") switchView("calendar");
+  if (usersTab) usersTab.classList.remove("hidden");
+  $(".tabs").classList.toggle("staff-mode", false);
+  
 }
 
 /* ══════════════════════════════════
@@ -850,7 +849,7 @@ function renderMonthHeader() {
 function renderUserFilter() {
   const filter = $("#userFilter"); const prev = filter.value || "all";
   const users = visibleUsers();
-  filter.innerHTML = `<option value="all">Todo el personal</option>` + users.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}${u.accessRole === "admin" ? " · Admin" : u.accessRole === "owner" ? " · Propietario" : ""}</option>`).join("");
+  filter.innerHTML = `<option value="all">Todo el personal</option>` + users.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}${u.accessRole === "admin" ? " · Supervisor" : u.accessRole === "owner" ? " · Propietario" : ""}</option>`).join("");
   filter.value = users.some(u=>u.id===prev) ? prev : "all";
 }
 function renderCalendar() {
@@ -906,9 +905,12 @@ function renderSummary() {
 }
 function renderUsers() {
   const list=$("#usersList"); list.innerHTML="";
-  if (!canManageUsers()) return;
+  const canManage = canManageUsers();
+  const panel = document.querySelector("#usersView .panel");
+  if (panel) panel.classList.toggle("hidden", !canManage);
   $("#baseDate").value ||= ymd(new Date());
-  visibleUsers().forEach(u=>{
+  const usersToShow = canManage ? visibleUsers() : visibleUsers().filter(u => u.id === currentUser?.uid);
+  usersToShow.forEach(u=>{
     const protectedOwner = u.accessRole === "owner";
     const isSelf = currentUser?.uid === u.id;
     const canModifyRole = !protectedOwner && !isSelf;
@@ -926,10 +928,10 @@ function renderUsers() {
       </div>
       <div class="card-actions">
         <button class="soft view-user" data-id="${u.id}">Ver individual</button>
-        ${(isOwner() || !protectedOwner) ? `<button class="soft edit-user" data-id="${u.id}">Editar datos</button>` : ""}
-        ${canModifyRole && u.accessRole === "user" ? `<button class="soft make-admin" data-id="${u.id}">Hacer admin</button>` : ""}
-        ${canModifyRole && u.accessRole === "admin" ? `<button class="soft make-user" data-id="${u.id}">Quitar admin</button>` : ""}
-        ${protectedOwner ? `<button class="danger" disabled>Protegido</button>` : `<button class="danger delete-user" data-id="${u.id}">Eliminar</button>`}
+        ${canManage && (isOwner() || !protectedOwner) ? `<button class="soft edit-user" data-id="${u.id}">Editar datos</button>` : ""}
+        ${isAdmin() && canModifyRole && u.accessRole === "user" ? `<button class="soft make-admin" data-id="${u.id}">Hacer supervisor</button>` : ""}
+        ${isAdmin() && canModifyRole && u.accessRole === "admin" ? `<button class="soft make-user" data-id="${u.id}">Hacer embajador</button>` : ""}
+        ${canManage ? (protectedOwner ? `<button class="danger" disabled>Protegido</button>` : `<button class="danger delete-user" data-id="${u.id}">Eliminar</button>`) : ""}
       </div>`;
     list.append(card);
   });
@@ -942,7 +944,7 @@ function renderUsers() {
 function emptyNode() {
   const node=$("#emptyTemplate").content.cloneNode(true);
   const btn=node.querySelector(".go-users");
-  if (btn) btn.addEventListener("click",()=> canManageUsers() ? switchView("users") : alert("Solo administradores pueden agregar personal."));
+  if (btn) btn.addEventListener("click",()=> canManageUsers() ? switchView("users") : alert("Solo supervisores pueden agregar personal."));
   return node;
 }
 
@@ -955,7 +957,7 @@ async function employeeExists(employeeId) {
   return !snap.empty;
 }
 async function createStaff({ employeeId, name, area, baseDate, color, accessRole, pin }) {
-  if (!canManageUsers()) throw new Error("Solo administradores pueden agregar personal.");
+  if (!canManageUsers()) throw new Error("Solo supervisores pueden agregar personal.");
   const clean = normalizeEmployee(employeeId);
   if (!clean || !name || !pin) throw new Error("Completa número de empleado, nombre y PIN.");
   if (pin.length < 4) throw new Error("El PIN debe tener mínimo 4 caracteres.");
@@ -991,11 +993,11 @@ async function editUserProfile(userId) {
   const protectedOwner = target.accessRole === "owner";
 
   if (protectedOwner && !isOwner()) {
-    alert("El administrador principal está protegido. Solo el propietario puede modificar sus propios datos.");
+    alert("El supervisor principal está protegido. Solo el propietario puede modificar sus propios datos.");
     return;
   }
   if (!isOwner() && !isAdmin()) {
-    alert("Solo administradores pueden editar datos de personal.");
+    alert("Solo supervisores pueden editar datos de personal.");
     return;
   }
 
@@ -1042,15 +1044,15 @@ async function editUserProfile(userId) {
 async function changeAccessRole(userId, accessRole) {
   const target = state.users.find(u=>u.id===userId);
   if (!target) return;
-  if (target.accessRole === "owner") { alert("El administrador principal no se puede modificar."); return; }
+  if (target.accessRole === "owner") { alert("El supervisor principal no se puede modificar."); return; }
   if (target.id === currentUser.uid) { alert("No puedes cambiar tu propio rol."); return; }
-  if (!confirm(accessRole === "admin" ? `¿Hacer administrador a ${target.name}?` : `¿Quitar permisos de administrador a ${target.name}?`)) return;
+  if (!confirm(accessRole === "admin" ? `¿Hacer supervisor a ${target.name}?` : `¿Hacer embajador a ${target.name}?`)) return;
   await updateDoc(doc(db,"profiles",userId), { accessRole, updatedAt: serverTimestamp(), updatedBy: currentUser.uid });
 }
 async function deactivateUser(userId) {
   const target = state.users.find(u=>u.id===userId);
   if (!target) return;
-  if (target.accessRole === "owner") { alert("El administrador principal está protegido y no se puede eliminar."); return; }
+  if (target.accessRole === "owner") { alert("El supervisor principal está protegido y no se puede eliminar."); return; }
   if (target.id === currentUser.uid) { alert("No puedes eliminar tu propio usuario."); return; }
   if (!confirm(`¿Eliminar/desactivar a ${target.name}? Ya no podrá entrar a la app.`)) return;
   await updateDoc(doc(db,"profiles",userId), { active:false, deletedAt: serverTimestamp(), deletedBy: currentUser.uid });
@@ -1112,7 +1114,6 @@ function updateRangeInfo() {
   $("#rangeInfo").textContent=days===1?"Se aplica a 1 día":`Se aplica a ${days} días (${from} → ${to})`;
 }
 function switchView(view) {
-  if (view === "users" && !canManageUsers()) { alert("Solo administradores pueden administrar personal."); return; }
   $$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===view));
   $$(".view").forEach(v=>v.classList.remove("active"));
   $(`#${view}View`).classList.add("active");
@@ -1129,13 +1130,6 @@ $("#loginForm").addEventListener("submit", async e=>{
   const btn=e.submitter;
   try { setBusy(btn,true,"Entrando..."); await login($("#loginEmployee").value,$("#loginPin").value); }
   catch(err) { authError("No se pudo entrar. Revisa número de empleado y PIN."); console.warn(err); }
-  finally { setBusy(btn,false); }
-});
-$("#setupOwnerBtn").addEventListener("click", async ()=>{
-  authError("");
-  const btn=$("#setupOwnerBtn");
-  try { setBusy(btn,true,"Creando..."); await setupOwner($("#loginEmployee").value,$("#loginPin").value); }
-  catch(err) { authError(err.message || "No se pudo crear el administrador principal."); console.warn(err); }
   finally { setBusy(btn,false); }
 });
 $("#logoutBtn").addEventListener("click",()=>signOut(auth));
