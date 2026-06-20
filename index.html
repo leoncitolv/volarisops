@@ -40,6 +40,21 @@
       --blur: 22px;
     }
 
+    /* Drag states */
+    .app-card[draggable="true"] { cursor: grab; }
+    .app-card[draggable="true"]:active { cursor: grabbing; }
+    .app-card.dragging {
+      opacity: .35;
+      transform: scale(.97);
+      transition: opacity .15s, transform .15s;
+    }
+    .app-card.drag-over {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 3px;
+      transform: scale(1.025);
+      transition: transform .15s ease, outline .1s ease;
+    }
+
     [data-theme="light"] {
       color-scheme: light;
       --bg: #f6efff;
@@ -794,11 +809,154 @@
         .trim();
     }
 
+    /* ── Drag & Drop reordering ── */
+    const ORDER_KEY = 'appvol-card-order';
+
+    function saveOrder() {
+      const ids = [...grid.querySelectorAll('.app-card')].map(c => c.dataset.id);
+      localStorage.setItem(ORDER_KEY, JSON.stringify(ids));
+    }
+
+    function loadOrder() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(ORDER_KEY));
+        if (!Array.isArray(saved) || saved.length === 0) return;
+        saved.forEach(id => {
+          const card = grid.querySelector(`.app-card[data-id="${id}"]`);
+          if (card) grid.appendChild(card);
+        });
+      } catch {}
+    }
+
+    let dragSrc = null;
+    let touchDragCard = null;
+    let touchClone = null;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+
+    function initDrag(card) {
+      // Desktop drag
+      card.setAttribute('draggable', 'true');
+
+      card.addEventListener('dragstart', e => {
+        dragSrc = card;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        grid.querySelectorAll('.app-card').forEach(c => c.classList.remove('drag-over'));
+        saveOrder();
+        dragSrc = null;
+      });
+
+      card.addEventListener('dragover', e => {
+        e.preventDefault();
+        if (!dragSrc || dragSrc === card) return;
+        e.dataTransfer.dropEffect = 'move';
+        grid.querySelectorAll('.app-card').forEach(c => c.classList.remove('drag-over'));
+        card.classList.add('drag-over');
+      });
+
+      card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+
+      card.addEventListener('drop', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!dragSrc || dragSrc === card) return;
+        card.classList.remove('drag-over');
+        const allCards = [...grid.querySelectorAll('.app-card')];
+        const srcIdx = allCards.indexOf(dragSrc);
+        const tgtIdx = allCards.indexOf(card);
+        if (srcIdx < tgtIdx) card.after(dragSrc);
+        else card.before(dragSrc);
+        saveOrder();
+      });
+
+      // Touch drag
+      card.addEventListener('touchstart', onTouchStart, { passive: true });
+    }
+
+    function onTouchStart(e) {
+      const card = e.currentTarget;
+      const touch = e.touches[0];
+      const rect = card.getBoundingClientRect();
+      touchOffsetX = touch.clientX - rect.left;
+      touchOffsetY = touch.clientY - rect.top;
+
+      const longPress = setTimeout(() => {
+        touchDragCard = card;
+        touchClone = card.cloneNode(true);
+        touchClone.style.cssText = `
+          position:fixed; z-index:9999; width:${rect.width}px; pointer-events:none;
+          opacity:.88; transform:scale(1.04) rotate(1.5deg);
+          box-shadow:0 28px 60px rgba(0,0,0,.45);
+          transition:transform .12s ease;
+          left:${rect.left}px; top:${rect.top}px;
+        `;
+        document.body.appendChild(touchClone);
+        card.classList.add('dragging');
+        if (navigator.vibrate) navigator.vibrate(18);
+      }, 300);
+
+      const cancelLong = () => clearTimeout(longPress);
+      card.addEventListener('touchend', cancelLong, { once: true });
+      card.addEventListener('touchmove', cancelLong, { once: true, passive: true });
+
+      card.addEventListener('touchmove', onTouchMove, { passive: true });
+      card.addEventListener('touchend', onTouchEnd, { once: true });
+    }
+
+    function onTouchMove(e) {
+      if (!touchDragCard || !touchClone) return;
+      const touch = e.touches[0];
+      touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+      touchClone.style.top  = (touch.clientY - touchOffsetY) + 'px';
+
+      touchClone.style.display = 'none';
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      const target = el && el.closest('.app-card');
+      grid.querySelectorAll('.app-card').forEach(c => c.classList.remove('drag-over'));
+      if (target && target !== touchDragCard) target.classList.add('drag-over');
+    }
+
+    function onTouchEnd(e) {
+      if (!touchDragCard) return;
+      const touch = e.changedTouches[0];
+      if (touchClone) { touchClone.remove(); touchClone = null; }
+      touchDragCard.classList.remove('dragging');
+
+      touchClone && touchClone.remove();
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const target = el && el.closest('.app-card');
+      grid.querySelectorAll('.app-card').forEach(c => c.classList.remove('drag-over'));
+
+      if (target && target !== touchDragCard) {
+        const allCards = [...grid.querySelectorAll('.app-card')];
+        const srcIdx = allCards.indexOf(touchDragCard);
+        const tgtIdx = allCards.indexOf(target);
+        if (srcIdx < tgtIdx) target.after(touchDragCard);
+        else target.before(touchDragCard);
+        saveOrder();
+      }
+
+      touchDragCard = null;
+    }
+
+    // Init drag on all cards
+    [...grid.querySelectorAll('.app-card')].forEach(initDrag);
+
+    // Restore saved order
+    loadOrder();
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
       });
     }
+
   </script>
 </body>
 </html>
