@@ -1213,11 +1213,12 @@ body::before{
 <div id="loginScreen">
   <div class="login-plane">✈</div>
   <div class="login-title">Acceso al portal</div>
-  <div class="login-sub">Ingresa tu número de empleado</div>
+  <div class="login-sub">Ingresa tu número de empleado y PIN de 4 cifras</div>
   <div class="login-form">
     <input class="login-input" id="loginNumero" type="text" placeholder="Número de empleado" maxlength="12" autocomplete="off" inputmode="numeric"/>
+    <input class="login-input" id="loginPassword" type="password" placeholder="PIN de 4 cifras" maxlength="4" autocomplete="current-password" inputmode="numeric" pattern="[0-9]*"/>
     <button class="btn-login" id="btnLogin" disabled>Entrar →</button>
-    <div class="login-error" id="loginError">Número no autorizado. Contacta al administrador.</div>
+    <div class="login-error" id="loginError">Número o contraseña incorrectos.</div>
   </div>
 </div>
 
@@ -1369,7 +1370,7 @@ body::before{
     <div class="tut-card" style="background:rgba(40,0,80,.35);border:1px solid rgba(180,100,255,.15);">
       <div class="tut-card-head" style="background:rgba(150,50,255,.15);"><span>🔐</span><span class="tut-card-title" style="color:#cc88ff;">Acceso al portal</span></div>
       <div class="tut-card-body">
-        <div class="tut-step"><span class="tut-num" style="background:rgba(85,200,255,.15);color:#55ccff;">1</span><span class="tut-text">Al entrar se te pide tu <strong style="color:#cc88ff;">número de empleado</strong>. Solo los números autorizados por el administrador pueden acceder.</span></div>
+        <div class="tut-step"><span class="tut-num" style="background:rgba(85,200,255,.15);color:#55ccff;">1</span><span class="tut-text">Al entrar se te pide tu <strong style="color:#cc88ff;">número de empleado</strong>. Solo los números autorizados por el supervisor pueden acceder.</span></div>
         <div class="tut-step"><span class="tut-num" style="background:rgba(85,200,255,.15);color:#55ccff;">2</span><span class="tut-text">Toca tu <strong style="color:#cc88ff;">chip de usuario</strong> en la barra superior para actualizar tu nombre en cualquier momento.</span></div>
       </div>
     </div>
@@ -1387,8 +1388,8 @@ body::before{
         <div class="tut-grid-item" style="color:#55ee88;">✓ Ver notas</div><div class="tut-grid-item" style="color:#aaddff;">Usuarios autorizados</div>
         <div class="tut-grid-item" style="color:#55ee88;">✓ Agregar notas</div><div class="tut-grid-item" style="color:#aaddff;">Usuarios autorizados</div>
         <div class="tut-grid-item" style="color:#55ee88;">✓ Marcar hecho</div><div class="tut-grid-item" style="color:#aaddff;">Usuarios autorizados</div>
-        <div class="tut-grid-item" style="color:#ffcc55;">⚠ Borrar notas</div><div class="tut-grid-item" style="color:#ffcc55;">Solo admin</div>
-        <div class="tut-grid-item" style="color:#ff7799;">✕ Gestionar usuarios</div><div class="tut-grid-item" style="color:#ffcc55;">Solo admin</div>
+        <div class="tut-grid-item" style="color:#ffcc55;">⚠ Borrar notas</div><div class="tut-grid-item" style="color:#ffcc55;">Solo supervisor</div>
+        <div class="tut-grid-item" style="color:#ff7799;">✕ Gestionar usuarios</div><div class="tut-grid-item" style="color:#ffcc55;">Solo supervisor</div>
       </div>
     </div>
   </div>
@@ -1450,27 +1451,11 @@ body::before{
   <img id="lightboxImg" src="" alt="foto"/>
 </div>
 
-<!-- MODAL ADMIN LOGIN -->
-<div id="modalAdmin" class="modal-overlay">
-  <div style="font-size:1.8rem;">🔐</div>
-  <div class="modal-ol-title" style="background:linear-gradient(135deg,#ffcc44,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Acceso Administrativo</div>
-  <div class="modal-ol-sub">Contraseña de administrador</div>
-  <div style="position:relative;width:100%;max-width:280px;">
-    <input class="input-modal" id="inputAdminPass" type="password" placeholder="••••••" maxlength="20" style="width:100%;padding-right:2.8rem;"/>
-    <button onclick="togglePassVis()" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(200,150,0,.5);font-size:1rem;" id="btnEyeToggle">👁</button>
-  </div>
-  <div class="admin-error" id="adminError">Contraseña incorrecta</div>
-  <div class="modal-btns">
-    <button class="btn-cancel" id="btnAdminCancel">Cancelar</button>
-    <button class="btn-ok" id="btnAdminOk">Entrar</button>
-  </div>
-</div>
-
 <!-- MODAL GESTIÓN USUARIOS (admin) -->
 <div id="modalUsuarios" class="modal-overlay" style="z-index:410;">
   <div style="font-size:1.6rem;">👥</div>
   <div class="modal-ol-title">Gestión de Usuarios</div>
-  <div class="modal-ol-sub">Solo el administrador puede editar</div>
+  <div class="modal-ol-sub">Roles de la app · Auth se crea en Firebase Console</div>
   <div class="user-list" id="userList"><div class="users-empty">Sin usuarios registrados</div></div>
   <div class="user-add-row">
     <input class="user-add-input" id="newUserNombre" type="text" placeholder="Nombre completo" maxlength="40"/>
@@ -1513,6 +1498,7 @@ body::before{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, update, remove, onValue, get, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBgxuSvpkpMJ6nGFdPV8j-Oj5RSHA7_uWM",
@@ -1526,6 +1512,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
 /* ══════════════════════════
    TEMA
@@ -1547,14 +1534,35 @@ document.getElementById('btnTheme').addEventListener('click', () => {
    USUARIOS en Firebase
    /volaris_users/{numero} = {nombre, numero, ts}
 ══════════════════════════ */
-let usersData = {};   // {numero: {nombre, numero, ts}}
+let usersData = {};   // {u_numero: {nombre, numero, rol, ts}}
 const usersRef = ref(db, 'volaris_users');
-onValue(usersRef, snap => {
-  usersData = snap.val() || {};
-  renderUserList();
-});
+let unsubscribeUsers = null;
+
+function startUsersListener(){
+  if(unsubscribeUsers) return;
+  unsubscribeUsers = onValue(usersRef, snap => {
+    usersData = snap.val() || {};
+    renderUserList();
+    updateTopUser();
+    syncSupervisorMode(false);
+  }, err => {
+    console.warn('Usuarios no disponibles hasta iniciar sesión:', err);
+  });
+}
+function stopUsersListener(){
+  if(unsubscribeUsers){ unsubscribeUsers(); unsubscribeUsers=null; }
+  usersData = {};
+}
 
 function userKey(numero){ return 'u_' + String(numero).replace(/\D/g,''); }
+function authEmailFromNumero(numero){ return String(numero).trim().replace(/\D/g,'') + '@volarisops.local'; }
+// Firebase Auth exige mínimo 6 caracteres; el usuario escribe 4 cifras y la app agrega este sufijo.
+// En Authentication crea las contraseñas como: PIN + AUTH_PIN_SUFFIX. Ejemplo: 1006 + 00 = 100600.
+const AUTH_PIN_SUFFIX = '00';
+function authPasswordFromPin(pin){
+  const clean = String(pin).trim();
+  return /^\d{4}$/.test(clean) ? clean + AUTH_PIN_SUFFIX : clean;
+}
 
 async function addUser(nombre, numero, rol='embajador'){
   const k = userKey(numero);
@@ -1567,21 +1575,28 @@ async function deleteUser(k){
   await remove(ref(db, 'volaris_users/' + k));
 }
 function isAuthorized(numero){
-  if(String(numero).trim() === ADMIN_NUMERO) return true;
-  return Object.values(usersData).some(u => String(u.numero).trim() === String(numero).trim());
+  return !!getUserByNumero(numero);
 }
 function getUserByNumero(numero){
-  return Object.values(usersData).find(u => String(u.numero).trim() === String(numero).trim()) || null;
+  const k=userKey(numero);
+  return usersData[k] || Object.values(usersData).find(u => String(u.numero).trim() === String(numero).trim()) || null;
+}
+async function getUserByNumeroFresh(numero){
+  const snap = await get(ref(db, 'volaris_users/' + userKey(numero)));
+  return snap.exists() ? snap.val() : null;
+}
+function getCurrentNumero(){
+  const email = auth.currentUser?.email || '';
+  const m = email.match(/^([^@]+)/);
+  return (m ? m[1] : '') || loadPerfil().numero;
 }
 function getRol(){
-  const p = loadPerfil();
-  if(String(p.numero).trim() === ADMIN_NUMERO) return 'admin';
-  const u = getUserByNumero(p.numero);
+  const u = getUserByNumero(getCurrentNumero());
   return u?.rol || 'embajador';
 }
-const puedeCrear  = () => ['admin','supervisor'].includes(getRol());
-const puedeEditar = () => ['admin','supervisor'].includes(getRol());
-const puedeBorrar = () => ['admin','supervisor'].includes(getRol());
+const puedeCrear  = () => ['supervisor'].includes(getRol());
+const puedeEditar = () => ['supervisor'].includes(getRol());
+const puedeBorrar = () => ['supervisor'].includes(getRol());
 
 /* ══════════════════════════
    PERFIL LOCAL
@@ -1596,9 +1611,9 @@ function updateTopUser(){
   document.getElementById('topUserAvatar').textContent = initials(p.nombre);
   // Insignia de rol en topbar
   const rol = getRol();
-  const rolLabels = {admin:'👑 Admin', supervisor:'👔 Supervisor', embajador:'✈️ Embajador'};
-  const rolColors = {admin:'rgba(200,150,0,.2)', supervisor:'rgba(85,200,255,.15)', embajador:'rgba(170,85,255,.12)'};
-  const rolTC = {admin:'#ffcc55', supervisor:'#55ccff', embajador:'#cc88ff'};
+  const rolLabels = {supervisor:'👔 Supervisor', embajador:'✈️ Embajador'};
+  const rolColors = {supervisor:'rgba(85,200,255,.15)', embajador:'rgba(170,85,255,.12)'};
+  const rolTC = {supervisor:'#55ccff', embajador:'#cc88ff'};
   let rb = document.getElementById('rolBadgeTop');
   if(!rb){ rb=document.createElement('span'); rb.id='rolBadgeTop';
     rb.style.fontSize='.55rem';rb.style.fontWeight='900';rb.style.letterSpacing='.06em';rb.style.textTransform='uppercase';rb.style.padding='.1rem .38rem';rb.style.borderRadius='99px';rb.style.flexShrink='0';
@@ -1638,8 +1653,8 @@ let globalData = {};
 let isAdmin = false;
 let expandedFolders = new Set();
 let expandedHistorial = new Set();
-const ADMIN_PASS = '2011ss';
-const ADMIN_NUMERO = '2771'; // César Lara administrador automático   // tu número de empleado como admin
+// Seguridad: el rol ya no depende de un número ni de una contraseña escrita en el HTML.
+// El supervisor debe existir en Firebase Authentication y en /volaris_users/u_NUMERO con rol:'supervisor'.
 
 /* ══════════════════════════
    SYNC BADGES
@@ -1651,12 +1666,22 @@ function setSyncOff(){ ['syncBadge','syncBadge2'].forEach(id=>{ const b=document
    FIREBASE NOTAS
 ══════════════════════════ */
 const dbRef = ref(db, 'volaris_notas');
-onValue(dbRef, snap => {
-  globalData = snap.val() || {};
-  setSyncOk();
-  renderFolders(document.getElementById('searchNotas').value);
-  renderGlobal();
-}, err => { console.error(err); setSyncOff(); });
+let unsubscribeNotas = null;
+function startNotasListener(){
+  if(unsubscribeNotas) return;
+  unsubscribeNotas = onValue(dbRef, snap => {
+    globalData = snap.val() || {};
+    setSyncOk();
+    renderFolders(document.getElementById('searchNotas').value);
+    renderGlobal();
+  }, err => { console.error(err); setSyncOff(); });
+}
+function stopNotasListener(){
+  if(unsubscribeNotas){ unsubscribeNotas(); unsubscribeNotas=null; }
+  globalData = {};
+}
+function startRealtimeListeners(){ startUsersListener(); startNotasListener(); }
+function stopRealtimeListeners(){ stopUsersListener(); stopNotasListener(); }
 
 function matKey(mat){ return mat.replace(/[.#$/\[\] ]/g,'_'); }
 async function fbSetEntry(mat, entry, modeloVal='', varianteVal=''){
@@ -2383,15 +2408,21 @@ function renderGlobal(){
 /* ══════════════════════════
    TELEGRAM BOT
 ══════════════════════════ */
-const TG_TOKEN = '8976769090:AAG3zqzafpyh53UWQ0E0oGKXgXMXQFexztc';
-const TG_CHAT  = '-1003585707802';
+// Telegram seguro: NO coloques aquí el token del bot.
+// Para activar notificaciones, crea una Cloud Function/endpoint propio y pega su URL pública aquí.
+// Ejemplo: const TELEGRAM_WEBHOOK_URL = 'https://tu-region-tu-proyecto.cloudfunctions.net/sendTelegram';
+const TELEGRAM_WEBHOOK_URL = '';
 
 async function tgNotify(msg){
+  if(!TELEGRAM_WEBHOOK_URL){
+    console.info('Telegram desactivado: falta configurar TELEGRAM_WEBHOOK_URL.');
+    return;
+  }
   try{
-    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
+    await fetch(TELEGRAM_WEBHOOK_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:TG_CHAT, text:msg, parse_mode:'HTML'})
+      body:JSON.stringify({text:msg})
     });
   }catch(e){ console.warn('Telegram no disponible:',e); }
 }
@@ -2488,46 +2519,30 @@ window.confirmDeleteAll=n=>showConfirm('🗑 Borrar matrícula','Elimina '+n+' y
 window.confirmDeleteEntry=(n,id)=>showConfirm('🗑 Borrar nota','¿Eliminar esta nota?',async()=>{if(puedeBorrar())await fbUpdateEntry(n,id,{deleted:true});});
 
 /* ══════════════════════════
-   ADMIN
+   SUPERVISOR / PERMISOS
 ══════════════════════════ */
-function esAdminPermanente(){
-  const p=loadPerfil();
-  return String(p.numero).trim()===ADMIN_NUMERO;
+function syncSupervisorMode(doRender=true){
+  const rol = getRol();
+  isAdmin = rol === 'supervisor';
+  const pencil=document.getElementById('btnAdminPencil');
+  const badge=document.getElementById('adminBadge');
+  if(pencil){
+    pencil.classList.toggle('admin-on', isAdmin);
+    pencil.title = isAdmin ? 'Supervisor: gestionar usuarios' : 'Solo supervisores';
+    pencil.style.display = isAdmin ? 'flex' : 'none';
+  }
+  if(badge){
+    badge.textContent = 'Supervisor';
+    badge.classList.toggle('show', isAdmin);
+  }
+  updateAdminUIExtras();
+  if(doRender){ renderGlobal(); renderFolders(document.getElementById('searchNotas').value); }
 }
+
 document.getElementById('btnAdminPencil').addEventListener('click',()=>{
-  if(esAdminPermanente()){
-    // César Lara (2771): admin siempre activo, sin pedir contraseña ni poder desactivarlo
-    if(!isAdmin){
-      isAdmin=true;
-      document.getElementById('btnAdminPencil').classList.add('admin-on');
-      document.getElementById('adminBadge').classList.add('show');
-      document.getElementById('btnAdminPencil').title='Admin permanente';
-      updateAdminUIExtras();
-      renderGlobal();renderFolders(document.getElementById('searchNotas').value);
-    }
-    return;
-  }
-  if(isAdmin){
-    isAdmin=false;document.getElementById('btnAdminPencil').classList.remove('admin-on');document.getElementById('adminBadge').classList.remove('show');
-    renderGlobal();renderFolders(document.getElementById('searchNotas').value);
-  } else {
-    document.getElementById('inputAdminPass').value='';document.getElementById('adminError').classList.remove('show');
-    document.getElementById('modalAdmin').classList.add('show');
-    setTimeout(()=>document.getElementById('inputAdminPass').focus(),300);
-  }
+  if(!isAdmin){ showToast('🔒 Solo supervisores'); return; }
+  window.openUserManager();
 });
-document.getElementById('btnAdminCancel').addEventListener('click',()=>document.getElementById('modalAdmin').classList.remove('show'));
-function checkAdmin(){
-  if(document.getElementById('inputAdminPass').value===ADMIN_PASS){
-    isAdmin=true;document.getElementById('modalAdmin').classList.remove('show');
-    document.getElementById('btnAdminPencil').classList.add('admin-on');document.getElementById('adminBadge').classList.add('show');
-    document.getElementById('btnAdminPencil').title='Admin activo — toca para desactivar';
-    renderGlobal();renderFolders(document.getElementById('searchNotas').value);
-  } else { document.getElementById('adminError').classList.add('show');document.getElementById('inputAdminPass').value=''; }
-}
-document.getElementById('btnAdminOk').addEventListener('click',checkAdmin);
-document.getElementById('inputAdminPass').addEventListener('keydown',e=>{if(e.key==='Enter')checkAdmin();});
-window.togglePassVis=()=>{ const i=document.getElementById('inputAdminPass');i.type=i.type==='password'?'text':'password';document.getElementById('btnEyeToggle').textContent=i.type==='password'?'👁':'🙈'; };
 
 /* ══════════════════════════
    GESTIÓN USUARIOS (admin)
@@ -2571,12 +2586,13 @@ document.getElementById('btnAddUser').addEventListener('click',async()=>{
   const rol=document.getElementById('newUserRol').value||'embajador';
   if(!nombre||!numero)return;
   await addUser(nombre,numero,rol);
+  showToast('✅ Rol guardado. Crea también el usuario en Authentication.');
   document.getElementById('newUserNombre').value='';
   document.getElementById('newUserNumero').value='';
   document.getElementById('newUserRol').value='embajador';
 });
 
-// Botón usuarios visible solo en modo admin — inyectado dinámicamente
+// Botón usuarios visible solo para Supervisor — inyectado dinámicamente
 function updateAdminUIExtras(){
   let btn=document.getElementById('btnUserManager');
   if(isAdmin&&!btn){
@@ -2588,20 +2604,6 @@ function updateAdminUIExtras(){
     document.querySelector('.top-bar').insertBefore(btn,document.getElementById('adminBadge'));
   } else if(!isAdmin&&btn){ btn.remove(); }
 }
-
-// Sobreescribir checkAdmin para incluir UI extras
-const _origCheckAdmin=checkAdmin;
-document.getElementById('btnAdminOk').removeEventListener('click',checkAdmin);
-function checkAdminFull(){
-  if(document.getElementById('inputAdminPass').value===ADMIN_PASS){
-    isAdmin=true;document.getElementById('modalAdmin').classList.remove('show');
-    document.getElementById('btnAdminPencil').classList.add('admin-on');document.getElementById('adminBadge').classList.add('show');
-    updateAdminUIExtras();renderGlobal();renderFolders(document.getElementById('searchNotas').value);
-  } else { document.getElementById('adminError').classList.add('show');document.getElementById('inputAdminPass').value=''; }
-}
-document.getElementById('btnAdminOk').addEventListener('click',checkAdminFull);
-document.getElementById('inputAdminPass').addEventListener('keydown',e=>{if(e.key==='Enter')checkAdminFull();});
-document.getElementById('btnAdminPencil').addEventListener('click',()=>{ setTimeout(()=>{if(!isAdmin)updateAdminUIExtras();},10); });
 
 /* ══════════════════════════
    SECCIONES SHOW/HIDE
@@ -2652,33 +2654,72 @@ document.getElementById('btnEditPerfilOk').addEventListener('click',()=>{
 document.getElementById('searchNotas').addEventListener('input',e=>renderFolders(e.target.value));
 
 /* ══════════════════════════
-   LOGIN con número de empleado
+   LOGIN con Firebase Authentication
 ══════════════════════════ */
-function activarAdminSiCorresponde(){
-  if(esAdminPermanente()&&!isAdmin){
-    isAdmin=true;
-    document.getElementById('btnAdminPencil').classList.add('admin-on');
-    document.getElementById('adminBadge').classList.add('show');
-    document.getElementById('btnAdminPencil').title='Admin permanente';
-    updateAdminUIExtras();
+let authReadyResolve;
+const authReadyPromise = new Promise(res=>authReadyResolve=res);
+onAuthStateChanged(auth, user=>{
+  authReadyResolve?.(user);
+  if(user){ startRealtimeListeners(); }
+  else { stopRealtimeListeners(); }
+});
+
+async function entrarAlPortalConNumero(numero){
+  const u = await getUserByNumeroFresh(numero);
+  if(!u){
+    await signOut(auth);
+    throw new Error('Usuario autenticado, pero sin registro de rol en /volaris_users.');
   }
-}
-const loginInput=document.getElementById('loginNumero');
-const btnLogin=document.getElementById('btnLogin');
-loginInput.addEventListener('input',()=>{ btnLogin.disabled=!loginInput.value.trim(); document.getElementById('loginError').classList.remove('show'); });
-loginInput.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!btnLogin.disabled)btnLogin.click(); });
-btnLogin.addEventListener('click',()=>{
-  const numero=loginInput.value.trim();
-  if(!isAuthorized(numero)){document.getElementById('loginError').classList.add('show');return;}
-  // Buscar nombre del usuario
-  const u=getUserByNumero(numero);
-  const nombre=u?.nombre||'';
-  savePerfil(nombre,numero);
+  usersData[userKey(numero)] = u;
+  savePerfil(u.nombre||'', String(numero).trim());
+  startRealtimeListeners();
   updateTopUser();
+  syncSupervisorMode(false);
   document.getElementById('loginScreen').classList.remove('show');
   document.getElementById('portal').classList.add('show');
-  activarAdminSiCorresponde();
   renderFolders('');renderGlobal();
+}
+
+function showLoginError(msg){
+  const el=document.getElementById('loginError');
+  el.textContent=msg;
+  el.classList.add('show');
+}
+
+const loginInput=document.getElementById('loginNumero');
+const loginPass=document.getElementById('loginPassword');
+const btnLogin=document.getElementById('btnLogin');
+function updateLoginButton(){
+  const pinOk = /^\d{4}$/.test(loginPass.value.trim());
+  btnLogin.disabled=!(loginInput.value.trim()&&pinOk);
+  document.getElementById('loginError').classList.remove('show');
+}
+loginInput.addEventListener('input',updateLoginButton);
+loginPass.addEventListener('input',()=>{
+  loginPass.value=loginPass.value.replace(/\D/g,'').slice(0,4);
+  updateLoginButton();
+});
+loginInput.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!btnLogin.disabled)btnLogin.click(); });
+loginPass.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!btnLogin.disabled)btnLogin.click(); });
+btnLogin.addEventListener('click',async()=>{
+  const numero=loginInput.value.trim();
+  const pin=loginPass.value.trim();
+  const pass=authPasswordFromPin(pin);
+  if(!numero||!/^\d{4}$/.test(pin))return;
+  btnLogin.disabled=true;
+  btnLogin.textContent='Entrando...';
+  try{
+    await signInWithEmailAndPassword(auth, authEmailFromNumero(numero), pass);
+    await entrarAlPortalConNumero(numero);
+    loginPass.value='';
+  }catch(e){
+    console.warn(e);
+    showLoginError('Número o PIN incorrecto, o usuario sin permiso.');
+  }finally{
+    btnLogin.disabled=false;
+    btnLogin.textContent='Entrar →';
+    updateLoginButton();
+  }
 });
 
 /* ══════════════════════════
@@ -2688,19 +2729,18 @@ document.getElementById('btnEnter').addEventListener('click',()=>{
   document.getElementById('hero').classList.add('exit-up');
   document.getElementById('divider').classList.add('exit-close');
   document.getElementById('enterWrap').classList.add('exit-down');
-  setTimeout(()=>{
+  setTimeout(async()=>{
     document.getElementById('splash').style.display='none';
     const p=loadPerfil();
-    // Si ya tiene número guardado y está autorizado, entrar directo
-    if(p.numero&&isAuthorized(p.numero)){
-      updateTopUser();
-      document.getElementById('portal').classList.add('show');
-      activarAdminSiCorresponde();
-      renderFolders('');renderGlobal();
-    } else {
-      document.getElementById('loginScreen').classList.add('show');
-      setTimeout(()=>loginInput.focus(),300);
+    const user=await authReadyPromise;
+    if(user && p.numero && user.email===authEmailFromNumero(p.numero)){
+      try{
+        await entrarAlPortalConNumero(p.numero);
+        return;
+      }catch(e){ console.warn(e); }
     }
+    document.getElementById('loginScreen').classList.add('show');
+    setTimeout(()=>loginInput.focus(),300);
   },480);
 });
 
