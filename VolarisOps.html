@@ -92,6 +92,9 @@ html,body{background:var(--bg-body);color:var(--text-main);transition:background
 @keyframes purpleSlide{0%{background-position:0%}100%{background-position:100%}}
 .btn-enter:active{transform:scale(.94);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+#splash.splash-out{opacity:0;transform:scale(1.035);transition:opacity .58s ease,transform .58s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+#splash.splash-out .hero{animation:heroUp .55s cubic-bezier(.6,0,.4,1) forwards;}
+@media(prefers-reduced-motion:reduce){#splash::after,.logo-text span,.logo-shine,.divider,.tagline,.enter-wrap{animation-duration:.01ms!important;animation-delay:0s!important;}}
 
 /* ─── LOGIN SCREEN ─── */
 #loginScreen{position:fixed;inset:0;z-index:90;background:linear-gradient(160deg,#080015 0%,#130030 50%,#0d0020 100%);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;gap:1.4rem;}
@@ -1205,8 +1208,7 @@ body::before{
     <p class="tagline">Portal de operaciones</p>
   </div>
   <div class="enter-wrap" id="enterWrap">
-    <span class="enter-hint">¿Listo para despegar?</span>
-    <button class="btn-enter" id="btnEnter">✈ Entrar</button>
+    <span class="enter-hint">Preparando acceso seguro...</span>
   </div>
 </div>
 
@@ -2724,26 +2726,58 @@ btnLogin.addEventListener('click',async()=>{
 });
 
 /* ══════════════════════════
-   ENTRAR DESDE SPLASH
+   SPLASH INICIAL + ENTRADA AUTOMÁTICA
+   - Muestra la animación al abrir.
+   - Si ya existe sesión guardada, entra directo al portal.
+   - Si no hay sesión, pasa solo al inicio de sesión.
 ══════════════════════════ */
-document.getElementById('btnEnter').addEventListener('click',()=>{
-  document.getElementById('hero').classList.add('exit-up');
-  document.getElementById('divider').classList.add('exit-close');
-  document.getElementById('enterWrap').classList.add('exit-down');
-  setTimeout(async()=>{
-    document.getElementById('splash').style.display='none';
-    const p=loadPerfil();
-    const user=await authReadyPromise;
-    if(user && p.numero && user.email===authEmailFromNumero(p.numero)){
-      try{
-        await entrarAlPortalConNumero(p.numero);
-        return;
-      }catch(e){ console.warn(e); }
+function numeroDesdeUsuarioAuth(user){
+  const email = user?.email || '';
+  const m = email.match(/^(\d+)@volarisops\.local$/i);
+  return m ? m[1] : '';
+}
+
+async function continuarDespuesDelSplash(){
+  const splash = document.getElementById('splash');
+  if(splash) splash.style.display = 'none';
+
+  const perfil = loadPerfil();
+  const user = await authReadyPromise;
+  const numeroSesion = perfil.numero || numeroDesdeUsuarioAuth(user);
+
+  if(user && numeroSesion && user.email === authEmailFromNumero(numeroSesion)){
+    try{
+      await entrarAlPortalConNumero(numeroSesion);
+      return;
+    }catch(e){
+      console.warn('No se pudo entrar con la sesión guardada:', e);
+      await signOut(auth).catch(()=>{});
     }
-    document.getElementById('loginScreen').classList.add('show');
-    setTimeout(()=>loginInput.focus(),300);
-  },480);
-});
+  }
+
+  document.getElementById('loginScreen').classList.add('show');
+  setTimeout(()=>loginInput.focus({preventScroll:true}),300);
+}
+
+(function iniciarSplashAutomatico(){
+  const splash = document.getElementById('splash');
+  if(!splash) return;
+  let done = false;
+
+  function finishSplash(){
+    if(done) return;
+    done = true;
+    document.getElementById('hero')?.classList.add('exit-up');
+    document.getElementById('divider')?.classList.add('exit-close');
+    document.getElementById('enterWrap')?.classList.add('exit-down');
+    splash.classList.add('splash-out');
+    setTimeout(()=>continuarDespuesDelSplash(),620);
+  }
+
+  window.addEventListener('load',()=>setTimeout(finishSplash,2350),{once:true});
+  setTimeout(finishSplash,3600);
+  splash.addEventListener('click',finishSplash,{once:true});
+})();
 
 /* ══════════════════════════
    WEB SPEECH API - DICTAR EN MODAL 🎤
