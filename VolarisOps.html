@@ -1193,6 +1193,185 @@ body::before{
   .top-bar-logo{display:none !important;}
 }
 
+
+/* ==========================================================
+   VOLARIS OPS 2.0 — VISUAL PATCH FINAL
+   Inspirado en el mockup aprobado: glassmorphism, profundidad,
+   morado radial, acentos lima/azul/rojo y lista premium.
+========================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800;900&display=swap');
+
+:root{
+  --v2-bg-a:#05010f;
+  --v2-bg-b:#14002d;
+  --v2-bg-c:#23064a;
+  --v2-card:rgba(255,255,255,.075);
+  --v2-card-2:rgba(255,255,255,.115);
+  --v2-line:rgba(255,255,255,.14);
+  --v2-line-soft:rgba(255,255,255,.085);
+  --v2-text:#f8edff;
+  --v2-sub:rgba(238,220,255,.68);
+  --v2-muted:rgba(238,220,255,.42);
+  --v2-purple:#b941ff;
+  --v2-purple-2:#7c2dff;
+  --v2-blue:#44c7ff;
+  --v2-green:#43f56f;
+  --v2-red:#ff416d;
+  --v2-orange:#ffbd58;
+  --v2-shadow:0 18px 50px rgba(0,0,0,.38);
+  --v2-shadow-soft:0 10px 28px rgba(0,0,0,.26);
+}
+html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;}
+#portal,#folderScreen,#loginScreen,#tutScreen{
+  background:
+    radial-gradient(circle at 50% 18%,rgba(185,65,255,.24),transparent 31%),
+    radial-gradient(circle at 8% 42%,rgba(68,199,255,.11),transparent 27%),
+    radial-gradient(circle at 96% 78%,rgba(67,245,111,.08),transparent 24%),
+    linear-gradient(168deg,var(--v2-bg-a) 0%,#0a0219 32%,var(--v2-bg-b) 68%,#05010f 100%)!important;
+}
+#portal::after,#folderScreen::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.024) 1px,transparent 1px);
+  background-size:38px 38px;
+  mask-image:radial-gradient(circle at 50% 26%,rgba(0,0,0,.75),transparent 76%);
+}
+#mainContent,.top-bar,.fs-nav,.fs-body{position:relative;z-index:2;}
+
+/* Top bar tipo dashboard */
+.top-bar{
+  margin:.75rem .85rem .2rem!important;
+  padding:.62rem .66rem!important;
+  border-radius:30px!important;
+  background:rgba(18,8,36,.58)!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  box-shadow:var(--v2-shadow-soft),inset 0 1px 0 rgba(255,255,255,.09)!important;
+  backdrop-filter:blur(28px) saturate(160%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(160%)!important;
+  gap:.48rem!important;
+}
+.top-bar-logo{
+  order:3!important;
+  background:transparent!important;border:0!important;padding:.25rem .5rem!important;
+  font-size:.72rem!important;color:var(--v2-text)!important;-webkit-text-fill-color:var(--v2-text)!important;
+}
+.top-user-chip{
+  order:1!important;margin-right:.25rem!important;position:relative!important;
+  padding:.42rem .78rem .42rem .42rem!important;border-radius:999px!important;
+  background:rgba(255,255,255,.075)!important;border:1px solid rgba(255,255,255,.14)!important;
+}
+.top-user-chip::after{
+  content:'';position:absolute;left:28px;bottom:6px;width:9px;height:9px;border-radius:50%;
+  background:var(--v2-green);box-shadow:0 0 10px rgba(67,245,111,.9);border:2px solid #16072d;
+}
+.top-user-avatar{
+  width:38px!important;height:38px!important;border-radius:50%!important;font-size:.83rem!important;
+  background:linear-gradient(135deg,#6d28d9,#c026d3)!important;
+  box-shadow:0 0 0 2px rgba(67,245,111,.85),0 0 20px rgba(67,245,111,.25)!important;
+}
+.top-user-name{font-size:.83rem!important;color:#fff!important;letter-spacing:.02em!important;}
+.top-user-emp{font-size:.58rem!important;color:var(--v2-sub)!important;}
+#rolBadgeTop{
+  order:2!important;font-size:.58rem!important;padding:.22rem .65rem!important;
+  color:#dff6ff!important;background:rgba(68,199,255,.12)!important;border:1px solid rgba(68,199,255,.25)!important;
+}
+.sync-indicator{font-size:.58rem!important;padding:.22rem .58rem!important;border-radius:999px!important;background:rgba(67,245,111,.12)!important;color:#9bffb4!important;border:1px solid rgba(67,245,111,.22)!important;}
+.sync-off{background:rgba(255,189,88,.12)!important;color:#ffcd7a!important;border-color:rgba(255,189,88,.22)!important;}
+#btnUserManager{
+  order:4!important;background:rgba(255,189,88,.10)!important;color:#ffe39a!important;border:1px solid rgba(255,189,88,.24)!important;
+  border-radius:999px!important;padding:.24rem .68rem!important;font-size:.58rem!important;letter-spacing:.08em!important;
+}
+.v2-bell{
+  order:9;min-width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.13);position:relative;flex:0 0 auto;
+}
+.v2-bell::before{content:'🔔';font-size:1rem;filter:grayscale(1) brightness(2);}
+.v2-bell::after{content:'61';position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;background:var(--v2-red);color:white;font-size:.56rem;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(255,65,109,.70);}
+.btn-theme,.btn-admin-pencil,.logo-volaris{order:8!important;}
+
+/* Hero */
+.hero-card{
+  margin:1rem .9rem .35rem!important;border-radius:30px!important;padding:1.15rem!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.115),rgba(255,255,255,.048)),radial-gradient(circle at 24% 0%,rgba(185,65,255,.28),transparent 54%)!important;
+  border:1px solid rgba(255,255,255,.15)!important;box-shadow:var(--v2-shadow),inset 0 1px 0 rgba(255,255,255,.10)!important;
+}
+.hero-card-icon{width:64px!important;height:64px!important;border-radius:24px!important;background:#05010f!important;border:1px solid rgba(185,65,255,.34)!important;box-shadow:0 0 28px rgba(185,65,255,.34)!important;}
+.hero-card-title{font-size:1.45rem!important;color:#fff!important;letter-spacing:.06em!important;}
+.hero-card-sub{font-size:.83rem!important;color:var(--v2-sub)!important;}
+.sec-label{letter-spacing:.28em!important;color:rgba(238,220,255,.50)!important;padding:1rem 1rem .5rem!important;}
+
+/* Tarjetas rápidas 2.0 */
+.quick-grid{gap:.72rem!important;padding:.65rem .9rem 0!important;}
+.quick-btn,.quick-grid .quick-btn[style]{
+  min-height:128px!important;border-radius:28px!important;padding:1rem!important;overflow:hidden!important;
+  background:linear-gradient(160deg,rgba(101,33,163,.58),rgba(16,7,36,.58))!important;
+  border:1px solid rgba(255,255,255,.14)!important;box-shadow:var(--v2-shadow-soft),inset 0 1px 0 rgba(255,255,255,.10)!important;
+  backdrop-filter:blur(22px) saturate(160%)!important;position:relative!important;
+}
+.quick-grid .quick-btn::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 6%,rgba(255,255,255,.11),transparent 38%),radial-gradient(circle at 96% 0%,rgba(185,65,255,.22),transparent 46%);pointer-events:none;}
+.quick-grid .quick-btn>*{position:relative;z-index:1;}
+.quick-btn.v2-new{align-items:center!important;justify-content:center!important;text-align:center!important;}
+.quick-btn.v2-new .quick-icon{width:68px!important;height:68px!important;border-radius:50%!important;background:#fff!important;color:#24103b!important;font-size:2.2rem!important;box-shadow:0 0 0 5px rgba(68,118,255,.18),0 0 28px rgba(68,118,255,.60)!important;margin:0 0 .36rem!important;border:0!important;}
+.quick-btn.v2-new .quick-label{color:#ffd8ff!important;}
+.quick-icon{width:46px!important;height:46px!important;border-radius:17px!important;background:rgba(255,255,255,.10)!important;border:1px solid rgba(255,255,255,.13)!important;margin-top:.35rem!important;}
+.quick-label{font-size:.82rem!important;color:#fff!important;letter-spacing:.10em!important;}
+.quick-btn p{color:var(--v2-sub)!important;font-size:.64rem!important;}
+.quick-btn span[id$='Badge']{top:.58rem!important;left:1rem!important;transform:none!important;background:rgba(68,199,255,.12)!important;color:#aeeaff!important;border:1px solid rgba(68,199,255,.32)!important;animation:none!important;font-size:.56rem!important;}
+.quick-btn span[id$='Count']{width:34px!important;height:34px!important;top:.65rem!important;right:.65rem!important;color:#fff!important;border:1px solid rgba(255,255,255,.20)!important;box-shadow:0 0 22px rgba(68,199,255,.44)!important;}
+#homeGlobalCount{background:linear-gradient(135deg,#16a34a,#43f56f)!important;box-shadow:0 0 22px rgba(67,245,111,.48)!important;}
+#homeMatProgress,#homeGlobalProgress{background:linear-gradient(90deg,var(--v2-green),#9cffba)!important;}
+.quick-btn div[style*='height:4px']{height:8px!important;border-radius:999px!important;background:rgba(120,96,170,.36)!important;margin-top:.74rem!important;}
+#homeMatProgressText,#homeGlobalProgressText{color:#d8caff!important;font-weight:800!important;}
+.quick-btn.v2-radar .quick-icon{font-size:1.55rem!important;}
+.quick-btn.v2-radar::after{content:'LIVE';position:absolute;top:.92rem;right:.85rem;background:linear-gradient(135deg,#ff416d,#ff3049);color:#fff;font-size:.62rem;font-weight:900;padding:.22rem .56rem;border-radius:999px;box-shadow:0 0 18px rgba(255,65,109,.60);z-index:3;}
+.quick-btn.v2-global .quick-label{color:#a3ff72!important;}
+.quick-btn.v2-mat .quick-label{color:#89ddff!important;}
+.info-strip{margin:1rem .9rem 0!important;border-radius:26px!important;padding:.78rem 1rem!important;background:rgba(255,255,255,.065)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:var(--v2-shadow-soft)!important;}
+.info-strip span:first-child{color:var(--v2-green)!important;filter:drop-shadow(0 0 8px rgba(67,245,111,.7));}
+
+/* Pantalla matrículas */
+#sectionNotas .sec-label{display:flex!important;gap:.55rem!important;align-items:center!important;padding:.85rem .95rem .45rem!important;letter-spacing:.10em!important;}
+#sectionNotas .sec-label>button,#sectionGlobal .sec-label>button{margin-right:0!important;padding:.42rem .88rem!important;border-radius:999px!important;background:rgba(255,65,109,.10)!important;border:1px solid rgba(255,65,109,.28)!important;color:#ff8aa3!important;}
+.v2-filter-chip{font-size:.62rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase;padding:.38rem .78rem;border-radius:999px;border:1px solid rgba(67,245,111,.25);background:rgba(67,245,111,.10);color:#9dffb5;white-space:nowrap;}
+.search-wrap{padding:.75rem .9rem .38rem!important;}
+.search-box{min-height:56px!important;border-radius:24px!important;background:rgba(255,255,255,.068)!important;border:1px solid rgba(255,255,255,.13)!important;box-shadow:var(--v2-shadow-soft),inset 0 1px 0 rgba(255,255,255,.06)!important;}
+.search-box::after{content:'≡';transform:rotate(90deg);color:rgba(238,220,255,.48);font-size:1.2rem;margin-left:.35rem;}
+.search-box input{font-size:1rem!important;}
+.folder-list{gap:.76rem!important;padding:.5rem .9rem 5.5rem!important;}
+.folder-item{border-radius:26px!important;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.04))!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 10px 26px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.08)!important;}
+.folder-header{padding:1rem 1rem!important;gap:.85rem!important;}
+.folder-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;font-size:0!important;}
+.folder-icon::before{content:'✈';font-size:1.25rem;filter:drop-shadow(0 0 7px rgba(68,199,255,.6));}
+.folder-header::after{content:'›';font-size:1.85rem;color:rgba(238,220,255,.55);margin-left:.15rem;}
+.folder-mat{font-size:1.08rem!important;color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;letter-spacing:.13em!important;}
+.folder-mat-sub{font-size:.68rem!important;color:rgba(238,220,255,.62)!important;}
+.folder-count{font-size:.68rem!important;padding:.23rem .62rem!important;background:rgba(255,189,88,.105)!important;color:#ffd27a!important;border:1px solid rgba(255,189,88,.23)!important;}
+.folder-count[style*='55ee88']{background:rgba(67,245,111,.09)!important;color:#9dffb5!important;border-color:rgba(67,245,111,.22)!important;}
+.btn-nueva-nota{width:64px!important;height:64px!important;right:1rem!important;bottom:1.1rem!important;background:linear-gradient(135deg,#9d2dff,#e044ff)!important;box-shadow:0 18px 42px rgba(185,65,255,.52),inset 0 1px 0 rgba(255,255,255,.20)!important;}
+
+/* Folder detalle */
+.fs-nav{border-radius:28px!important;margin:.72rem .85rem .3rem!important;background:rgba(18,8,36,.60)!important;border:1px solid rgba(255,255,255,.13)!important;}
+.fs-title{font-size:1.06rem!important;color:#fff!important;}
+.fs-stats-bar{border-radius:28px!important;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.12)!important;}
+#folderScreen .nota-personal{border-radius:26px!important;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.04))!important;border:1px solid rgba(255,255,255,.12)!important;}
+.nota-subitem-diamond,#folderScreen .nota-subitem-diamond{border-radius:50%!important;}
+
+@media(max-width:520px){
+  .top-bar{overflow-x:auto!important;scrollbar-width:none!important;}
+  .top-bar::-webkit-scrollbar{display:none;}
+  .top-bar-logo{display:none!important;}
+  .top-user-avatar{width:34px!important;height:34px!important;}
+  .top-user-name{max-width:96px!important;font-size:.78rem!important;}
+  #rolBadgeTop,#btnUserManager,.sync-indicator{font-size:.52rem!important;padding:.2rem .5rem!important;}
+  .v2-bell{min-width:32px;height:32px;}
+  .hero-card-title{font-size:1.25rem!important;}
+  .quick-btn,.quick-grid .quick-btn[style]{min-height:122px!important;border-radius:25px!important;}
+  .quick-label{font-size:.72rem!important;}
+  .quick-btn.v2-new .quick-icon{width:60px!important;height:60px!important;font-size:2rem!important;}
+  #sectionNotas .sec-label{overflow-x:auto;scrollbar-width:none;}
+  #sectionNotas .sec-label::-webkit-scrollbar{display:none;}
+  .folder-mat{font-size:.98rem!important;}
+}
+
 </style>
 </head>
 <body>
@@ -2924,6 +3103,59 @@ if('serviceWorker' in navigator){
 window.EMOJI_PERSONALIZADO_NOTA = true;
 window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
 </script>
+
+<script>
+/* ==========================================================
+   VOLARIS OPS 2.0 — pequeños ajustes DOM sin tocar Firebase
+========================================================== */
+(function(){
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  ready(function(){
+    document.documentElement.setAttribute('data-v2','visual-2.0');
+
+    // Campana de notificación visual, separada de la lógica existente.
+    const top=document.querySelector('.top-bar');
+    if(top && !document.querySelector('.v2-bell')){
+      const bell=document.createElement('span');
+      bell.className='v2-bell';
+      bell.title='Notificaciones';
+      top.appendChild(bell);
+    }
+
+    // Chips visuales para tarjetas rápidas.
+    document.querySelectorAll('.quick-grid .quick-btn').forEach(btn=>{
+      const t=(btn.textContent||'').toLowerCase();
+      if(t.includes('nueva nota')) btn.classList.add('v2-new');
+      if(t.includes('matr')) btn.classList.add('v2-mat');
+      if(t.includes('flight')) btn.classList.add('v2-radar');
+      if(t.includes('global')) btn.classList.add('v2-global');
+    });
+
+    // Filtro EN LÍNEA visible en pantalla de matrículas.
+    const notasLabel=document.querySelector('#sectionNotas .sec-label');
+    if(notasLabel && !notasLabel.querySelector('.v2-filter-chip')){
+      const chip=document.createElement('span');
+      chip.className='v2-filter-chip';
+      chip.textContent='● EN LÍNEA';
+      const closeBtn=notasLabel.querySelector('button');
+      notasLabel.insertBefore(chip, closeBtn || null);
+    }
+
+    // Texto del sync más limpio cuando está conectado/desconectado.
+    const syncMap = new MutationObserver(()=>{
+      document.querySelectorAll('#syncBadge,#syncBadge2').forEach(el=>{
+        if(!el) return;
+        const txt=(el.textContent||'').trim();
+        if(txt==='✅' || txt.toLowerCase().includes('online')) el.textContent='● EN LÍNEA';
+        if(txt==='⏳') el.textContent='↻ SYNC';
+      });
+    });
+    syncMap.observe(document.body,{childList:true,subtree:true,characterData:true});
+    document.querySelectorAll('#syncBadge,#syncBadge2').forEach(el=>{ if(el && el.textContent.trim()==='⏳') el.textContent='↻ SYNC'; });
+  });
+})();
+</script>
+
 </body>
 
 </html>
