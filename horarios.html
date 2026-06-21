@@ -587,6 +587,251 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
   #splashHorarios::after,.splash-horarios-word span,.splash-horarios-logo-shine,.splash-horarios-divider,.splash-horarios-caption{animation-duration:.01ms!important;animation-delay:0s!important;}
 }
 
+
+
+/* ═════ Mejoras visuales calendario 2.5 ═════ */
+:root{
+  --lime:#86efac;
+  --cyan:#4de2ff;
+  --cyan-soft:rgba(77,226,255,.18);
+  --rose-soft:rgba(251,113,133,.2);
+  --panel-elevated:rgba(14,9,34,.92);
+}
+body{
+  background-image:
+    linear-gradient(rgba(148,84,255,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,84,255,.055) 1px, transparent 1px),
+    radial-gradient(circle at top left, rgba(139,47,201,.28), transparent 28%),
+    radial-gradient(circle at top right, rgba(93,39,203,.18), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(88,28,135,.16), transparent 32%),
+    linear-gradient(180deg,#130726 0%,#090312 34%,#06040d 100%);
+  background-size: 40px 40px, 40px 40px, auto, auto, auto, auto;
+}
+.hero-top{
+  position:relative;
+}
+.hero-top::after{
+  content:"";
+  position:absolute;
+  right:2%;
+  top:8px;
+  width:min(38vw,280px);
+  height:min(38vw,280px);
+  background:radial-gradient(circle at center, rgba(139,47,201,.24), rgba(76,29,149,.08) 42%, transparent 68%);
+  border-radius:50%;
+  filter:blur(1px);
+  opacity:.9;
+  pointer-events:none;
+}
+.toolbar{
+  grid-template-columns:minmax(230px,1fr) minmax(280px,1.15fr) auto;
+  gap:12px;
+  padding:16px;
+  align-items:stretch;
+}
+.field-wide{grid-column:auto}
+.toolbar-meta{display:grid;gap:12px}
+.toggle-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:74px;
+  padding:14px 16px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(7,4,20,.88),rgba(10,7,26,.82));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.toggle-card > div{display:grid;gap:4px}
+.toggle-label{
+  display:block;
+  color:var(--text);
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.01em;
+}
+.toggle-card small{color:var(--muted);line-height:1.35;font-size:12px}
+.switch{position:relative;display:inline-flex;align-items:center;flex:0 0 auto}
+.switch input{position:absolute;opacity:0;pointer-events:none}
+.slider{
+  width:72px;height:40px;border-radius:999px;position:relative;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 6px rgba(0,0,0,.35);
+  transition:background .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.slider::before{
+  content:"";
+  position:absolute;left:4px;top:4px;
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(180deg,#fff,#ddd6fe);
+  box-shadow:0 6px 14px rgba(0,0,0,.26);
+  transition:transform .18s ease;
+}
+.switch input:checked + .slider{
+  background:linear-gradient(135deg, rgba(34,197,94,.9), rgba(77,226,255,.95));
+  border-color:rgba(134,239,172,.55);
+  box-shadow:0 0 0 4px rgba(77,226,255,.12), inset 0 1px 8px rgba(255,255,255,.18);
+}
+.switch input:checked + .slider::before{transform:translateX(32px)}
+.soft.accent{
+  min-width:110px;
+  background:linear-gradient(135deg,#9d45ea,#c057ff);
+  border-color:rgba(192,87,255,.36);
+  box-shadow:0 16px 34px rgba(134,52,255,.28), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.soft.accent:hover{background:linear-gradient(135deg,#a954f0,#ce6bff)}
+.calendar-grid{gap:8px}
+.weekdays{margin-bottom:10px}
+.weekdays span{font-size:11.5px;color:#9082bc}
+.day{
+  min-height:152px;
+  border-radius:24px;
+  padding:10px;
+  gap:8px;
+  background:
+    linear-gradient(180deg,rgba(20,12,44,.98),rgba(9,6,26,.95)),
+    linear-gradient(135deg,rgba(132,73,246,.12),transparent 55%);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 16px 32px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.day:hover{transform:translateY(-2px);border-color:rgba(176,92,255,.28)}
+.day.other{opacity:.38}
+.day.selected{
+  border-color:rgba(192,87,255,.7);
+  box-shadow:0 0 0 1px rgba(192,87,255,.26), 0 18px 38px rgba(59,18,122,.42), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.day.today{
+  border-color:rgba(168,85,247,.8);
+  box-shadow:0 0 0 1px rgba(192,87,255,.28), 0 0 0 6px rgba(168,85,247,.10), 0 18px 36px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.day-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.date-bubble{
+  min-width:32px;height:32px;padding:0 10px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:950;font-size:15px;letter-spacing:-.03em;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.04);
+}
+.day.today .date-bubble{
+  background:linear-gradient(135deg,#a855f7,#d946ef);
+  box-shadow:0 8px 20px rgba(168,85,247,.32);
+}
+.day.selected .date-bubble{box-shadow:0 0 0 3px rgba(192,87,255,.16)}
+.mini-count{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 8px;border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.06);
+  color:#d5cdf5;font-size:11px;font-weight:850;
+}
+.mini-count svg{width:12px;height:12px;opacity:.85}
+.badge{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:7px;
+  padding:7px 9px;
+  border-radius:999px;
+  font-size:11px;
+  min-width:0;
+}
+.badge-copy{min-width:0;text-align:left}
+.badge-copy strong,.badge-copy small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge-copy strong{font-size:11.3px}
+.badge-copy small{font-size:10px;color:rgba(255,255,255,.78)}
+.badge-icon,.badge-state{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.badge-icon{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(255,255,255,.16);
+  font-size:11px;font-weight:900;
+}
+.badge-state{font-size:12px;opacity:.96}
+.badge.current-user{
+  border:1px solid rgba(77,226,255,.44);
+  box-shadow:0 0 0 1px rgba(77,226,255,.10), 0 8px 18px rgba(18,73,102,.22), inset 0 1px 0 rgba(255,255,255,.14);
+}
+.badge.current-user .badge-copy strong{color:#f4feff}
+.you-chip{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:5px;padding:2px 6px;border-radius:999px;
+  font-size:9px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;
+  color:#05131a;background:rgba(255,255,255,.85);
+}
+.status-work{background:linear-gradient(135deg,rgba(239,68,68,.92),rgba(127,29,29,.74))}
+.status-rest{background:linear-gradient(135deg,rgba(34,197,94,.9),rgba(20,83,45,.74))}
+.status-vacation{background:linear-gradient(135deg,rgba(56,189,248,.9),rgba(14,116,144,.72))}
+.status-course{background:linear-gradient(135deg,rgba(250,204,21,.96),rgba(180,83,9,.84));color:#251902}
+.status-course .badge-copy small{color:rgba(37,25,2,.7)}
+.status-overtime{background:linear-gradient(135deg,rgba(167,139,250,.92),rgba(91,33,182,.76))}
+.status-permission{background:linear-gradient(135deg,rgba(148,163,184,.88),rgba(51,65,85,.76))}
+.badge.current-user.status-work{background:linear-gradient(135deg,rgba(36,204,239,.98),rgba(14,165,233,.84))}
+.badge.current-user.status-rest{background:linear-gradient(135deg,rgba(34,211,238,.96),rgba(45,212,191,.82))}
+.badge.current-user.status-vacation,.badge.current-user.status-course,.badge.current-user.status-overtime,.badge.current-user.status-permission{
+  background:linear-gradient(135deg,rgba(77,226,255,.96),rgba(59,130,246,.84));
+  color:#04111a;
+}
+.badge.current-user .badge-copy small,
+.badge.current-user.status-vacation .badge-copy small,
+.badge.current-user.status-course .badge-copy small,
+.badge.current-user.status-overtime .badge-copy small,
+.badge.current-user.status-permission .badge-copy small{color:rgba(4,17,26,.74)}
+.more{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10.5px;color:#c9beed;padding-left:4px;font-weight:850;
+}
+.more::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.22),transparent)}
+.calendar-detail{
+  margin-top:14px;
+  padding:14px 16px 16px;
+  border-radius:28px;
+  background:
+    linear-gradient(180deg,rgba(25,17,52,.92),rgba(12,8,30,.95)),
+    linear-gradient(135deg,rgba(91,33,182,.14),transparent 40%);
+}
+.detail-grabber{width:64px;height:5px;border-radius:999px;background:rgba(192,87,255,.5);margin:0 auto 14px}
+.detail-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.detail-eyebrow{margin:0 0 4px;color:var(--purple2);font-size:11px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+.calendar-detail h3{margin:0;font-size:22px;line-height:1.05;letter-spacing:-.03em}
+.detail-count{margin:4px 0 0;color:var(--muted);font-size:13px}
+.detail-action{min-width:130px}
+.detail-items{display:grid;gap:8px;margin-bottom:14px}
+.status-legend{display:flex;flex-wrap:wrap;gap:10px 16px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px;color:#d6ccf4;font-size:12px}
+.status-legend span{display:inline-flex;align-items:center;gap:8px}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 3px rgba(255,255,255,.04)}
+.legend-work{background:#fb7185}
+.legend-rest{background:#22c55e}
+.legend-vacation{background:#38bdf8}
+.legend-course{background:#facc15}
+.legend-overtime{background:#a78bfa}
+.legend-you{background:linear-gradient(135deg,#4de2ff,#86efac)}
+#userFilter:disabled{opacity:.82;filter:saturate(.9)}
+@media(max-width:760px){
+  .toolbar{grid-template-columns:1fr;}
+  .toolbar-meta{grid-template-columns:1fr;}
+  .soft.accent{width:100%;}
+  .calendar-detail h3{font-size:19px}
+  .detail-header{flex-direction:column;align-items:stretch}
+  .detail-action{width:100%}
+}
+@media(max-width:430px){
+  .toggle-card{padding:13px 14px;border-radius:19px;min-height:70px}
+  .toggle-label{font-size:13.2px}
+  .slider{width:66px;height:36px}
+  .slider::before{width:28px;height:28px}
+  .switch input:checked + .slider::before{transform:translateX(28px)}
+  .day{min-height:112px;padding:7px;border-radius:18px}
+  .day-header{align-items:flex-start}
+  .date-bubble{min-width:28px;height:28px;font-size:13px;padding:0 8px}
+  .mini-count{font-size:10px;padding:4px 7px}
+  .badge{padding:5px 6px;gap:5px}
+  .badge-copy strong{font-size:10.4px}
+  .badge-copy small{display:none}
+  .badge-icon{width:18px;height:18px;font-size:10px}
+  .status-legend{gap:8px 12px;font-size:11px}
+}
+
 </style>
 </head>
 <body class="locked">
@@ -630,7 +875,7 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
     <div class="auth-signature" aria-label="Firma de la app">
       <div class="signature-inner">
         <span class="signature-by">by laraclv</span>
-        <span class="signature-version">v 2.4.0</span>
+        <span class="signature-version">v 2.5.0</span>
       </div>
     </div>
   </section>
@@ -688,24 +933,36 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
 
     <main>
       <section class="toolbar glass">
-        <label class="field">
+        <label class="field field-wide">
           <span>Vista</span>
           <select id="userFilter"><option value="all">Todo el personal</option></select>
         </label>
-        <label class="field">
-          <span>Marca r&#225;pida</span>
-          <select id="quickStatus">
-            <option value="">Tocar d&#237;a para editar</option>
-            <option value="work">Turno nocturno</option>
-            <option value="rest">Descanso</option>
-            <option value="vacation">Vacaciones</option>
-            <option value="course">Curso</option>
-            <option value="overtime">Tiempo extra</option>
-            <option value="permission">Permiso</option>
-            <option value="clear">Quitar modificaci&#243;n</option>
-          </select>
-        </label>
-        <button id="todayBtn" class="soft">Hoy</button>
+        <div class="toolbar-meta">
+          <label class="toggle-card" for="myScheduleToggle">
+            <div>
+              <span class="toggle-label">Ver solo mi horario</span>
+              <small>Resalta tu nombre y filtra tus turnos al instante</small>
+            </div>
+            <span class="switch">
+              <input id="myScheduleToggle" type="checkbox" />
+              <span class="slider"></span>
+            </span>
+          </label>
+          <label class="field">
+            <span>Marca r&#225;pida</span>
+            <select id="quickStatus">
+              <option value="">Tocar d&#237;a para editar</option>
+              <option value="work">Turno nocturno</option>
+              <option value="rest">Descanso</option>
+              <option value="vacation">Vacaciones</option>
+              <option value="course">Curso</option>
+              <option value="overtime">Tiempo extra</option>
+              <option value="permission">Permiso</option>
+              <option value="clear">Quitar modificaci&#243;n</option>
+            </select>
+          </label>
+        </div>
+        <button id="todayBtn" class="soft accent">Hoy</button>
       </section>
 
       <section id="calendarView" class="view active">
@@ -713,6 +970,26 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
           <span>Dom</span><span>Lun</span><span>Mar</span><span>Mi&#233;</span><span>Jue</span><span>Vie</span><span>S&#225;b</span>
         </div>
         <div id="calendarGrid" class="calendar-grid"></div>
+        <aside id="calendarDetail" class="calendar-detail glass">
+          <div class="detail-grabber"></div>
+          <div class="detail-header">
+            <div>
+              <p class="detail-eyebrow">Vista del d&#237;a</p>
+              <h3 id="detailDate">Selecciona un d&#237;a</h3>
+              <p id="detailCount" class="detail-count">Toca cualquier celda para ver el detalle.</p>
+            </div>
+            <button id="detailAction" class="soft detail-action" type="button">Ver detalle</button>
+          </div>
+          <div id="detailItems" class="detail-items"></div>
+          <div class="status-legend">
+            <span><b class="legend-dot legend-work"></b>Turno nocturno</span>
+            <span><b class="legend-dot legend-rest"></b>Disponible</span>
+            <span><b class="legend-dot legend-vacation"></b>Vacaciones</span>
+            <span><b class="legend-dot legend-course"></b>Curso</span>
+            <span><b class="legend-dot legend-overtime"></b>Tiempo extra</span>
+            <span><b class="legend-dot legend-you"></b>Eres t&#250;</span>
+          </div>
+        </aside>
       </section>
 
       <section id="agendaView" class="view">
@@ -744,7 +1021,7 @@ body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-
     <footer class="app-signature" aria-label="Firma de la app">
       <div class="signature-inner">
         <span class="signature-by">by laraclv</span>
-        <span class="signature-version">v 2.4.0</span>
+        <span class="signature-version">v 2.5.0</span>
       </div>
     </footer>
   </div>
@@ -910,6 +1187,26 @@ function isAdmin() { return ["owner","admin"].includes(currentProfile?.accessRol
 function canManageUsers() { return isAdmin(); }
 function canEditUser(userId) { return isAdmin() || currentUser?.uid === userId; }
 function visibleUsers() { return state.users.filter(u => u.active !== false); }
+function currentProfileId() { return currentProfile?.uid || currentUser?.uid || ""; }
+function isMyScheduleOnly() { return !!$("#myScheduleToggle")?.checked; }
+function isCurrentProfileUser(user) { return !!user && user.id === currentProfileId(); }
+function statusIcon(status) {
+  return ({ work:"🌙", rest:"✅", vacation:"🧳", course:"📚", overtime:"⏱", permission:"🛡" }[status]) || "•";
+}
+function statusTail(status) {
+  return ({ work:"🌙", rest:"✓", vacation:"✈", course:"✎", overtime:"＋", permission:"•" }[status]) || "•";
+}
+function recordMetaLabel(record) {
+  const s = STATUS[record.status] || STATUS.work;
+  return record.note ? record.note : s.label;
+}
+function sortRecordsForDisplay(records=[]) {
+  return [...records].sort((a,b)=> {
+    const mine = Number(isCurrentProfileUser(b.user)) - Number(isCurrentProfileUser(a.user));
+    if (mine) return mine;
+    return String(a.user?.name || "").localeCompare(String(b.user?.name || ""),"es");
+  });
+}
 
 function authError(msg="") {
   const box = $("#authError");
@@ -1040,6 +1337,7 @@ function activeView() { return $(".tab.active")?.dataset.view || "calendar"; }
 function selectedUserId() { return $("#userFilter").value; }
 function getUsersForView() {
   const users = visibleUsers();
+  if (isMyScheduleOnly() && currentProfileId()) return users.filter(u => u.id === currentProfileId());
   const id = selectedUserId();
   return id === "all" ? users : users.filter(u => u.id === id);
 }
@@ -1066,30 +1364,34 @@ function dayRecord(user,date) {
 function render() {
   if (!currentProfile) return;
   updateRoleUI();
-  renderMonthHeader(); renderUserFilter(); renderCalendar(); renderAgenda(); renderSummary(); renderUsers();
+  renderMonthHeader(); renderUserFilter(); renderCalendar(); renderCalendarDetail(); renderAgenda(); renderSummary(); renderUsers();
 }
 function renderMonthHeader() {
   $("#monthLabel").textContent = monthName(current);
-  $("#todayLabel").textContent = `Hoy: ${new Date().toLocaleDateString("es-MX",{day:"numeric",month:"short",year:"numeric"})}`;
+  $("#todayLabel").innerHTML = `Hoy: <strong style="color:var(--purple2);font-weight:900">${new Date().toLocaleDateString("es-MX",{day:"numeric",month:"short",year:"numeric"})}</strong>`;
 }
 function renderUserFilter() {
   const filter = $("#userFilter"); const prev = filter.value || "all";
   const users = visibleUsers();
   filter.innerHTML = `<option value="all">Todo el personal</option>` + users.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}${u.accessRole === "admin" ? " · Supervisor" : u.accessRole === "owner" ? " · Propietario" : ""}</option>`).join("");
-  filter.value = users.some(u=>u.id===prev) ? prev : "all";
+  const preferred = isMyScheduleOnly() && currentProfileId() ? currentProfileId() : prev;
+  filter.value = users.some(u=>u.id===preferred) ? preferred : "all";
+  filter.disabled = isMyScheduleOnly();
 }
 function renderCalendar() {
   const grid = $("#calendarGrid"); grid.innerHTML="";
   if (!visibleUsers().length) { grid.append(emptyNode()); return; }
   const first = startOfMonth(current); const start = addDays(first, -first.getDay());
   const today = ymd(new Date());
+  const activeDate = selectedDate || today;
   for (let i=0; i<42; i++) {
-    const d=addDays(start,i); const date=ymd(d); const records=getUsersForView().map(u=>dayRecord(u,date));
+    const d=addDays(start,i); const date=ymd(d); let records=sortRecordsForDisplay(getUsersForView().map(u=>dayRecord(u,date)));
     const cell=document.createElement("button");
-    cell.className=`day ${d.getMonth()!==current.getMonth()?"other":""} ${date===today?"today":""}`;
+    cell.className=`day ${d.getMonth()!==current.getMonth()?"other":""} ${date===today?"today":""} ${date===activeDate?"selected":""}`;
     cell.dataset.date=date;
-    const max = selectedUserId()==="all" ? 3 : 5;
-    cell.innerHTML = `<div class="date-number"><span>${d.getDate()}</span><span class="mini-count">${records.length>1?records.length+" pers.":""}</span></div>` +
+    const max = (selectedUserId()==="all" && !isMyScheduleOnly()) ? 3 : 5;
+    const countLabel = records.length ? `<span class="mini-count"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>${records.length}</span>` : "";
+    cell.innerHTML = `<div class="day-header"><span class="date-bubble">${d.getDate()}</span>${countLabel}</div>` +
       records.slice(0,max).map(recordBadge).join("") + (records.length>max?`<span class="more">+${records.length-max} más</span>`:"");
     cell.addEventListener("click", ()=>handleDayClick(date));
     grid.append(cell);
@@ -1097,7 +1399,29 @@ function renderCalendar() {
 }
 function recordBadge(r) {
   const s=STATUS[r.status] || STATUS.work;
-  return `<div class="badge ${s.css}" title="${escapeHtml(r.user.name)} · ${s.label}"><span class="dot" style="background:${r.user.color || "#8b2fc9"}"></span><div><strong>${escapeHtml(r.user.name)}</strong><small>${s.short} · ${r.note?escapeHtml(r.note):s.time}</small></div></div>`;
+  const mine = isCurrentProfileUser(r.user);
+  const safeName = escapeHtml(r.user.name);
+  const meta = escapeHtml(recordMetaLabel(r));
+  return `<div class="badge ${s.css} ${mine?"current-user":""}" title="${safeName} · ${s.label}">` +
+    `<span class="badge-icon">${mine ? "★" : statusIcon(r.status)}</span>` +
+    `<div class="badge-copy"><strong>${safeName}${mine ? '<span class="you-chip">Tú</span>' : ''}</strong><small>${meta}</small></div>` +
+    `<span class="badge-state">${statusTail(r.status)}</span>` +
+  `</div>`;
+}
+function renderCalendarDetail() {
+  const detail = $("#calendarDetail");
+  if (!detail || !currentProfile) return;
+  const baseDate = selectedDate || ymd(new Date());
+  const date = parseYMD(baseDate);
+  const records = sortRecordsForDisplay(getUsersForView().map(u=>dayRecord(u, baseDate)));
+  $("#detailDate").textContent = longDate(date);
+  $("#detailCount").textContent = records.length ? `${records.length} persona${records.length===1?"":"s"} programada${records.length===1?"":"s"}` : "Sin personal programado para este día.";
+  $("#detailItems").innerHTML = records.length ? records.map(recordBadge).join("") : `<div class="badge status-permission"><span class="badge-icon">i</span><div class="badge-copy"><strong>Sin registros</strong><small>El día seleccionado no tiene personal visible en esta vista.</small></div><span class="badge-state">•</span></div>`;
+  const btn = $("#detailAction");
+  if (btn) {
+    btn.onclick = () => handleDayClick(baseDate);
+    btn.textContent = getEditableUsersForView().length ? "Ver detalle" : "Solo lectura";
+  }
 }
 function renderAgenda() {
   const box=$("#agendaList"); box.innerHTML="";
@@ -1288,15 +1612,19 @@ async function deactivateUser(userId) {
    INTERACCIONES DE CALENDARIO
    ══════════════════════════════════ */
 function handleDayClick(date) {
+  selectedDate = date;
+  renderCalendarDetail();
   const quick=$("#quickStatus").value;
   const users=getEditableUsersForView();
-  if (!users.length) { alert("No tienes permiso para editar este día de otra persona."); return; }
+  if (!users.length) { render(); alert("No tienes permiso para editar este día de otra persona."); return; }
   if (quick) {
     applyQuickStatus(users,date,quick);
     $("#quickStatus").value="";
+    render();
     return;
   }
-  selectedDate=date; openDialog(date);
+  render();
+  openDialog(date);
 }
 async function applyQuickStatus(users,date,quick) {
   const batch = writeBatch(db);
@@ -1362,8 +1690,10 @@ $("#logoutBtn").addEventListener("click",()=>signOut(auth));
 
 $("#prevMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()-1,1); render(); });
 $("#nextMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()+1,1); render(); });
-$("#todayBtn").addEventListener("click",()=>{ current=startOfMonth(new Date()); render(); });
-$("#userFilter").addEventListener("change",render);
+$("#todayBtn").addEventListener("click",()=>{ current=startOfMonth(new Date()); selectedDate = ymd(new Date()); render(); });
+$("#userFilter").addEventListener("change",()=>{ selectedDate = selectedDate || ymd(new Date()); render(); });
+$("#myScheduleToggle")?.addEventListener("change",()=>{ selectedDate = selectedDate || ymd(new Date()); render(); });
+$("#detailAction")?.addEventListener("click",()=>{ if (selectedDate) handleDayClick(selectedDate); });
 $$(".tab").forEach(t=>t.addEventListener("click",()=>{ switchView(t.dataset.view); render(); }));
 
 $("#userForm").addEventListener("submit",async e=>{
