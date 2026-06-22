@@ -841,11 +841,11 @@ body{
 
 /* ═════ Corrección visual estados + colores editables ═════ */
 :root{
-  --status-work:#22c55e;
-  --status-work-dark:#14532d;
+  --status-work:#ef4444;
+  --status-work-dark:#7f1d1d;
   --status-work-text:#ffffff;
-  --status-rest:#ef4444;
-  --status-rest-dark:#7f1d1d;
+  --status-rest:#22c55e;
+  --status-rest-dark:#14532d;
   --status-rest-text:#ffffff;
   --status-vacation:#38bdf8;
   --status-vacation-dark:#0e7490;
@@ -965,91 +965,140 @@ body{
 }
 
 
-
-/* ═════ Rediseño visual compacto inspirado en mockup 2026 ═════ */
-:root{
-  --neo-bg:#05040d;
-  --neo-card:rgba(11,10,27,.74);
-  --neo-card-strong:rgba(22,18,48,.92);
-  --neo-line:rgba(201,184,255,.13);
-  --neo-purple:#b05cff;
-  --neo-green:#22c55e;
-  --neo-red:#e11d48;
-  --neo-yellow:#facc15;
-  --neo-violet:#a855f7;
-}
-body{
+.month-insights{
+  margin-top:18px;
+  padding:18px;
+  border-radius:34px;
   background:
-    radial-gradient(circle at 12% 4%, rgba(153,85,255,.22), transparent 22%),
-    radial-gradient(circle at 86% 12%, rgba(85,255,214,.12), transparent 20%),
-    radial-gradient(circle at 50% 58%, rgba(99,20,188,.16), transparent 35%),
-    linear-gradient(180deg,#060510 0%,#090617 45%,#05040d 100%) !important;
+    radial-gradient(circle at 82% 15%, rgba(173, 93, 255, .20), transparent 32%),
+    linear-gradient(180deg, rgba(23,16,48,.94), rgba(8,8,26,.94));
+  border:1px solid rgba(190,160,255,.18);
+  box-shadow:0 18px 48px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
 }
-.app-shell{padding-inline:clamp(14px,2.6vw,28px);padding-bottom:calc(88px + env(safe-area-inset-bottom));}
-.hero{position:relative;top:auto;padding-top:8px;background:linear-gradient(180deg,rgba(5,4,13,.92),rgba(5,4,13,.68) 72%,rgba(5,4,13,0));backdrop-filter:blur(24px) saturate(1.25);}
-.hero::after{display:none;}
-.hero-top{padding:10px 0 10px;align-items:center;}
-.volaris-badge{gap:8px;margin:0;}
-.airline-name{display:none;}
-.brand h1{font-size:clamp(27px,7vw,46px);letter-spacing:-.04em;text-shadow:0 6px 24px rgba(0,0,0,.45);}
-.subtitle{margin-top:8px;color:#c7bfde;font-size:clamp(12px,3.5vw,15px);}
-.top-actions{gap:8px;}
-.home-link{display:none!important;}
-#logoutBtn.ghost{min-height:46px;padding:12px 17px;border-radius:18px;background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.11)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-size:14px;}
-.neo-dashboard{display:grid;grid-template-columns:minmax(130px,.82fr) minmax(0,2fr);gap:10px;margin:2px 0 12px;}
-.neo-today-card,.neo-panel-card{border-radius:26px;border:1px solid var(--neo-line);background:linear-gradient(180deg,rgba(17,15,38,.86),rgba(9,8,24,.76));box-shadow:0 16px 44px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(22px) saturate(1.25);}
-.neo-today-card{padding:16px 14px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden;}
-.neo-today-card::after{content:"";position:absolute;right:0;top:18%;bottom:18%;width:3px;border-radius:99px;background:linear-gradient(180deg,transparent,var(--neo-green),transparent);opacity:.7;}
-.neo-today-card span{color:var(--neo-purple);font-weight:950;font-size:15px;}
-.neo-today-card strong{font-size:clamp(44px,13vw,74px);line-height:.9;letter-spacing:-.07em;color:white;text-shadow:0 12px 30px rgba(0,0,0,.38);}
-.neo-today-card b{color:var(--neo-purple);font-size:18px;line-height:1.1;}
-.neo-today-card button{margin-top:9px;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);font-weight:850;color:#d8ccff;}
-.neo-panel-card{padding:14px;display:grid;gap:12px;align-content:center;}
-.neo-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.neo-stat{min-height:98px;padding:11px 8px;border-radius:20px;border:1px solid rgba(255,255,255,.075);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));display:grid;place-items:center;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.045);}
-.neo-stat i{width:36px;height:36px;border-radius:999px;display:grid;place-items:center;font-style:normal;font-weight:950;font-size:20px;margin-bottom:2px;background:rgba(255,255,255,.055);}
-.neo-stat strong{font-size:clamp(24px,6vw,38px);line-height:1;font-weight:950;}
-.neo-stat span{font-size:12px;color:#e8e2ff;font-weight:750;}
-.neo-work{box-shadow:inset 0 0 0 1px rgba(34,197,94,.08), inset 0 -36px 60px rgba(34,197,94,.08);}.neo-work i,.neo-work strong{color:var(--neo-green)}
-.neo-rest{box-shadow:inset 0 0 0 1px rgba(225,29,72,.08), inset 0 -36px 60px rgba(225,29,72,.08);}.neo-rest i,.neo-rest strong{color:var(--neo-red)}
-.neo-extra{box-shadow:inset 0 0 0 1px rgba(250,204,21,.08), inset 0 -36px 60px rgba(250,204,21,.06);}.neo-extra i,.neo-extra strong{color:var(--neo-yellow)}
-.neo-vac{box-shadow:inset 0 0 0 1px rgba(168,85,247,.09), inset 0 -36px 60px rgba(168,85,247,.08);}.neo-vac i,.neo-vac strong{color:var(--neo-violet)}
-.neo-shift-pill{min-height:42px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.045);display:flex;align-items:center;justify-content:center;gap:9px;padding:8px 12px;color:#e8e2ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.neo-shift-pill span{color:var(--neo-purple);font-size:20px}.neo-shift-pill b{font-weight:850}.neo-shift-pill strong{color:var(--neo-purple);font-weight:900}.neo-shift-pill em{font-style:normal;margin-left:auto;padding:5px 13px;border-radius:999px;background:rgba(176,92,255,.18);color:#d7b6ff;font-weight:850;}
-.controls.glass{border-radius:26px;margin:0 0 10px;padding:7px;background:rgba(8,7,22,.78);box-shadow:0 12px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.05);}
-.month-title strong{font-size:clamp(19px,5vw,25px);}.month-title span{display:none;}
-.round{height:48px;border-radius:18px;background:rgba(255,255,255,.055);font-size:28px;color:#f2ebff;}
-.tabs{padding:7px;border-radius:24px;background:rgba(8,7,22,.74);border:1px solid rgba(255,255,255,.08);box-shadow:0 12px 34px rgba(0,0,0,.30);gap:4px;}
-.tab{min-height:48px;border-radius:20px;background:transparent;border-color:transparent;font-size:clamp(11px,3vw,15px);color:#aaa2c4;}
-.tab.active{background:linear-gradient(135deg,#7c2dca,#4f1fb5);box-shadow:0 0 0 1px rgba(176,92,255,.24),0 14px 28px rgba(90,24,180,.32);}
-.toolbar.glass{border-radius:22px;padding:9px;gap:8px;background:rgba(8,7,22,.58);box-shadow:0 10px 28px rgba(0,0,0,.24);grid-template-columns:minmax(130px,1fr) minmax(150px,1.1fr) auto;}
-.toolbar .field span{font-size:9.5px;letter-spacing:.12em}.field input,.field select,.field textarea{border-radius:15px;padding:10px 11px;background:rgba(6,5,18,.86)}
-.toolbar-meta{grid-template-columns:1fr;gap:8px}.toggle-card{min-height:46px;border-radius:16px;padding:8px 10px}.toggle-label{font-size:12px}.toggle-card small{display:none}.slider{width:54px;height:30px}.slider::before{width:22px;height:22px}.switch input:checked + .slider::before{transform:translateX(24px)}
-.weekdays{margin:10px 4px 8px;gap:4px}.weekdays span{font-size:12px;letter-spacing:.18em;color:#a59cbe;}
-.calendar-grid{gap:4px;}
-.day{min-height:72px;border-radius:14px;padding:7px 5px;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(12,11,27,.96),rgba(7,6,18,.95));border:1px solid rgba(255,255,255,.085);box-shadow:0 8px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.035);}
-.day:hover{transform:translateY(-1px)}.day.other{opacity:.28}.day-header{width:100%;justify-content:center;min-height:23px}.date-bubble{height:auto;min-width:0;padding:0;background:transparent!important;border:0!important;box-shadow:none!important;font-size:clamp(14px,4vw,18px);color:#f4f0ff;text-shadow:0 2px 10px rgba(0,0,0,.32)}
-.day.selected{border-color:rgba(176,92,255,.85);background:radial-gradient(circle at center,rgba(176,92,255,.34),rgba(20,12,48,.95) 54%,rgba(8,6,21,.95));box-shadow:0 0 0 1px rgba(176,92,255,.25),0 0 24px rgba(176,92,255,.28),inset 0 1px 0 rgba(255,255,255,.06);}
-.day.today:not(.selected){border-color:rgba(176,92,255,.34);box-shadow:0 0 0 1px rgba(176,92,255,.10),0 8px 18px rgba(0,0,0,.25)}
-.day.today::before{content:"Hoy";position:absolute;bottom:4px;left:0;right:0;text-align:center;color:var(--neo-purple);font-size:10px;font-weight:900;z-index:2;}
-.day.today .badge{margin-bottom:10px;}
-.calendar-grid .mini-count{display:none!important}.calendar-grid .badge{width:34px;height:34px;padding:0;margin:0 auto;border-radius:999px;display:grid;place-items:center;border:1.5px solid rgba(255,255,255,.72)!important;box-shadow:0 8px 18px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.18)!important;outline:0!important;}
-.calendar-grid .badge-copy,.calendar-grid .badge-state{display:none!important}.calendar-grid .badge-icon{width:100%;height:100%;border-radius:999px;background:transparent;font-size:18px;display:grid;place-items:center;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.38)}
-.status-work,.badge.status-work,.badge.current-user.status-work{background:linear-gradient(135deg,var(--status-work),var(--status-work-dark))!important;color:var(--status-work-text)!important}.status-rest,.badge.status-rest,.badge.current-user.status-rest{background:linear-gradient(135deg,var(--status-rest),var(--status-rest-dark))!important;color:var(--status-rest-text)!important}.status-overtime,.badge.status-overtime{background:linear-gradient(135deg,var(--status-overtime),var(--status-overtime-dark))!important;color:var(--status-overtime-text)!important}.status-vacation,.badge.status-vacation{background:linear-gradient(135deg,var(--status-vacation),var(--status-vacation-dark))!important;color:var(--status-vacation-text)!important}
-.status-legend{justify-content:center;gap:10px 20px;border-top:0;padding-top:12px}.status-legend span{font-size:12px;color:#d5cdf5}.legend-work{background:#22c55e!important}.legend-rest{background:#e11d48!important}
-.calendar-detail{margin-top:14px;border-radius:24px;padding:16px;background:linear-gradient(180deg,rgba(15,13,34,.88),rgba(8,7,21,.80));border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 38px rgba(0,0,0,.30);}.detail-grabber{display:none}.calendar-detail h3{font-size:clamp(19px,5vw,26px);color:var(--neo-purple)}.detail-eyebrow{display:none}.detail-count{font-weight:800;color:#93e5a6}.detail-items{margin-top:12px;}
-.neo-bottom-nav{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:50;width:min(920px,calc(100% - 24px));display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;border-radius:24px;border:1px solid rgba(255,255,255,.10);background:rgba(8,7,22,.86);backdrop-filter:blur(24px) saturate(1.25);box-shadow:0 20px 55px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.06);}
-.neo-bottom-nav a,.neo-bottom-nav button{min-height:54px;border-radius:18px;background:transparent;color:#aaa2c4;text-decoration:none;display:grid;place-items:center;gap:2px;font-size:11px;font-weight:750;}.neo-bottom-nav span{font-size:22px;line-height:1}.neo-bottom-nav b{font-size:11px;font-weight:750}.neo-bottom-nav .active{background:rgba(126,54,224,.24);color:#c58cff;box-shadow:inset 0 0 0 1px rgba(176,92,255,.16)}
-.app-signature{padding-bottom:calc(88px + env(safe-area-inset-bottom));}
-@media(max-width:760px){
-  .app-shell{padding-inline:12px;}
-  .hero-top{gap:8px;align-items:flex-start}.brand h1{font-size:30px}.subtitle{max-width:270px;line-height:1.35}.top-actions{margin-top:3px}#sessionBadge{display:none!important}
-  .neo-dashboard{grid-template-columns:1fr;gap:9px}.neo-today-card{grid-template-columns:auto 1fr auto auto;place-items:center;text-align:left;padding:11px 13px;column-gap:10px}.neo-today-card span{font-size:13px}.neo-today-card strong{font-size:42px}.neo-today-card b{font-size:15px}.neo-today-card button{margin:0}.neo-today-card::after{display:none}.neo-panel-card{padding:10px}.neo-stats{gap:6px}.neo-stat{min-height:74px;border-radius:16px;padding:8px 5px}.neo-stat i{width:28px;height:28px;font-size:16px}.neo-stat strong{font-size:24px}.neo-stat span{font-size:10.2px}.neo-shift-pill{min-height:36px;font-size:12px;justify-content:flex-start}.neo-shift-pill em{display:none}
-  .toolbar.glass{grid-template-columns:1fr 1fr;}.toolbar .soft.accent{width:100%;grid-column:1/-1;min-height:42px}.toggle-card{display:none}.toolbar-meta{display:block}
-  .calendar-grid{gap:4px}.day{min-height:66px;border-radius:13px;padding:6px 4px}.calendar-grid .badge{width:31px;height:31px}.calendar-grid .badge-icon{font-size:16px}.weekdays span{font-size:11px;letter-spacing:.14em}.status-legend{font-size:11px;gap:8px 12px}
+.insights-hero{
+  display:grid;
+  grid-template-columns:minmax(180px, 1fr) auto auto auto;
+  align-items:center;
+  gap:18px;
+  padding:10px 6px 18px;
 }
-@media(max-width:430px){
-  .brand h1{font-size:28px}.subtitle{font-size:12px;max-width:235px}.volaris-badge img{width:30px!important;height:30px!important}.logoutBtn{font-size:12px}.neo-stats{grid-template-columns:repeat(4,minmax(0,1fr))}.neo-stat span{font-size:9.2px}.neo-shift-pill strong{font-size:12px}.controls{grid-template-columns:42px 1fr 42px!important}.round{height:42px;border-radius:15px}.month-title strong{font-size:18px}.tab{min-height:43px;border-radius:16px}.tab svg{width:13px;height:13px}.day{min-height:58px}.date-bubble{font-size:14px}.calendar-grid .badge{width:29px;height:29px}.calendar-grid .badge-icon{font-size:15px}.day.today::before{font-size:9px;bottom:2px}.day.today .badge{margin-bottom:8px}.calendar-detail{padding:14px}.neo-bottom-nav{width:calc(100% - 18px);border-radius:22px}.neo-bottom-nav a,.neo-bottom-nav button{min-height:50px;border-radius:16px}.neo-bottom-nav b{font-size:10px}.neo-bottom-nav span{font-size:20px}
+.insight-month-pill{
+  color:var(--purple2);
+  font-size:clamp(1.1rem, 1.7vw, 1.7rem);
+  font-weight:900;
+  letter-spacing:.01em;
+}
+.insight-day-number{
+  font-size:clamp(3rem, 6vw, 5.4rem);
+  line-height:.9;
+  font-weight:1000;
+  color:#fff;
+  text-shadow:0 8px 24px rgba(0,0,0,.26);
+}
+.insight-weekday{
+  font-size:clamp(1.35rem, 2.6vw, 2.25rem);
+  font-weight:900;
+  color:var(--purple2);
+}
+.insight-today{
+  min-width:138px;
+  justify-content:center;
+  gap:10px;
+  font-size:1.05rem;
+  padding:17px 22px;
+  border-radius:24px;
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+.insight-today svg{opacity:.9}
+.insights-metrics{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:16px;
+}
+.insight-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:28px;
+  padding:20px 18px 18px;
+  min-height:164px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.insight-card::after{
+  content:"";
+  position:absolute;
+  inset:auto -20% -35% auto;
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.1), transparent 65%);
+  pointer-events:none;
+}
+.insight-card.work{background:linear-gradient(180deg, rgba(24, 89, 58, .28), rgba(17, 23, 35, .92));}
+.insight-card.rest{background:linear-gradient(180deg, rgba(128, 26, 45, .26), rgba(23, 17, 35, .92));}
+.insight-card.overtime{background:linear-gradient(180deg, rgba(132, 103, 17, .24), rgba(24, 20, 35, .92));}
+.insight-card.vacation{background:linear-gradient(180deg, rgba(81, 30, 138, .28), rgba(20, 17, 35, .92));}
+.insight-icon{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  margin-bottom:14px;
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+  font-size:1.85rem;
+}
+.insight-card.work .insight-icon{color:#27e06e;}
+.insight-card.rest .insight-icon{color:#ff4a67;}
+.insight-card.overtime .insight-icon{color:#ffd233;}
+.insight-card.vacation .insight-icon{color:#bb69ff;}
+.insight-value{
+  font-size:clamp(2.35rem, 4vw, 4rem);
+  line-height:.95;
+  font-weight:1000;
+  margin-bottom:4px;
+}
+.insight-card.work .insight-value{color:#27e06e;}
+.insight-card.rest .insight-value{color:#ff4a67;}
+.insight-card.overtime .insight-value{color:#ffd233;}
+.insight-card.vacation .insight-value{color:#bb69ff;}
+.insight-label{
+  font-size:clamp(1.12rem, 1.5vw, 1.55rem);
+  font-weight:900;
+  color:#fff;
+}
+.insight-note{
+  margin-top:6px;
+  font-size:.88rem;
+  color:var(--muted);
+}
+@media (max-width: 980px){
+  .insights-hero{
+    grid-template-columns:1fr auto;
+    grid-template-areas:
+      "month button"
+      "day weekday";
+    row-gap:10px;
+  }
+  .insight-month-pill{grid-area:month;}
+  .insight-day-number{grid-area:day;}
+  .insight-weekday{grid-area:weekday; align-self:end;}
+  .insight-today{grid-area:button; justify-self:end;}
+  .insights-metrics{grid-template-columns:repeat(2, minmax(0, 1fr));}
+}
+@media (max-width: 640px){
+  .month-insights{padding:16px; border-radius:28px;}
+  .insights-hero{grid-template-columns:1fr; grid-template-areas:none; gap:8px;}
+  .insight-month-pill,.insight-day-number,.insight-weekday,.insight-today{grid-area:auto;}
+  .insight-day-number{font-size:3.3rem;}
+  .insight-weekday{font-size:1.5rem;}
+  .insight-today{width:100%;}
+  .insights-metrics{grid-template-columns:1fr 1fr; gap:12px;}
+  .insight-card{min-height:140px; padding:16px 14px; border-radius:22px;}
+  .insight-icon{width:52px; height:52px; font-size:1.5rem; margin-bottom:10px;}
 }
 
 </style>
@@ -1122,24 +1171,6 @@ body{
         </div>
       </div>
 
-      <section id="neoDashboard" class="neo-dashboard" aria-label="Resumen visual del mes">
-        <article class="neo-today-card">
-          <span id="neoDashMonth">Junio 2026</span>
-          <strong id="neoDashDay">22</strong>
-          <b id="neoDashWeekday">Lunes</b>
-          <button id="neoDashTodayBtn" type="button">▣ Hoy</button>
-        </article>
-        <div class="neo-panel-card">
-          <div class="neo-stats">
-            <article class="neo-stat neo-work"><i>✓</i><strong id="neoCountWork">0</strong><span>Trabajados</span></article>
-            <article class="neo-stat neo-rest"><i>★</i><strong id="neoCountRest">0</strong><span>Descansos</span></article>
-            <article class="neo-stat neo-extra"><i>◷</i><strong id="neoCountExtra">0</strong><span>Extra</span></article>
-            <article class="neo-stat neo-vac"><i>✈</i><strong id="neoCountVac">0</strong><span>Vacaciones</span></article>
-          </div>
-          <div class="neo-shift-pill"><span>☾</span><b>Turno nocturno:</b><strong>20:30 – 08:00 hrs</strong><em>Noche</em></div>
-        </div>
-      </section>
-
       <section class="controls glass">
         <button id="prevMonth" class="round" aria-label="Mes anterior">&#8249;</button>
         <div class="month-title">
@@ -1167,6 +1198,19 @@ body{
           Personal
         </button>
       </nav>
+
+      <section class="month-insights glass" aria-label="Resumen visual del mes">
+        <div class="insights-hero">
+          <div class="insight-month-pill" id="insightMonth">Junio de 2026</div>
+          <div class="insight-day-number" id="insightDayNumber">22</div>
+          <div class="insight-weekday" id="insightWeekday">Lunes</div>
+          <button id="insightTodayBtn" class="soft insight-today" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 15H5V9h14v10zm-7-8h5v5h-5z"/></svg>
+            Hoy
+          </button>
+        </div>
+        <div class="insights-metrics" id="insightMetrics"></div>
+      </section>
     </header>
 
     <main>
@@ -1258,7 +1302,7 @@ body{
           <div class="status-color-head">
             <div>
               <h2>Colores de estados</h2>
-              <p class="hint">Edita los colores del calendario. Por defecto: verde = días trabajados y rojo = días de descanso.</p>
+              <p class="hint">Edita los colores del calendario. Por defecto: rojo = días de trabajo y verde = días de descanso.</p>
             </div>
             <button id="resetStatusColors" type="button" class="soft">Restablecer</button>
           </div>
@@ -1276,14 +1320,6 @@ body{
         <div id="usersList" class="users-list"></div>
       </section>
     </main>
-    <nav class="neo-bottom-nav" aria-label="Navegación rápida">
-      <a href="index.html"><span>⌂</span><b>Inicio</b></a>
-      <button type="button" data-view="calendar" class="active"><span>▣</span><b>Calendario</b></button>
-      <button type="button" data-view="summary"><span>▥</span><b>Reportes</b></button>
-      <button type="button" data-view="agenda"><span>◉</span><b>Lista</b></button>
-      <button type="button" data-view="users"><span>♙</span><b>Perfil</b></button>
-    </nav>
-
     <footer class="app-signature" aria-label="Firma de la app">
       <div class="signature-inner">
         <span class="signature-by">by laraclv</span>
@@ -1401,8 +1437,8 @@ const $ = (q) => document.querySelector(q);
 const $$ = (q) => [...document.querySelectorAll(q)];
 
 const STATUS = {
-  work:       { label: "Turno trabajado", short: "N",   css: "status-work",       color: "#22c55e", time: "20:30 – 08:00 hrs" },
-  rest:       { label: "Descanso",     short: "D",   css: "status-rest",       color: "#ef4444", time: "Libre" },
+  work:       { label: "Turno noche",  short: "N",   css: "status-work",       color: "#ef4444", time: "20:30 – 08:00 hrs" },
+  rest:       { label: "Descanso",     short: "D",   css: "status-rest",       color: "#22c55e", time: "Libre" },
   vacation:   { label: "Vacaciones",   short: "VAC", css: "status-vacation",   color: "#38bdf8", time: "Programado" },
   course:     { label: "Curso",        short: "CUR", css: "status-course",     color: "#facc15", time: "Capacitación" },
   overtime:   { label: "Tiempo extra", short: "TE",  css: "status-overtime",   color: "#a78bfa", time: "Extra" },
@@ -1511,10 +1547,10 @@ function currentProfileId() { return currentProfile?.uid || currentUser?.uid || 
 function isMyScheduleOnly() { return !!$("#myScheduleToggle")?.checked; }
 function isCurrentProfileUser(user) { return !!user && user.id === currentProfileId(); }
 function statusIcon(status) {
-  return ({ work:"✓", rest:"★", vacation:"✈", course:"✎", overtime:"◷", permission:"•" }[status]) || "•";
+  return ({ work:"🌙", rest:"✅", vacation:"🧳", course:"📚", overtime:"⏱", permission:"🛡" }[status]) || "•";
 }
 function statusTail(status) {
-  return ({ work:"✓", rest:"★", vacation:"✈", course:"✎", overtime:"＋", permission:"•" }[status]) || "•";
+  return ({ work:"🌙", rest:"✓", vacation:"✈", course:"✎", overtime:"＋", permission:"•" }[status]) || "•";
 }
 function recordMetaLabel(record) {
   const s = STATUS[record.status] || STATUS.work;
@@ -1678,45 +1714,13 @@ function dayRecord(user,date) {
   return { user, date, status, note: ov?.note || "", auto: !ov || ov.status === "auto" };
 }
 
-function renderNeoDashboard() {
-  const selected = selectedDate || ymd(new Date());
-  const selectedObj = parseYMD(selected);
-  const monthNode = document.getElementById("neoDashMonth");
-  if (!monthNode) return;
-  monthNode.textContent = selectedObj.toLocaleDateString("es-MX", {month:"long", year:"numeric"}).replace(/^./, c => c.toUpperCase());
-  document.getElementById("neoDashDay").textContent = String(selectedObj.getDate());
-  document.getElementById("neoDashWeekday").textContent = selectedObj.toLocaleDateString("es-MX", {weekday:"long"}).replace(/^./, c => c.toUpperCase());
-
-  const counts = { work:0, rest:0, overtime:0, vacation:0 };
-  const days = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
-  const users = getUsersForView();
-  for (let n=1; n<=days; n++) {
-    const date = ymd(new Date(current.getFullYear(), current.getMonth(), n));
-    users.forEach(u => {
-      const status = dayRecord(u, date).status;
-      if (counts[status] !== undefined) counts[status]++;
-    });
-  }
-  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
-  setText("neoCountWork", counts.work);
-  setText("neoCountRest", counts.rest);
-  setText("neoCountExtra", counts.overtime);
-  setText("neoCountVac", counts.vacation);
-}
-function updateNeoBottomNav() {
-  const view = activeView();
-  document.querySelectorAll(".neo-bottom-nav [data-view]").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.view === view);
-  });
-}
-
 /* ══════════════════════════════════
    RENDERIZADO
    ══════════════════════════════════ */
 function render() {
   if (!currentProfile) return;
   updateRoleUI();
-  renderMonthHeader(); renderUserFilter(); renderCalendar(); renderCalendarDetail(); renderAgenda(); renderSummary(); renderUsers(); renderStatusColorPanel(); renderNeoDashboard(); updateNeoBottomNav();
+  renderMonthHeader(); renderUserFilter(); renderInsights(); renderCalendar(); renderCalendarDetail(); renderAgenda(); renderSummary(); renderUsers(); renderStatusColorPanel();
 }
 function renderMonthHeader() {
   $("#monthLabel").textContent = monthName(current);
@@ -1729,6 +1733,45 @@ function renderUserFilter() {
   const preferred = isMyScheduleOnly() && currentProfileId() ? currentProfileId() : prev;
   filter.value = users.some(u=>u.id===preferred) ? preferred : "all";
   filter.disabled = isMyScheduleOnly();
+}
+function monthStats() {
+  const counts = { work:0, rest:0, overtime:0, vacation:0 };
+  const users = getUsersForView();
+  const days = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+  users.forEach((user) => {
+    for (let n = 1; n <= days; n++) {
+      const date = ymd(new Date(current.getFullYear(), current.getMonth(), n));
+      const status = dayRecord(user, date).status;
+      if (status in counts) counts[status] += 1;
+    }
+  });
+  return counts;
+}
+function renderInsights() {
+  const monthEl = $("#insightMonth");
+  const dayEl = $("#insightDayNumber");
+  const weekdayEl = $("#insightWeekday");
+  const metricsEl = $("#insightMetrics");
+  if (!monthEl || !dayEl || !weekdayEl || !metricsEl) return;
+  const focus = selectedDate ? parseYMD(selectedDate) : new Date();
+  monthEl.textContent = monthName(current);
+  dayEl.textContent = String(focus.getDate());
+  weekdayEl.textContent = focus.toLocaleDateString("es-MX", { weekday:"long" }).replace(/^./, c => c.toUpperCase());
+  const counts = monthStats();
+  const cards = [
+    { key:"work", label:"Trabajados", value:counts.work, icon:"✓", note:"Turnos cubiertos este mes" },
+    { key:"rest", label:"Descansos", value:counts.rest, icon:"★", note:"Días de descanso programados" },
+    { key:"overtime", label:"Extra", value:counts.overtime, icon:"◔", note:"Registros de tiempo extra" },
+    { key:"vacation", label:"Vacaciones", value:counts.vacation, icon:"✈", note:"Días marcados como vacaciones" }
+  ];
+  metricsEl.innerHTML = cards.map(card => `
+    <article class="insight-card ${card.key}">
+      <div class="insight-icon" aria-hidden="true">${card.icon}</div>
+      <div class="insight-value">${card.value}</div>
+      <div class="insight-label">${card.label}</div>
+      <div class="insight-note">${card.note}</div>
+    </article>
+  `).join("");
 }
 function renderCalendar() {
   const grid = $("#calendarGrid"); grid.innerHTML="";
@@ -2067,7 +2110,7 @@ $("#logoutBtn").addEventListener("click",()=>signOut(auth));
 $("#prevMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()-1,1); render(); });
 $("#nextMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()+1,1); render(); });
 $("#todayBtn").addEventListener("click",()=>{ current=startOfMonth(new Date()); selectedDate = ymd(new Date()); render(); });
-$("#neoDashTodayBtn")?.addEventListener("click",()=>{ current=startOfMonth(new Date()); selectedDate = ymd(new Date()); render(); });
+$("#insightTodayBtn")?.addEventListener("click",()=>{ current=startOfMonth(new Date()); selectedDate = ymd(new Date()); render(); });
 $("#userFilter").addEventListener("change",()=>{ selectedDate = selectedDate || ymd(new Date()); render(); });
 $("#myScheduleToggle")?.addEventListener("change",()=>{ selectedDate = selectedDate || ymd(new Date()); render(); });
 $("#detailAction")?.addEventListener("click",()=>{ if (selectedDate) handleDayClick(selectedDate); });
@@ -2088,7 +2131,6 @@ $("#resetStatusColors")?.addEventListener("click", ()=>{
   render();
 });
 $$(".tab").forEach(t=>t.addEventListener("click",()=>{ switchView(t.dataset.view); render(); }));
-$$('.neo-bottom-nav [data-view]').forEach(btn=>btn.addEventListener("click",()=>{ switchView(btn.dataset.view); render(); window.scrollTo({top:0, behavior:"smooth"}); }));
 
 $("#userForm").addEventListener("submit",async e=>{
   e.preventDefault();
