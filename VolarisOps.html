@@ -1474,6 +1474,39 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
   }
 }
 
+
+
+/* === AJUSTE TOP BAR FINAL: logo Volaris a la izquierda y badge En línea reubicado === */
+.logo-volaris{
+  order:0 !important;
+  margin-left:0 !important;
+  margin-right:.35rem !important;
+  align-self:center !important;
+  flex:0 0 auto !important;
+}
+.top-user-chip{order:1 !important;}
+#rolBadgeTop{order:2 !important;}
+.top-bar-spacer{order:6 !important;}
+#btnUserManager{order:5 !important;}
+#syncBadge{
+  order:7 !important;
+  white-space:nowrap !important;
+}
+.btn-theme,.btn-admin-pencil{order:8 !important;}
+.v2-bell{order:9 !important;}
+
+@media(max-width:520px){
+  .logo-volaris{
+    order:0 !important;
+    width:30px !important;
+    height:30px !important;
+    margin-right:.3rem !important;
+  }
+  #syncBadge{
+    order:7 !important;
+  }
+}
+
 </style>
 </head>
 <body>
