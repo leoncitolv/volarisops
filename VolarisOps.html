@@ -1684,7 +1684,231 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
   .top-bar.premium-topbar-v3 #adminBadge{display:none !important;}
 }
 
+
+
+/* === TOP BAR OPTION 3 · VOLARIS OPS 3.0 === */
+.top-bar.topbar-v30-option3{
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+  scrollbar-width:none !important;
+  gap:.54rem !important;
+  padding:.56rem .70rem !important;
+}
+.top-bar.topbar-v30-option3::-webkit-scrollbar{display:none !important;}
+.top-bar.topbar-v30-option3 .logo-volaris,
+.top-bar.topbar-v30-option3 .top-bar-logo{
+  display:none !important;
+}
+.top-bar.topbar-v30-option3 #syncBadge{
+  display:inline-flex !important;
+  order:0 !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-height:40px !important;
+  padding:.16rem .88rem !important;
+  border-radius:999px !important;
+  background:rgba(87,255,132,.09) !important;
+  border:1px solid rgba(127,255,167,.24) !important;
+  color:#a7ffbe !important;
+  font-size:.62rem !important;
+  font-weight:900 !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase !important;
+  white-space:nowrap !important;
+  box-shadow:0 0 18px rgba(73,255,137,.08), inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+.top-bar.topbar-v30-option3 #syncBadge.sync-off{
+  background:rgba(255,189,88,.10) !important;
+  border-color:rgba(255,189,88,.22) !important;
+  color:#ffd38a !important;
+}
+.top-bar.topbar-v30-option3 .top-user-chip{
+  order:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:.78rem !important;
+  padding:.08rem .25rem .10rem .08rem !important;
+  margin-right:.08rem !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  min-width:auto !important;
+  flex:0 1 auto !important;
+}
+.top-bar.topbar-v30-option3 .top-user-chip::after{display:none !important;}
+.top-bar.topbar-v30-option3 .top-user-avatar{
+  position:relative !important;
+  width:58px !important;
+  height:58px !important;
+  min-width:58px !important;
+  border-radius:50% !important;
+  font-size:1.12rem !important;
+  font-weight:900 !important;
+  letter-spacing:.02em !important;
+  color:#fff !important;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.34), transparent 22%),
+    radial-gradient(circle at 68% 74%, rgba(54,255,142,.18), transparent 24%),
+    linear-gradient(145deg,#7c3aed 0%,#5b21b6 46%,#2a105d 100%) !important;
+  border:2px solid rgba(181,121,255,.82) !important;
+  box-shadow:
+    0 0 0 4px rgba(61,244,117,.12),
+    0 0 26px rgba(155,85,255,.34),
+    inset 0 2px 10px rgba(255,255,255,.15) !important;
+  overflow:visible !important;
+}
+.top-bar.topbar-v30-option3 .top-user-avatar::before{
+  content:'✈';
+  position:absolute;
+  top:-7px;
+  left:2px;
+  font-size:.82rem;
+  color:#d9a4ff;
+  text-shadow:0 0 10px rgba(185,92,255,.6);
+  transform:rotate(-18deg);
+}
+.top-bar.topbar-v30-option3 .top-user-avatar::after{
+  content:'';
+  position:absolute;
+  right:-2px;
+  bottom:1px;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#56ff76;
+  border:2px solid #14082b;
+  box-shadow:0 0 14px rgba(86,255,118,.82);
+}
+.top-bar.topbar-v30-option3 .top-user-chip > div:last-child{
+  position:relative !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:.14rem !important;
+  padding-bottom:.20rem !important;
+}
+.top-bar.topbar-v30-option3 .top-user-name{
+  position:relative !important;
+  display:inline-block !important;
+  font-family:'Allura','Segoe Script','Brush Script MT','Lucida Handwriting',cursive !important;
+  font-size:1.72rem !important;
+  line-height:.9 !important;
+  font-weight:400 !important;
+  letter-spacing:.01em !important;
+  color:#ffffff !important;
+  text-shadow:0 0 12px rgba(255,255,255,.08), 0 0 22px rgba(205,98,255,.16) !important;
+}
+.top-bar.topbar-v30-option3 .top-user-name::after{
+  content:'';
+  position:absolute;
+  left:6px;
+  right:-16px;
+  bottom:-3px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(187,95,255,0), rgba(187,95,255,.95) 18%, rgba(255,132,213,.88) 55%, rgba(187,95,255,0) 100%);
+  box-shadow:0 0 12px rgba(201,94,255,.26);
+}
+.top-bar.topbar-v30-option3 .top-user-emp{
+  font-size:.58rem !important;
+  line-height:1 !important;
+  color:#bca7dd !important;
+  letter-spacing:.24em !important;
+  text-transform:uppercase !important;
+  padding-left:.20rem !important;
+}
+.top-bar.topbar-v30-option3 .top-bar-spacer{
+  order:2 !important;
+  flex:1 1 auto !important;
+  min-width:12px !important;
+}
+.top-bar.topbar-v30-option3 .top-role-switch{
+  order:3 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:.48rem !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+.top-bar.topbar-v30-option3 .top-role-switch > *{
+  position:relative !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:.45rem !important;
+  min-height:38px !important;
+  padding:.18rem .95rem !important;
+  border-radius:999px !important;
+  white-space:nowrap !important;
+  font-size:.58rem !important;
+  font-weight:900 !important;
+  letter-spacing:.09em !important;
+  text-transform:uppercase !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 0 14px rgba(18,8,36,.18) !important;
+}
+.top-bar.topbar-v30-option3 .top-role-switch > * + *::before{display:none !important;}
+.top-bar.topbar-v30-option3 #rolBadgeTop{
+  color:#eef3ff !important;
+  background:rgba(79,111,255,.10) !important;
+  border:1px solid rgba(118,140,255,.28) !important;
+}
+.top-bar.topbar-v30-option3 #btnUserManager,
+.top-bar.topbar-v30-option3 .top-role-ghost{
+  color:#ffd390 !important;
+  background:rgba(255,191,92,.08) !important;
+  border:1px solid rgba(255,191,92,.22) !important;
+  cursor:pointer !important;
+}
+.top-bar.topbar-v30-option3 #adminBadge,
+.top-bar.topbar-v30-option3 #btnAdminPencil{display:none !important;}
+.top-bar.topbar-v30-option3 #btnTheme{
+  order:4 !important;
+  min-width:34px !important;
+  width:34px !important;
+  height:34px !important;
+}
+.top-bar.topbar-v30-option3 .v2-bell{order:5 !important;}
+
+@media(max-width:640px){
+  .top-bar.topbar-v30-option3{padding:.54rem .62rem !important; gap:.42rem !important;}
+  .top-bar.topbar-v30-option3 #syncBadge{
+    min-height:34px !important;
+    padding:.14rem .62rem !important;
+    font-size:.52rem !important;
+    letter-spacing:.11em !important;
+  }
+  .top-bar.topbar-v30-option3 .top-user-chip{gap:.52rem !important;}
+  .top-bar.topbar-v30-option3 .top-user-avatar{
+    width:46px !important;
+    height:46px !important;
+    min-width:46px !important;
+    font-size:.92rem !important;
+  }
+  .top-bar.topbar-v30-option3 .top-user-avatar::before{font-size:.70rem !important; top:-6px !important; left:0 !important;}
+  .top-bar.topbar-v30-option3 .top-user-avatar::after{width:11px !important; height:11px !important;}
+  .top-bar.topbar-v30-option3 .top-user-name{font-size:1.28rem !important;}
+  .top-bar.topbar-v30-option3 .top-user-name::after{right:-10px !important; bottom:-2px !important;}
+  .top-bar.topbar-v30-option3 .top-user-emp{font-size:.50rem !important; letter-spacing:.18em !important;}
+  .top-bar.topbar-v30-option3 .top-role-switch{gap:.34rem !important;}
+  .top-bar.topbar-v30-option3 .top-role-switch > *{
+    min-height:34px !important;
+    padding:.16rem .74rem !important;
+    font-size:.50rem !important;
+    letter-spacing:.06em !important;
+  }
+  .top-bar.topbar-v30-option3 #btnTheme,
+  .top-bar.topbar-v30-option3 .v2-bell{
+    min-width:30px !important;
+    width:30px !important;
+    height:30px !important;
+  }
+}
+
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Allura&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -1824,7 +2048,7 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
   <div style="text-align:center;padding:2.2rem 1rem 5.5rem;pointer-events:none;user-select:none;">
     <div style="display:inline-flex;flex-direction:column;align-items:center;gap:.22rem;opacity:.28;">
       <span style="font-style:italic;font-family:Georgia,'Times New Roman',serif;font-size:.72rem;letter-spacing:.06em;color:var(--text-main);">by laraclv</span>
-      <span style="font-size:.52rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--text-main);font-family:'Nunito',sans-serif;">v 2.5</span>
+      <span style="font-size:.52rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--text-main);font-family:'Nunito',sans-serif;">v 3.0</span>
     </div>
   </div>
 </div>
@@ -2098,7 +2322,7 @@ function initials(nombre){ const p=(nombre||'').trim().split(' ').filter(Boolean
 function updateTopUser(){
   const p = loadPerfil();
   document.getElementById('topUserName').textContent = p.nombre || '–';
-  document.getElementById('topUserEmp').textContent = p.numero ? '#' + p.numero : '–';
+  document.getElementById('topUserEmp').textContent = p.numero ? String(p.numero) : '–';
   document.getElementById('topUserAvatar').textContent = initials(p.nombre);
   // Insignia de rol en topbar
   const rol = getRol();
@@ -3423,7 +3647,7 @@ window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
 (function(){
   function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
   ready(function(){
-    document.documentElement.setAttribute('data-v2','visual-2.0');
+    document.documentElement.setAttribute('data-v2','visual-3.0');
 
     // Campana de notificación visual, separada de la lógica existente.
     const top=document.querySelector('.top-bar');
@@ -3548,6 +3772,102 @@ window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
   });
 })();
 </script>
+
+<script>
+/* === VOLARIS OPS 3.0 · TOP BAR OPCIÓN 3 === */
+(function(){
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  function normalizeTopUser(){
+    const emp = document.getElementById('topUserEmp');
+    if(emp && emp.textContent){
+      emp.textContent = emp.textContent.replace(/^#\s*/, '').trim() || '–';
+    }
+  }
+
+  function renderOnlineChip(){
+    const sync = document.getElementById('syncBadge');
+    if(!sync) return;
+    const txt = (sync.textContent || '').toLowerCase();
+    sync.style.display = 'inline-flex';
+    if(txt.includes('sin conexión') || txt.includes('offline') || txt.includes('🔴')){
+      sync.textContent = '● SIN CONEXIÓN';
+      sync.classList.add('sync-off');
+    } else {
+      sync.textContent = '● EN LÍNEA';
+      sync.classList.remove('sync-off');
+    }
+  }
+
+  function applyTopbarV30(){
+    const top = document.querySelector('.top-bar');
+    if(!top) return;
+
+    top.classList.remove('premium-topbar-v3');
+    top.classList.add('topbar-v30-option3');
+
+    const logoText = top.querySelector('.top-bar-logo');
+    if(logoText) logoText.textContent = 'Volaris Ops';
+
+    const spacer = top.querySelector('.top-bar-spacer');
+    const roleBadge = document.getElementById('rolBadgeTop');
+    const userBtn = document.getElementById('btnUserManager');
+    const themeBtn = document.getElementById('btnTheme');
+
+    let switcher = document.getElementById('topRoleSwitch');
+    if(!switcher){
+      switcher = document.createElement('div');
+      switcher.id = 'topRoleSwitch';
+      switcher.className = 'top-role-switch';
+      top.insertBefore(switcher, spacer || themeBtn || null);
+    }
+
+    if(roleBadge && roleBadge.parentNode !== switcher){
+      switcher.appendChild(roleBadge);
+    }
+
+    let ghost = switcher.querySelector('.top-role-ghost');
+    if(userBtn){
+      userBtn.textContent = '👥 Usuario';
+      userBtn.title = 'Gestión de usuarios';
+      if(userBtn.parentNode !== switcher) switcher.appendChild(userBtn);
+      if(ghost) ghost.remove();
+    } else if(!ghost){
+      ghost = document.createElement('span');
+      ghost.className = 'top-role-ghost';
+      ghost.textContent = '👥 Usuario';
+      switcher.appendChild(ghost);
+    }
+
+    normalizeTopUser();
+    renderOnlineChip();
+  }
+
+  ready(function(){
+    applyTopbarV30();
+
+    const top = document.querySelector('.top-bar');
+    if(top){
+      let ticking = false;
+      const obs = new MutationObserver(function(){
+        if(ticking) return;
+        ticking = true;
+        requestAnimationFrame(function(){
+          ticking = false;
+          applyTopbarV30();
+        });
+      });
+      obs.observe(top, { childList:true, subtree:true, characterData:true });
+    }
+
+    [250, 700, 1400, 2600, 5000].forEach(ms => setTimeout(applyTopbarV30, ms));
+  });
+})();
+</script>
+
 </body>
 
 </html>
