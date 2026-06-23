@@ -3274,7 +3274,7 @@ async function continuarDespuesDelSplash(){
   if(splash) splash.style.display = 'none';
 
   const perfil = loadPerfil();
-  const user = await authReadyPromise;
+  const user = await Promise.race([authReadyPromise, new Promise(res => setTimeout(() => res(null), 2500))]);
   const numeroSesion = perfil.numero || numeroDesdeUsuarioAuth(user);
 
   if(user && numeroSesion && user.email === authEmailFromNumero(numeroSesion)){
@@ -3470,16 +3470,25 @@ window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
 
 
 <script>
-/* === TOP BAR PREMIUM · OPCIÓN 2 === */
+/* === TOP BAR PREMIUM · OPCIÓN 2 — corregido sin bloqueo de splash === */
 (function(){
-  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  function ready(fn){
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
   function applyPremiumTopbar(){
     const top = document.querySelector('.top-bar');
     if(!top) return;
-    top.classList.add('premium-topbar-v3');
+
+    if(!top.classList.contains('premium-topbar-v3')){
+      top.classList.add('premium-topbar-v3');
+    }
 
     const logoText = top.querySelector('.top-bar-logo');
-    if(logoText) logoText.textContent = 'Volaris Ops';
+    if(logoText && logoText.textContent.trim() !== 'Volaris Ops'){
+      logoText.textContent = 'Volaris Ops';
+    }
 
     const spacer = top.querySelector('.top-bar-spacer');
     const roleBadge = document.getElementById('rolBadgeTop');
@@ -3487,7 +3496,7 @@ window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
     const sync = document.getElementById('syncBadge');
     const themeBtn = document.getElementById('btnTheme');
 
-    if(sync) sync.style.display = 'none';
+    if(sync && sync.style.display !== 'none') sync.style.display = 'none';
 
     let switcher = document.getElementById('topRoleSwitch');
     if(!switcher){
@@ -3497,36 +3506,48 @@ window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
       top.insertBefore(switcher, spacer || themeBtn || null);
     }
 
-    if(roleBadge && roleBadge.parentNode !== switcher) switcher.appendChild(roleBadge);
-
-    if(userBtn){
-      userBtn.textContent = '👥 Usuario';
-      userBtn.title = 'Gestión de usuarios';
-      if(userBtn.parentNode !== switcher) switcher.appendChild(userBtn);
-      const ghost = switcher.querySelector('.top-role-ghost');
-      if(ghost) ghost.remove();
-    } else if(!switcher.querySelector('.top-role-ghost')){
-      const ghost = document.createElement('span');
-      ghost.className = 'top-role-ghost';
-      ghost.textContent = '👥 Usuario';
-      switcher.appendChild(ghost);
+    if(roleBadge && roleBadge.parentNode !== switcher){
+      switcher.appendChild(roleBadge);
     }
 
-    if(spacer) top.appendChild(spacer);
+    const ghost = switcher.querySelector('.top-role-ghost');
+    if(userBtn){
+      if(userBtn.textContent.trim() !== '👥 Usuario') userBtn.textContent = '👥 Usuario';
+      userBtn.title = 'Gestión de usuarios';
+      if(userBtn.parentNode !== switcher){
+        switcher.appendChild(userBtn);
+      }
+      if(ghost) ghost.remove();
+    }else if(!ghost){
+      const newGhost = document.createElement('span');
+      newGhost.className = 'top-role-ghost';
+      newGhost.textContent = '👥 Usuario';
+      switcher.appendChild(newGhost);
+    }
   }
 
   ready(function(){
     applyPremiumTopbar();
-    const obs = new MutationObserver(() => applyPremiumTopbar());
-    obs.observe(document.body, { childList:true, subtree:true });
-    setTimeout(() => obs.disconnect(), 15000);
-    setTimeout(applyPremiumTopbar, 500);
-    setTimeout(applyPremiumTopbar, 1500);
-    setTimeout(applyPremiumTopbar, 3000);
+
+    const top = document.querySelector('.top-bar');
+    if(top){
+      let scheduled = false;
+      const obs = new MutationObserver(function(){
+        if(scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(function(){
+          scheduled = false;
+          applyPremiumTopbar();
+        });
+      });
+      obs.observe(top, { childList:true, subtree:false });
+    }
+
+    // Reaplicar algunas veces porque los chips de rol/usuarios se crean dinámicamente después del login.
+    [300, 900, 1800, 3500, 6000].forEach(ms => setTimeout(applyPremiumTopbar, ms));
   });
 })();
 </script>
-
 </body>
 
 </html>
