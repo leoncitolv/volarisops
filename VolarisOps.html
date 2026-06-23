@@ -1372,6 +1372,108 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
   .folder-mat{font-size:.98rem!important;}
 }
 
+
+
+/* ==========================================================
+   PATCH — Flight Radar LIVE integrado + iconos flotantes suaves
+   Mantiene estructura y JS; solo mejora visual en pantalla principal.
+========================================================== */
+#sectionInicio .quick-grid .quick-btn{
+  overflow:hidden !important;
+}
+#sectionInicio .quick-btn.v2-radar{
+  padding-top:2.15rem !important;
+  background:
+    linear-gradient(160deg,rgba(68,199,255,.105),rgba(101,33,163,.48)),
+    radial-gradient(circle at 12% 8%,rgba(68,199,255,.22),transparent 42%) !important;
+  border-color:rgba(68,199,255,.18) !important;
+}
+#sectionInicio .quick-btn.v2-radar .radar-status-badge{
+  top:.78rem !important;
+  left:.88rem !important;
+  transform:none !important;
+  padding:.18rem .58rem !important;
+  font-size:.54rem !important;
+  letter-spacing:.09em !important;
+  color:#bff0ff !important;
+  background:rgba(68,199,255,.12) !important;
+  border:1px solid rgba(68,199,255,.28) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 14px rgba(68,199,255,.16) !important;
+  animation:none !important;
+}
+#sectionInicio .quick-btn.v2-radar .radar-status-badge::before{
+  content:'';
+  display:inline-block;
+  width:6px;
+  height:6px;
+  margin-right:.36rem;
+  border-radius:50%;
+  background:#43f56f;
+  box-shadow:0 0 9px rgba(67,245,111,.85);
+  vertical-align:middle;
+}
+#sectionInicio .quick-btn.v2-radar .radar-inline-live{
+  display:none !important;
+}
+#sectionInicio .quick-btn.v2-radar::after{
+  content:'LIVE' !important;
+  top:.78rem !important;
+  right:.82rem !important;
+  padding:.18rem .56rem !important;
+  min-width:auto !important;
+  height:auto !important;
+  border-radius:999px !important;
+  font-size:.55rem !important;
+  line-height:1 !important;
+  letter-spacing:.08em !important;
+  color:#ffd6df !important;
+  background:rgba(255,65,109,.13) !important;
+  border:1px solid rgba(255,65,109,.30) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 16px rgba(255,65,109,.22) !important;
+}
+#sectionInicio .quick-btn.v2-radar .quick-icon{
+  background:linear-gradient(135deg,rgba(68,199,255,.18),rgba(185,65,255,.16)) !important;
+  border:1px solid rgba(68,199,255,.20) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 0 18px rgba(68,199,255,.18) !important;
+}
+@keyframes volIconFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+#sectionInicio .hero-card-icon,
+#sectionInicio .quick-grid .quick-icon{
+  animation:volIconFloat 4.2s ease-in-out infinite;
+  will-change:transform;
+}
+#sectionInicio .quick-grid .quick-btn:nth-child(1) .quick-icon{animation-delay:0s;}
+#sectionInicio .quick-grid .quick-btn:nth-child(2) .quick-icon{animation-delay:.35s;}
+#sectionInicio .quick-grid .quick-btn:nth-child(3) .quick-icon{animation-delay:.70s;}
+#sectionInicio .quick-grid .quick-btn:nth-child(4) .quick-icon{animation-delay:1.05s;}
+#sectionInicio .hero-card-icon{animation-delay:.2s;}
+@media(prefers-reduced-motion:reduce){
+  #sectionInicio .hero-card-icon,
+  #sectionInicio .quick-grid .quick-icon{
+    animation:none !important;
+  }
+}
+@media(max-width:520px){
+  #sectionInicio .quick-btn.v2-radar{
+    padding-top:2.05rem !important;
+  }
+  #sectionInicio .quick-btn.v2-radar .radar-status-badge{
+    top:.68rem !important;
+    left:.72rem !important;
+    font-size:.48rem !important;
+    padding:.15rem .48rem !important;
+  }
+  #sectionInicio .quick-btn.v2-radar::after{
+    top:.68rem !important;
+    right:.68rem !important;
+    font-size:.49rem !important;
+    padding:.15rem .46rem !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1450,8 +1552,8 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
           <p id="homeMatProgressText" style="margin:0.3rem 0 0;font-size:0.58rem;color:rgba(100,180,255,0.6);font-weight:600;">0% completado</p>
         </button>
         <button class="quick-btn card-blue" style="position:relative;overflow:visible;background:rgba(85,150,255,.08);border:1px solid rgba(85,150,255,.18);" onclick="window.open('https://www.flightradar24.com/', '_blank')">
-          <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(33,130,200,.8);color:#d0eeff;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(100,180,255,.3);z-index:3;animation:bounce 2s ease-in-out infinite 0.3s;">En vivo</span>
-          <span style="position:absolute;top:0.5rem;right:0.5rem;width:26px;height:18px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:0.45rem;font-weight:900;color:#fff;background:linear-gradient(135deg,#2196F3,#64B5F6);box-shadow:0 0 8px rgba(33,150,243,.7);z-index:2;">LIVE</span>
+          <span class="radar-status-badge" style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:rgba(33,130,200,.8);color:#d0eeff;font-size:0.52rem;font-weight:900;padding:0.12rem 0.55rem;border-radius:99px;letter-spacing:0.08em;white-space:nowrap;border:1px solid rgba(100,180,255,.3);z-index:3;animation:bounce 2s ease-in-out infinite 0.3s;">En vivo</span>
+          <span class="radar-inline-live" style="position:absolute;top:0.5rem;right:0.5rem;width:26px;height:18px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:0.45rem;font-weight:900;color:#fff;background:linear-gradient(135deg,#2196F3,#64B5F6);box-shadow:0 0 8px rgba(33,150,243,.7);z-index:2;">LIVE</span>
           <span class="quick-icon">🛫</span>
           <span class="quick-label" style="color:#64B5F6;">Flight Radar</span>
           <p style="margin:0.4rem 0 0;font-size:0.58rem;color:rgba(85,150,255,0.6);font-weight:700;">Vuelos en tiempo real</p>
