@@ -1507,6 +1507,183 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
   }
 }
 
+
+
+/* === TOP BAR PREMIUM · OPCIÓN 2 === */
+.top-bar.premium-topbar-v3{
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+  scrollbar-width:none !important;
+  gap:.52rem !important;
+  padding:.58rem .72rem !important;
+}
+.top-bar.premium-topbar-v3::-webkit-scrollbar{display:none;}
+.top-bar.premium-topbar-v3 .logo-volaris{
+  order:0 !important;
+  width:36px !important;
+  height:36px !important;
+  margin:0 .18rem 0 0 !important;
+  opacity:.98 !important;
+  filter:drop-shadow(0 0 12px rgba(185,65,255,.40)) !important;
+}
+.top-bar.premium-topbar-v3 .top-bar-logo{
+  order:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  white-space:nowrap !important;
+  padding:.1rem .78rem .1rem .08rem !important;
+  margin-right:.08rem !important;
+  border-right:1px solid rgba(255,255,255,.15) !important;
+  font-size:.95rem !important;
+  font-weight:900 !important;
+  letter-spacing:.01em !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff !important;
+  text-transform:none !important;
+}
+.top-bar.premium-topbar-v3 .top-user-chip{
+  order:2 !important;
+  min-width:228px !important;
+  margin-right:.15rem !important;
+  padding:.42rem .82rem .42rem .42rem !important;
+  background:rgba(255,255,255,.06) !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+}
+.top-bar.premium-topbar-v3 .top-user-avatar{
+  width:40px !important;
+  height:40px !important;
+  font-size:.92rem !important;
+}
+.top-bar.premium-topbar-v3 .top-user-chip::after{
+  width:10px !important;
+  height:10px !important;
+  left:29px !important;
+  bottom:6px !important;
+}
+.top-bar.premium-topbar-v3 .top-user-name{font-size:.84rem !important;}
+.top-bar.premium-topbar-v3 .top-user-emp{font-size:.56rem !important; letter-spacing:.08em !important;}
+.top-bar.premium-topbar-v3 #syncBadge{
+  display:none !important;
+}
+.top-bar.premium-topbar-v3 .top-bar-spacer{
+  order:5 !important;
+  flex:1 1 auto !important;
+  min-width:14px !important;
+}
+.top-bar.premium-topbar-v3 .top-role-switch{
+  order:4 !important;
+  display:flex !important;
+  align-items:center !important;
+  flex:0 0 auto !important;
+  min-height:42px !important;
+  padding:3px !important;
+  border-radius:999px !important;
+  background:linear-gradient(135deg,rgba(77,118,255,.13),rgba(255,170,78,.10)) !important;
+  border:1px solid rgba(156,177,255,.22) !important;
+  box-shadow:0 8px 24px rgba(17,10,40,.22), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+.top-bar.premium-topbar-v3 .top-role-switch > *{
+  position:relative !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:.42rem !important;
+  min-height:36px !important;
+  padding:.2rem .9rem !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:999px !important;
+  color:#eef2ff !important;
+  font-size:.58rem !important;
+  font-weight:900 !important;
+  letter-spacing:.07em !important;
+  text-transform:uppercase !important;
+  white-space:nowrap !important;
+  box-shadow:none !important;
+}
+.top-bar.premium-topbar-v3 .top-role-switch > * + *::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:8px;
+  bottom:8px;
+  width:1px;
+  background:rgba(255,255,255,.16);
+}
+.top-bar.premium-topbar-v3 #rolBadgeTop{
+  color:#eaf1ff !important;
+}
+.top-bar.premium-topbar-v3 #btnUserManager{
+  color:#ffd793 !important;
+  cursor:pointer !important;
+}
+.top-bar.premium-topbar-v3 .top-role-switch .top-role-ghost{
+  color:#ffd793 !important;
+  opacity:.92 !important;
+}
+.top-bar.premium-topbar-v3 #adminBadge{
+  order:6 !important;
+  font-size:.48rem !important;
+  padding:.16rem .42rem !important;
+  opacity:.58 !important;
+  background:rgba(255,255,255,.06) !important;
+  color:#c9d0e7 !important;
+  border:1px solid rgba(255,255,255,.11) !important;
+}
+.top-bar.premium-topbar-v3 #btnTheme{order:7 !important;}
+.top-bar.premium-topbar-v3 #btnAdminPencil{order:8 !important;}
+.top-bar.premium-topbar-v3 .v2-bell{order:9 !important;}
+
+@media(max-width:520px){
+  .top-bar.premium-topbar-v3{
+    gap:.42rem !important;
+    padding:.54rem .62rem !important;
+  }
+  .top-bar.premium-topbar-v3 .logo-volaris{
+    width:30px !important;
+    height:30px !important;
+  }
+  .top-bar.premium-topbar-v3 .top-bar-logo{
+    display:flex !important;
+    font-size:.76rem !important;
+    padding:.04rem .54rem .04rem .02rem !important;
+  }
+  .top-bar.premium-topbar-v3 .top-user-chip{
+    min-width:170px !important;
+    padding:.34rem .62rem .34rem .34rem !important;
+  }
+  .top-bar.premium-topbar-v3 .top-user-avatar{
+    width:34px !important;
+    height:34px !important;
+    font-size:.82rem !important;
+  }
+  .top-bar.premium-topbar-v3 .top-user-chip::after{
+    left:25px !important;
+    bottom:5px !important;
+    width:9px !important;
+    height:9px !important;
+  }
+  .top-bar.premium-topbar-v3 .top-user-name{
+    font-size:.74rem !important;
+    max-width:88px !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+  .top-bar.premium-topbar-v3 .top-user-emp{font-size:.51rem !important;}
+  .top-bar.premium-topbar-v3 .top-role-switch{
+    min-height:36px !important;
+    padding:2px !important;
+  }
+  .top-bar.premium-topbar-v3 .top-role-switch > *{
+    min-height:31px !important;
+    padding:.16rem .62rem !important;
+    font-size:.5rem !important;
+    letter-spacing:.05em !important;
+  }
+  .top-bar.premium-topbar-v3 #adminBadge{display:none !important;}
+}
+
 </style>
 </head>
 <body>
@@ -3287,6 +3464,65 @@ window.EMOJI_PREDETERMINADO_NOTA = '🔶'; // rombo por defecto
     });
     syncMap.observe(document.body,{childList:true,subtree:true,characterData:true});
     document.querySelectorAll('#syncBadge,#syncBadge2').forEach(el=>{ if(el && el.textContent.trim()==='⏳') el.textContent='↻ SYNC'; });
+  });
+})();
+</script>
+
+
+<script>
+/* === TOP BAR PREMIUM · OPCIÓN 2 === */
+(function(){
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  function applyPremiumTopbar(){
+    const top = document.querySelector('.top-bar');
+    if(!top) return;
+    top.classList.add('premium-topbar-v3');
+
+    const logoText = top.querySelector('.top-bar-logo');
+    if(logoText) logoText.textContent = 'Volaris Ops';
+
+    const spacer = top.querySelector('.top-bar-spacer');
+    const roleBadge = document.getElementById('rolBadgeTop');
+    const userBtn = document.getElementById('btnUserManager');
+    const sync = document.getElementById('syncBadge');
+    const themeBtn = document.getElementById('btnTheme');
+
+    if(sync) sync.style.display = 'none';
+
+    let switcher = document.getElementById('topRoleSwitch');
+    if(!switcher){
+      switcher = document.createElement('div');
+      switcher.id = 'topRoleSwitch';
+      switcher.className = 'top-role-switch';
+      top.insertBefore(switcher, spacer || themeBtn || null);
+    }
+
+    if(roleBadge && roleBadge.parentNode !== switcher) switcher.appendChild(roleBadge);
+
+    if(userBtn){
+      userBtn.textContent = '👥 Usuario';
+      userBtn.title = 'Gestión de usuarios';
+      if(userBtn.parentNode !== switcher) switcher.appendChild(userBtn);
+      const ghost = switcher.querySelector('.top-role-ghost');
+      if(ghost) ghost.remove();
+    } else if(!switcher.querySelector('.top-role-ghost')){
+      const ghost = document.createElement('span');
+      ghost.className = 'top-role-ghost';
+      ghost.textContent = '👥 Usuario';
+      switcher.appendChild(ghost);
+    }
+
+    if(spacer) top.appendChild(spacer);
+  }
+
+  ready(function(){
+    applyPremiumTopbar();
+    const obs = new MutationObserver(() => applyPremiumTopbar());
+    obs.observe(document.body, { childList:true, subtree:true });
+    setTimeout(() => obs.disconnect(), 15000);
+    setTimeout(applyPremiumTopbar, 500);
+    setTimeout(applyPremiumTopbar, 1500);
+    setTimeout(applyPremiumTopbar, 3000);
   });
 })();
 </script>
