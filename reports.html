@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reporte de Turno • Laraclv</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <title>Reporte de Turno • Cesar Lara</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Allura&family=Parisienne&family=Sacramento&family=Great+Vibes&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -2000,6 +2000,68 @@ body.view-historial .floating-report-actions{display:none}
       }
     }
 
+  
+
+    /* ════════════════════════════════════════
+       AJUSTE NOMBRE — estilo como la imagen
+       ════════════════════════════════════════ */
+    .hero-user-signature {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      min-width: 220px;
+      padding: 0 8px 0;
+      line-height: 1;
+    }
+
+    .signature-name {
+      font-family: "Allura", "Parisienne", "Sacramento", "Great Vibes", cursive;
+      font-size: clamp(50px, 9.2vw, 72px);
+      font-weight: 400;
+      line-height: .92;
+      letter-spacing: 0;
+      color: #fffaff;
+      text-shadow:
+        0 0 2px rgba(255,255,255,.92),
+        0 0 8px rgba(221, 181, 255, .28),
+        0 0 16px rgba(166, 90, 255, .12);
+      white-space: nowrap;
+      transform: none;
+      transform-origin: left center;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+
+    .signature-id {
+      margin-top: -2px;
+      margin-left: 14px;
+      font-size: clamp(14px, 3.1vw, 19px);
+      font-weight: 700;
+      letter-spacing: .14em;
+      color: rgba(182, 170, 214, .88);
+      text-shadow: 0 0 6px rgba(120, 86, 235, .12);
+    }
+
+    .hero-topline {
+      align-items: flex-start !important;
+      margin-bottom: 12px !important;
+    }
+
+    @media (max-width: 430px) {
+      .hero-user-signature {
+        min-width: 150px;
+        padding-left: 2px;
+      }
+      .signature-name {
+        font-size: 56px;
+      }
+      .signature-id {
+        font-size: 14px;
+        margin-left: 12px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2008,7 +2070,10 @@ body.view-historial .floating-report-actions{display:none}
     <!-- HEADER -->
     <div class="header report-hero">
       <div class="hero-topline">
-        <div class="hero-chip hero-user-chip">Cesar Lara · V2771</div>
+        <div class="hero-user-signature" aria-label="Cesar Lara 2771">
+          <div class="signature-name">Cesar Lara</div>
+          <div class="signature-id">2771</div>
+        </div>
         <div class="hero-chip hero-status-chip">● En línea</div>
       </div>
       <div class="hero-main">
@@ -2550,7 +2615,7 @@ body.view-historial .floating-report-actions{display:none}
       fotosPendientes = [];
       document.getElementById('previewPendientes').innerHTML = '';
       document.getElementById('reportPendientes').value = '';
-      document.getElementById('reportPersonal').value = 'Laraclv';
+      document.getElementById('reportPersonal').value = 'Cesar Lara - V2771';
       inicializarAeronaves();
       setFechaActual();
       mostrarToast('✅ Reporte guardado exitosamente', 'success');
