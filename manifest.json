@@ -1,12 +1,13 @@
 {
-  "name": "Volaris Ops",
-  "short_name": "Volaris Ops",
-  "description": "Portal de operaciones Volaris con modo offline y caché local.",
-  "start_url": "./VolarisOps.html",
+  "name": "AppVol Centro de Control",
+  "short_name": "Vol App",
+  "description": "Abridor principal con acceso a Volaris Ops, Números de Parte, Paint, Horarios y Reporte de Turno.",
+  "id": "./index.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#05010f",
-  "theme_color": "#aa22ff",
+  "background_color": "#08020f",
+  "theme_color": "#160022",
   "orientation": "portrait",
   "icons": [
     {

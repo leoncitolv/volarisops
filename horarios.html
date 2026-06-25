@@ -8,15 +8,15 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="application-name" content="Vol turnos" />
   <meta name="msapplication-TileColor" content="#0a0a1a" />
-  <meta name="msapplication-TileImage" content="./icon-192.png" />
+  <meta name="msapplication-TileImage" content="./icon-horarios-192.png" />
 
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Horarios" />
   <title>Portal de Horarios · Volaris</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
-  <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png" />
-  <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png" />
+  <link rel="manifest" href="./manifest-horarios.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-horarios-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="./icon-horarios-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="./icon-horarios-512.png" />
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Allura&display=swap');
 :root{
@@ -2319,12 +2319,56 @@ if (initFirebase()) {
 }
   </script>
 
+
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js', { scope: './' }).catch(console.warn);
-    });
+(function(){
+  const APP_FILE = './horarios.html';
+  function avisar(msg){
+    try {
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:30000;padding:12px 14px;border-radius:18px;text-align:center;font:800 13px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#fff;background:rgba(20,8,45,.92);border:1px solid rgba(176,92,255,.32);box-shadow:0 16px 40px rgba(0,0,0,.35);backdrop-filter:blur(18px);';
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.style.transition='opacity .25s ease, transform .25s ease'; el.style.opacity='0'; el.style.transform='translateY(12px)'; setTimeout(()=>el.remove(),280); }, 2600);
+    } catch(e) {}
   }
+  if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    window.addEventListener('online', () => { avisar('✅ Conexión recuperada. Revisando cambios...'); revisar(); });
+    window.addEventListener('offline', () => avisar('📴 Modo sin datos: usando horarios guardados'));
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      avisar('✨ Actualización instalada. Abriendo versión nueva...');
+      setTimeout(()=>location.reload(), 900);
+    });
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'APP_UPDATED') {
+        avisar('✨ Nueva versión de Horarios encontrada. Actualizando...');
+        setTimeout(()=>location.reload(), 1200);
+      }
+    });
+    async function revisar(){
+      try {
+        const reg = await navigator.serviceWorker.getRegistration('./');
+        if (reg) {
+          await reg.update();
+          if (reg.active) reg.active.postMessage({ type:'CHECK_UPDATE', file: APP_FILE });
+        }
+        await fetch(APP_FILE + '?update=' + Date.now(), { cache:'no-store' });
+      } catch(e) {}
+    }
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js', { scope:'./' });
+        if (reg.waiting) reg.waiting.postMessage({ type:'SKIP_WAITING' });
+        await revisar();
+        setInterval(revisar, 10 * 60 * 1000);
+      } catch(e) { console.warn(e); }
+    });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) revisar(); });
+  }
+})();
 </script>
 
 </body>

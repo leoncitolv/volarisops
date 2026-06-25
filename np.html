@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#7a19ff">
+<meta name="apple-mobile-web-app-title" content="N/P Volaris">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest-np.json">
+<link rel="apple-touch-icon" href="./icon-np-192.png">
 <title>Números de Parte</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -1339,5 +1345,65 @@ function importarJSON(event){
 
 initFirebase();
 </script>
+
+<script>
+/* PWA OFFLINE — registro compartido para GitHub Pages */
+(function(){
+  const APP_FILE = './np.html';
+  const APP_NAME = 'Números de Parte';
+
+  function npToast(msg){
+    try {
+      if (typeof toast === 'function') { toast('📲', msg); return; }
+      console.log(msg);
+    } catch(e) { console.log(msg); }
+  }
+
+  window.addEventListener('online', () => {
+    npToast('Conexión recuperada. Revisando actualizaciones...');
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({type:'CHECK_UPDATE', file: APP_FILE});
+    }
+  });
+
+  window.addEventListener('offline', () => {
+    npToast('Modo sin datos: usando información guardada');
+  });
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+        console.log('SW compartido registrado:', reg.scope);
+
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({type:'CACHE_APP', file: APP_FILE});
+        }
+
+        reg.addEventListener('updatefound', () => {
+          const nuevoSW = reg.installing;
+          if (!nuevoSW) return;
+          nuevoSW.addEventListener('statechange', () => {
+            if (nuevoSW.state === 'installed' && navigator.serviceWorker.controller) {
+              npToast('Nueva versión lista. Abre de nuevo la app.');
+            }
+          });
+        });
+
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (!event.data) return;
+          if (event.data.type === 'APP_UPDATED' && event.data.file === APP_FILE) {
+            npToast(APP_NAME + ' actualizado. Recargando...');
+            setTimeout(() => location.reload(), 900);
+          }
+        });
+      } catch (e) {
+        console.warn('SW error:', e);
+      }
+    });
+  }
+})();
+</script>
+
 </body>
 </html>

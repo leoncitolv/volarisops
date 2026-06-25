@@ -1,163 +1,196 @@
-/* Volaris Apps PWA compartido - GitHub Pages
-   Este sw.js controla la carpeta completa.
-   Sirve para VolarisOps.html y reports.html sin crear conflicto.
-   Abre sin datos después de la primera carga y actualiza cuando vuelve internet. */
-
-const CACHE_PREFIX = 'volaris-apps-shared';
-const APP_CACHE = `${CACHE_PREFIX}-app-auto`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-auto`;
+/* AppVol PWA compartido final
+   Un solo sw.js para toda la carpeta de GitHub Pages.
+   Controla: index + VolarisOps + Reports + Paint + NP + Horarios. */
+const CACHE_PREFIX = 'volaris-suite';
+const APP_CACHE = `${CACHE_PREFIX}-app-v3`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-v3`;
 
 const APP_SHELL = [
   './',
+  './index.html',
   './VolarisOps.html',
   './reports.html',
+  './paint.html',
+  './np.html',
+  './horarios.html',
   './manifest.json',
   './manifest-reports.json',
+  './manifest-paint.json',
+  './manifest-np.json',
+  './manifest-horarios.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './icon-paint-192.png',
+  './icon-paint-512.png',
+  './icon-np-192.png',
+  './icon-np-512.png',
+  './icon-horarios-192.png',
+  './icon-horarios-512.png'
 ];
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
+const APP_HTML = [
+  './index.html',
+  './VolarisOps.html',
+  './reports.html',
+  './paint.html',
+  './np.html',
+  './horarios.html'
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(APP_CACHE);
-
-    // Cachea lo que exista; si un archivo todavía no está en GitHub, no rompe la instalación.
-    await Promise.allSettled(
-      APP_SHELL.map((url) =>
-        cache.add(new Request(url, { cache: 'reload' }))
-      )
-    );
-
-    await self.skipWaiting();
+    await Promise.all(APP_SHELL.map(async (url) => {
+      try {
+        const req = new Request(url, { cache: 'reload' });
+        const res = await fetch(req);
+        if (res && res.status < 400) await cache.put(url, res.clone());
+      } catch (e) {
+        // Si algún archivo todavía no está subido, no se rompe la instalación.
+      }
+    }));
   })());
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-
     await Promise.all(
       keys
         .filter((key) => key.startsWith(CACHE_PREFIX) && ![APP_CACHE, RUNTIME_CACHE].includes(key))
         .map((key) => caches.delete(key))
     );
-
     await self.clients.claim();
   })());
 });
 
-function isSameOrigin(request) {
-  return new URL(request.url).origin === self.location.origin;
+function normalizeAppFile(pathname) {
+  const file = pathname.split('/').pop() || 'index.html';
+  if (file === '' || file === 'index.html') return './index.html';
+  const found = APP_HTML.find((f) => f.endsWith(file));
+  return found || './index.html';
 }
 
-function pathnameOf(value) {
-  return new URL(value, self.location.href).pathname;
+function isFirebaseRequest(url) {
+  return url.hostname.includes('firebaseio.com') ||
+         url.hostname.includes('firestore.googleapis.com') ||
+         url.hostname.includes('firebasestorage.googleapis.com') ||
+         url.hostname.includes('identitytoolkit.googleapis.com') ||
+         url.hostname.includes('securetoken.googleapis.com') ||
+         url.hostname.includes('googleapis.com') ||
+         (url.hostname.includes('gstatic.com') && url.pathname.includes('firebasejs'));
 }
 
-function isAppShellPath(pathname) {
-  return APP_SHELL.some((url) => pathnameOf(url) === pathname);
+function isExternalWrite(request, url) {
+  return request.method !== 'GET' || url.hostname.includes('api.cloudinary.com');
 }
 
-async function notifyClients(message) {
-  const clientsList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-  for (const client of clientsList) {
-    client.postMessage(message);
-  }
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  const cache = await caches.open(RUNTIME_CACHE);
+  const fresh = await fetch(request);
+  if (request.method === 'GET' && fresh && fresh.status < 400) cache.put(request, fresh.clone());
+  return fresh;
 }
 
-async function putIfChanged(cacheName, request, response) {
-  if (!response || !response.ok) return response;
-
-  const cache = await caches.open(cacheName);
-  const oldResponse = await cache.match(request, { ignoreSearch: true });
-
-  let changed = !oldResponse;
-
-  if (oldResponse) {
-    try {
-      const contentType = response.headers.get('content-type') || '';
-      if (
-        contentType.includes('text') ||
-        contentType.includes('javascript') ||
-        contentType.includes('json') ||
-        contentType.includes('html') ||
-        contentType.includes('css')
-      ) {
-        const oldText = await oldResponse.clone().text();
-        const newText = await response.clone().text();
-        changed = oldText !== newText;
-      } else {
-        changed = false;
-      }
-    } catch (_) {
-      changed = true;
-    }
-  }
-
-  await cache.put(request, response.clone());
-
-  if (changed) {
-    await notifyClients({ type: 'VOL_APP_UPDATED', url: request.url });
-  }
-
-  return response;
-}
-
-async function networkFirst(request, fallbackHtml) {
-  const cache = await caches.open(APP_CACHE);
-
+async function networkFirst(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
   try {
-    const fresh = await fetch(request, { cache: 'no-store' });
-    await putIfChanged(APP_CACHE, request, fresh.clone());
+    const fresh = await fetch(request);
+    if (request.method === 'GET' && fresh && fresh.status < 400) cache.put(request, fresh.clone());
     return fresh;
-  } catch (_) {
-    return (
-      (await cache.match(request, { ignoreSearch: true })) ||
-      (await cache.match(fallbackHtml)) ||
-      (await cache.match('./VolarisOps.html')) ||
-      (await cache.match('./reports.html'))
-    );
+  } catch (err) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    throw err;
   }
 }
 
-async function staleWhileRevalidate(request) {
-  const appCache = await caches.open(APP_CACHE);
-  const runtimeCache = await caches.open(RUNTIME_CACHE);
+async function fetchAndUpdate(file, notifyClientId) {
+  const cache = await caches.open(APP_CACHE);
+  const url = file.startsWith('./') ? file : `./${file}`;
+  try {
+    const req = new Request(url, { cache: 'no-store' });
+    const fresh = await fetch(req);
+    if (!fresh || fresh.status >= 400) return false;
 
-  const cached =
-    (await appCache.match(request, { ignoreSearch: true })) ||
-    (await runtimeCache.match(request, { ignoreSearch: true }));
+    const old = await cache.match(url);
+    let changed = false;
 
-  const updatePromise = fetch(request, { cache: 'no-store' })
-    .then((fresh) => {
-      const cacheName = isAppShellPath(new URL(request.url).pathname) ? APP_CACHE : RUNTIME_CACHE;
-      return putIfChanged(cacheName, request, fresh.clone());
-    })
-    .catch(() => null);
+    const type = fresh.headers.get('content-type') || '';
+    const canCompareText = type.includes('text') ||
+                           type.includes('javascript') ||
+                           type.includes('json') ||
+                           url.endsWith('.html') ||
+                           url.endsWith('.js') ||
+                           url.endsWith('.css') ||
+                           url.endsWith('.json') ||
+                           url.endsWith('.webmanifest');
 
-  return cached || updatePromise || fetch(request);
+    if (old && canCompareText) {
+      const oldText = await old.clone().text();
+      const freshText = await fresh.clone().text();
+      changed = oldText !== freshText;
+    }
+
+    await cache.put(url, fresh.clone());
+
+    if (changed && notifyClientId) {
+      const client = await self.clients.get(notifyClientId);
+      if (client) client.postMessage({ type: 'APP_UPDATED', file: url });
+    }
+    return changed;
+  } catch (e) {
+    return false;
+  }
 }
 
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-
+  const request = event.request;
   if (request.method !== 'GET') return;
-  if (!isSameOrigin(request)) return;
-
   const url = new URL(request.url);
-  const path = url.pathname;
 
-  if (request.mode === 'navigate' || path.endsWith('/VolarisOps.html') || path.endsWith('/reports.html')) {
-    const fallback = path.endsWith('/reports.html') ? './reports.html' : './VolarisOps.html';
-    event.respondWith(networkFirst(request, fallback));
+  if (isExternalWrite(request, url)) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      const appFile = normalizeAppFile(url.pathname);
+      const cached = await caches.match(appFile);
+      const networkPromise = fetch(request).then(async (response) => {
+        if (response && response.status < 400) {
+          const cache = await caches.open(APP_CACHE);
+          await cache.put(appFile, response.clone());
+        }
+        return response;
+      }).catch(() => null);
+
+      return cached || await networkPromise || caches.match('./index.html');
+    })());
     return;
   }
 
-  event.respondWith(staleWhileRevalidate(request));
+  if (isFirebaseRequest(url)) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  event.respondWith(cacheFirst(request));
+});
+
+self.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if (data.type === 'SKIP_WAITING') self.skipWaiting();
+  if (data.type === 'CACHE_APP' && data.file) event.waitUntil(fetchAndUpdate(data.file, null));
+  if (data.type === 'CHECK_UPDATE') {
+    const file = data.file || './index.html';
+    event.waitUntil(fetchAndUpdate(file, event.source && event.source.id));
+  }
+});
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'refresh-apps') {
+    event.waitUntil(Promise.all(APP_HTML.map((file) => fetchAndUpdate(file, null))));
+  }
 });

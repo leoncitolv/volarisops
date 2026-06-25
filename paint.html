@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="theme-color" content="#06020f">
+<link rel="manifest" href="./manifest-paint.json">
+<link rel="apple-touch-icon" href="./icon-paint-192.png">
 <title>ROG Paint — Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -1303,5 +1307,42 @@ function resetTab(t){
   if(t==='h2o'){q('h2o-card-day').classList.add('hidden');}
 }
 </script>
+
+<script>
+/* PWA compartida: VolarisOps + Reports + ROG Paint */
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').then(function(reg){
+      // Revisa actualizaciones cuando haya internet, sin tocar nada desde iPhone.
+      if (navigator.onLine && reg.update) {
+        reg.update().catch(function(){});
+      }
+
+      // Si llega un SW nuevo, toma control y refresca una sola vez.
+      reg.addEventListener('updatefound', function(){
+        var nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', function(){
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            nw.postMessage({type:'SKIP_WAITING'});
+          }
+        });
+      });
+    }).catch(function(err){
+      console.log('Service Worker no registrado:', err);
+    });
+  });
+
+  var refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
+})();
+</script>
+
 </body>
 </html>
