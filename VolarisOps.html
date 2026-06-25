@@ -3682,14 +3682,77 @@ if(SpeechRecognition){
 
 </script>
 <script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('SW registrado'))
-      .catch(e => console.warn('SW error:', e));
-  });
-}
-</script>
+/* PWA OFFLINE + ACTUALIZACIÓN AUTOMÁTICA PARA GITHUB PAGES */
+(function(){
+  const toast = (msg) => {
+    const t = document.getElementById('appToast');
+    if (!t) return console.log(msg);
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  };
+
+  let reloadingForUpdate = false;
+
+  async function checkForUpdates(reg) {
+    if (!navigator.onLine || !reg) return;
+    try {
+      await reg.update();
+      // Forzamos una revisión ligera del HTML actual para que GitHub Pages entregue cambios nuevos.
+      await fetch('./VolarisOps.html?update=' + Date.now(), { cache: 'no-store' });
+    } catch (e) {
+      console.log('No se pudo revisar actualización todavía:', e);
+    }
+  }
+
+  window.addEventListener('online', () => toast('✅ Conexión recuperada. Revisando cambios...'));
+  window.addEventListener('offline', () => toast('📴 Modo sin datos: usando información guardada'));
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (!event.data || event.data.type !== 'VOL_APP_UPDATED') return;
+      if (reloadingForUpdate) return;
+      reloadingForUpdate = true;
+      toast('✨ Nueva versión encontrada. Actualizando...');
+      setTimeout(() => window.location.reload(), 1200);
+    });
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloadingForUpdate) return;
+      reloadingForUpdate = true;
+      toast('✨ Actualización instalada. Abriendo versión nueva...');
+      setTimeout(() => window.location.reload(), 1000);
+    });
+
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+        console.log('SW registrado en GitHub Pages', reg.scope);
+
+        await checkForUpdates(reg);
+
+        window.addEventListener('online', () => checkForUpdates(reg));
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) checkForUpdates(reg);
+        });
+        setInterval(() => checkForUpdates(reg), 10 * 60 * 1000);
+
+        reg.addEventListener('updatefound', () => {
+          const nuevoSW = reg.installing;
+          if (!nuevoSW) return;
+          nuevoSW.addEventListener('statechange', () => {
+            if (nuevoSW.state === 'installed' && navigator.serviceWorker.controller) {
+              toast('✨ Nueva versión lista. Actualizando...');
+              setTimeout(() => window.location.reload(), 1200);
+            }
+          });
+        });
+      } catch (e) {
+        console.warn('SW error:', e);
+      }
+    });
+  }
+})();</script>
 
 <script>
 window.EMOJI_PERSONALIZADO_NOTA = true;
