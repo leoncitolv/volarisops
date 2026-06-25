@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reporte de Turno • Cesar Lara</title>
+  
+  <link rel="manifest" href="./manifest-reports.json">
+  <meta name="theme-color" content="#aa22ff">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Reportes">
+<title>Reporte de Turno • Cesar Lara</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Allura&family=Parisienne&family=Sacramento&family=Great+Vibes&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3478,5 +3485,56 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
+<script>
+/* PWA compartida con VolarisOps:
+   - Abre sin datos después de cargar una vez.
+   - Cuando hay internet, revisa cambios y actualiza sola.
+   - Usa ./sw.js para no romper GitHub Pages en carpetas. */
+(function () {
+  if (!("serviceWorker" in navigator)) return;
+
+  let reloadedByUpdate = false;
+
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").then(function (registration) {
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+
+      registration.addEventListener("updatefound", function () {
+        const newWorker = registration.installing;
+        if (!newWorker) return;
+
+        newWorker.addEventListener("statechange", function () {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            newWorker.postMessage({ type: "SKIP_WAITING" });
+          }
+        });
+      });
+    }).catch(function (error) {
+      console.log("No se pudo registrar el modo offline:", error);
+    });
+  });
+
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (reloadedByUpdate) return;
+    reloadedByUpdate = true;
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.addEventListener("message", function (event) {
+    if (!event.data || event.data.type !== "VOL_APP_UPDATED") return;
+
+    const updatedUrl = new URL(event.data.url);
+    const currentUrl = new URL(window.location.href);
+
+    if (updatedUrl.pathname === currentUrl.pathname) {
+      window.location.reload();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
