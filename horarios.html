@@ -1457,6 +1457,107 @@ body.admin-mode .admin-only{display:flex !important;}
   .kpi-card strong{font-size:30px;}
 }
 
+
+/* ═════ AJUSTE DAVID — distribución móvil sin cambiar estética ═════
+   Solo reacomoda la pantalla principal en celular para evitar recortes
+   y que cada bloque use mejor el ancho disponible. */
+@media(max-width:560px){
+  .main-dashboard{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+    margin:8px 0 14px !important;
+  }
+  .main-dashboard .dashboard-card{
+    width:100% !important;
+    max-width:100% !important;
+    overflow:visible !important;
+  }
+  .dashboard-head{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    align-items:stretch !important;
+    gap:12px !important;
+    margin-bottom:12px !important;
+  }
+  .dashboard-user-signature,
+  .dashboard-signature{
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .dashboard-signature{
+    padding-top:10px !important;
+  }
+  .dashboard-signature .user-signature-name{
+    font-size:clamp(40px,13.8vw,58px) !important;
+    line-height:.88 !important;
+    padding-top:2px !important;
+  }
+  .dashboard-signature .user-signature-meta{
+    flex-wrap:wrap !important;
+    row-gap:5px !important;
+  }
+  .turn-pill{
+    width:100% !important;
+    justify-content:center !important;
+    text-align:center !important;
+    white-space:normal !important;
+  }
+  .request-vacation-btn,
+  .admin-shortcut{
+    width:100% !important;
+  }
+  .vacation-card{
+    gap:11px !important;
+  }
+  .vacation-title{
+    display:grid !important;
+    grid-template-columns:1fr auto !important;
+    align-items:start !important;
+    gap:10px !important;
+  }
+  .vacation-title h2{
+    font-size:21px !important;
+  }
+  .vacation-title p{
+    font-size:12.5px !important;
+  }
+  .vacation-available{
+    text-align:right !important;
+    min-width:66px !important;
+  }
+  .vacation-available strong{
+    font-size:31px !important;
+  }
+  .vacation-progress{
+    height:18px !important;
+  }
+  .vacation-metrics{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+  .vacation-metric{
+    min-width:0 !important;
+  }
+  .vacation-settings{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+  .vacation-settings button{
+    width:100% !important;
+  }
+}
+@media(max-width:380px){
+  .dashboard-signature .user-signature-name{
+    font-size:clamp(36px,13vw,50px) !important;
+  }
+  .vacation-title{
+    grid-template-columns:1fr !important;
+  }
+  .vacation-available{
+    text-align:left !important;
+  }
+}
+
 </style>
 </head>
 <body class="locked">
