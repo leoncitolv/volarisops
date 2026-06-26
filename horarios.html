@@ -1975,6 +1975,197 @@ body.admin-mode .admin-only{display:flex !important;}
   }
 }
 
+
+/* ═════ Calendario opción 1 — chips rectangulares suaves ═════
+   Cambia solo la marcación visual del calendario para evitar tantos círculos.
+   Mantiene colores, datos, edición, filtros y estructura. */
+.calendar-grid .day{
+  gap:6px !important;
+}
+.calendar-grid .badge{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:5px !important;
+  min-height:30px !important;
+  padding:6px 8px 6px 10px !important;
+  border-radius:10px !important;
+  overflow:hidden !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 6px 14px rgba(0,0,0,.16) !important;
+}
+.calendar-grid .badge::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:5px;
+  bottom:5px;
+  width:3px;
+  border-radius:999px;
+  background:rgba(255,255,255,.70);
+}
+.calendar-grid .badge-icon{
+  width:auto !important;
+  height:auto !important;
+  min-width:12px !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  opacity:.92;
+}
+.calendar-grid .badge-state{
+  width:auto !important;
+  height:auto !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  opacity:.82;
+}
+.calendar-grid .badge-copy strong{
+  font-size:10.2px !important;
+  line-height:1.05 !important;
+  letter-spacing:-.01em !important;
+}
+.calendar-grid .badge-copy small{
+  display:block !important;
+  margin-top:1px !important;
+  font-size:8.7px !important;
+  line-height:1.05 !important;
+  opacity:.90 !important;
+}
+.calendar-grid .you-chip{
+  padding:1px 4px !important;
+  font-size:7.5px !important;
+  margin-left:3px !important;
+}
+.calendar-grid .status-work,
+.calendar-grid .badge.status-work,
+.calendar-grid .badge.current-user.status-work{
+  background:linear-gradient(135deg,rgba(239,68,68,.78),rgba(127,29,29,.52)) !important;
+}
+.calendar-grid .status-rest,
+.calendar-grid .badge.status-rest,
+.calendar-grid .badge.current-user.status-rest{
+  background:linear-gradient(135deg,rgba(34,197,94,.78),rgba(20,83,45,.52)) !important;
+}
+.calendar-grid .status-vacation,
+.calendar-grid .badge.status-vacation,
+.calendar-grid .badge.current-user.status-vacation{
+  background:linear-gradient(135deg,rgba(56,189,248,.76),rgba(14,116,144,.50)) !important;
+}
+.calendar-grid .status-course,
+.calendar-grid .badge.status-course,
+.calendar-grid .badge.current-user.status-course{
+  background:linear-gradient(135deg,rgba(250,204,21,.86),rgba(161,98,7,.58)) !important;
+}
+.calendar-grid .status-overtime,
+.calendar-grid .badge.status-overtime,
+.calendar-grid .badge.current-user.status-overtime{
+  background:linear-gradient(135deg,rgba(167,139,250,.82),rgba(76,29,149,.54)) !important;
+}
+.calendar-grid .status-permission,
+.calendar-grid .badge.status-permission,
+.calendar-grid .badge.current-user.status-permission{
+  background:linear-gradient(135deg,rgba(148,163,184,.72),rgba(51,65,85,.50)) !important;
+}
+.calendar-grid .badge.current-user{
+  outline:1px solid rgba(255,255,255,.85) !important;
+  outline-offset:1px !important;
+  box-shadow:0 0 0 2px rgba(176,92,255,.16), inset 0 1px 0 rgba(255,255,255,.14), 0 6px 14px rgba(0,0,0,.18) !important;
+}
+.calendar-grid .more{
+  margin-top:auto !important;
+  padding:4px 7px !important;
+  border-radius:9px !important;
+  background:rgba(255,255,255,.055) !important;
+  border:1px solid rgba(255,255,255,.06) !important;
+  color:#d8cdf8 !important;
+  font-size:10px !important;
+}
+.calendar-grid .more::before{
+  display:none !important;
+}
+@media(max-width:760px){
+  .calendar-grid{
+    gap:5px !important;
+  }
+  .calendar-grid .day{
+    min-height:88px !important;
+    padding:6px !important;
+    gap:4px !important;
+    border-radius:15px !important;
+  }
+  .calendar-grid .day-header{
+    gap:4px !important;
+  }
+  .calendar-grid .date-bubble{
+    min-width:24px !important;
+    height:24px !important;
+    padding:0 6px !important;
+    font-size:12px !important;
+  }
+  .calendar-grid .mini-count{
+    padding:3px 5px !important;
+    font-size:8.5px !important;
+  }
+  .calendar-grid .mini-count svg{
+    width:9px !important;
+    height:9px !important;
+  }
+  .calendar-grid .badge{
+    min-height:23px !important;
+    padding:4px 5px 4px 8px !important;
+    border-radius:8px !important;
+    gap:3px !important;
+  }
+  .calendar-grid .badge::before{
+    top:4px !important;
+    bottom:4px !important;
+    width:2px !important;
+  }
+  .calendar-grid .badge-icon{
+    font-size:8.5px !important;
+  }
+  .calendar-grid .badge-state{
+    font-size:9px !important;
+  }
+  .calendar-grid .badge-copy strong{
+    font-size:8.7px !important;
+  }
+  .calendar-grid .badge-copy small{
+    display:none !important;
+  }
+  .calendar-grid .you-chip{
+    display:none !important;
+  }
+  .calendar-grid .more{
+    padding:3px 5px !important;
+    font-size:8.5px !important;
+    border-radius:7px !important;
+  }
+}
+@media(max-width:430px){
+  .calendar-grid .day{
+    min-height:78px !important;
+    padding:5px !important;
+    border-radius:14px !important;
+  }
+  .calendar-grid .badge{
+    min-height:20px !important;
+  }
+  .calendar-grid .badge-copy strong{
+    font-size:8px !important;
+  }
+  .calendar-grid .badge-icon,
+  .calendar-grid .badge-state{
+    font-size:8px !important;
+  }
+}
+
 </style>
 </head>
 <body class="locked">
@@ -2772,7 +2963,7 @@ function renderCalendar() {
     const cell=document.createElement("button");
     cell.className=`day ${d.getMonth()!==current.getMonth()?"other":""} ${date===today?"today":""} ${date===activeDate?"selected":""}`;
     cell.dataset.date=date;
-    const max = (selectedUserId()==="all" && !isMyScheduleOnly()) ? 3 : 5;
+    const max = (selectedUserId()==="all" && !isMyScheduleOnly()) ? 2 : 4;
     const countLabel = records.length ? `<span class="mini-count"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>${records.length}</span>` : "";
     cell.innerHTML = `<div class="day-header"><span class="date-bubble">${d.getDate()}</span>${countLabel}</div>` +
       records.slice(0,max).map(recordBadge).join("") + (records.length>max?`<span class="more">+${records.length-max} más</span>`:"");
