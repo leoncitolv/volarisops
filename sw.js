@@ -2,8 +2,8 @@
    Un solo sw.js para toda la carpeta de GitHub Pages.
    Controla: index + VolarisOps + Reports + Paint + NP + Horarios. */
 const CACHE_PREFIX = 'volaris-suite';
-const APP_CACHE = `${CACHE_PREFIX}-app-v3`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-v3`;
+const APP_CACHE = `${CACHE_PREFIX}-app-v4`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-v4`;
 
 const APP_SHELL = [
   './',
@@ -139,7 +139,10 @@ async function fetchAndUpdate(file, notifyClientId) {
 
     if (changed && notifyClientId) {
       const client = await self.clients.get(notifyClientId);
-      if (client) client.postMessage({ type: 'APP_UPDATED', file: url });
+      if (client) {
+        client.postMessage({ type: 'APP_UPDATED', file: url });
+        client.postMessage({ type: 'VOL_APP_UPDATED', file: url });
+      }
     }
     return changed;
   } catch (e) {

@@ -2269,7 +2269,7 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, update, remove, onValue, get, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBgxuSvpkpMJ6nGFdPV8j-Oj5RSHA7_uWM",
@@ -2284,6 +2284,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch(err => console.warn('Persistencia Auth no disponible:', err));
+const VOP_USERS_CACHE_KEY = 'vop_users_cache_v1';
+const VOP_NOTAS_CACHE_KEY = 'vop_notas_cache_v1';
+function readJSONCache(key, fallback) { try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; } catch(e) { return fallback; } }
+function writeJSONCache(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {} }
+function loadUsersCache() { return readJSONCache(VOP_USERS_CACHE_KEY, {}); }
+function loadNotasCache() { return readJSONCache(VOP_NOTAS_CACHE_KEY, {}); }
+function offlineAuthMessage(){ return 'Sin conexión. Para entrar por primera vez necesitas internet. Si ya habías iniciado sesión, la app puede abrir con datos guardados.'; }
 
 /* ══════════════════════════
    TEMA
@@ -2313,11 +2321,16 @@ function startUsersListener(){
   if(unsubscribeUsers) return;
   unsubscribeUsers = onValue(usersRef, snap => {
     usersData = snap.val() || {};
+    writeJSONCache(VOP_USERS_CACHE_KEY, usersData);
     renderUserList();
     updateTopUser();
     syncSupervisorMode(false);
   }, err => {
-    console.warn('Usuarios no disponibles hasta iniciar sesión:', err);
+    console.warn('Usuarios no disponibles, usando caché local:', err);
+    usersData = loadUsersCache();
+    renderUserList();
+    updateTopUser();
+    syncSupervisorMode(false);
   });
 }
 function stopUsersListener(){
@@ -2353,8 +2366,19 @@ function getUserByNumero(numero){
   return usersData[k] || Object.values(usersData).find(u => String(u.numero).trim() === String(numero).trim()) || null;
 }
 async function getUserByNumeroFresh(numero){
-  const snap = await get(ref(db, 'volaris_users/' + userKey(numero)));
-  return snap.exists() ? snap.val() : null;
+  try {
+    const snap = await get(ref(db, 'volaris_users/' + userKey(numero)));
+    const value = snap.exists() ? snap.val() : null;
+    if (value) {
+      usersData[userKey(numero)] = value;
+      writeJSONCache(VOP_USERS_CACHE_KEY, usersData);
+    }
+    return value;
+  } catch(e) {
+    const cached = loadUsersCache();
+    usersData = Object.keys(usersData || {}).length ? usersData : cached;
+    return cached[userKey(numero)] || Object.values(cached).find(u => String(u.numero).trim() === String(numero).trim()) || null;
+  }
 }
 function getCurrentNumero(){
   const email = auth.currentUser?.email || '';
@@ -2442,11 +2466,19 @@ function startNotasListener(){
   if(unsubscribeNotas) return;
   unsubscribeNotas = onValue(dbRef, snap => {
     globalData = snap.val() || {};
+    writeJSONCache(VOP_NOTAS_CACHE_KEY, globalData);
     setSyncOk();
     renderFolders(document.getElementById('searchNotas').value);
     renderGlobal();
     updateHomeQuickStats();
-  }, err => { console.error(err); setSyncOff(); });
+  }, err => {
+    console.error(err);
+    globalData = loadNotasCache();
+    setSyncOff();
+    renderFolders(document.getElementById('searchNotas').value);
+    renderGlobal();
+    updateHomeQuickStats();
+  });
 }
 function stopNotasListener(){
   if(unsubscribeNotas){ unsubscribeNotas(); unsubscribeNotas=null; }
@@ -3524,12 +3556,22 @@ btnLogin.addEventListener('click',async()=>{
   btnLogin.disabled=true;
   btnLogin.textContent='Entrando...';
   try{
+    if(!navigator.onLine){
+      const user = auth.currentUser || await Promise.race([authReadyPromise, new Promise(res=>setTimeout(()=>res(null), 900))]);
+      if(user && user.email === authEmailFromNumero(numero)){
+        await entrarAlPortalConNumero(numero);
+        loginPass.value='';
+        return;
+      }
+      throw new Error('OFFLINE_LOGIN');
+    }
+    await authPersistenceReady;
     await signInWithEmailAndPassword(auth, authEmailFromNumero(numero), pass);
     await entrarAlPortalConNumero(numero);
     loginPass.value='';
   }catch(e){
     console.warn(e);
-    showLoginError('Número o PIN incorrecto, o usuario sin permiso.');
+    showLoginError(e?.message === 'OFFLINE_LOGIN' ? offlineAuthMessage() : 'Número o PIN incorrecto, o usuario sin permiso.');
   }finally{
     btnLogin.disabled=false;
     btnLogin.textContent='Entrar →';

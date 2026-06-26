@@ -1,0 +1,29 @@
+MODO OFFLINE INTELIGENTE - VOLARIS OPS
+
+Qué se modificó:
+1. sw.js actualizado a caché v4 para abrir las apps sin datos después de cargarlas una vez con internet.
+2. horarios.html:
+   - Persistencia local de Firebase Auth.
+   - Caché offline de Firestore.
+   - Respaldo local de perfil, usuarios, turnos y vacaciones.
+   - Mensaje claro si intentan iniciar sesión por primera vez sin internet.
+3. VolarisOps.html:
+   - Persistencia local de Firebase Auth.
+   - Caché local de usuarios y notas.
+   - Entrada offline si ya había sesión guardada.
+4. np.html:
+   - Persistencia de sesión anónima.
+   - Caché offline de Firestore.
+   - Respaldo local del catálogo cargado previamente.
+
+Importante:
+- El primer inicio de sesión siempre requiere internet.
+- Para usar offline, abre cada app una vez con internet y entra con tu usuario.
+- No cierres sesión si quieres conservar entrada offline.
+- Los enlaces externos, como solicitud de vacaciones Deloitte, requieren internet.
+- Cuando vuelva la conexión, Firestore sincroniza los cambios pendientes en las apps que usan Firestore.
+
+Subida a GitHub:
+- Sube todos los archivos de esta carpeta reemplazando los actuales.
+- Abre las apps una vez con internet para que el nuevo sw.js guarde la versión actual.
+- Si el celular no actualiza, cierra y vuelve a abrir la PWA o borra caché/instala de nuevo.

@@ -2512,10 +2512,15 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut
+  signOut,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
   getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
   collection,
   doc,
   setDoc,
@@ -2630,6 +2635,9 @@ let current = startOfMonth(new Date());
 let deferredPrompt = null;
 let isBootstrappingOwner = false;
 let state = { users: [], overrides: {} };
+let authPersistenceReady = Promise.resolve();
+
+const HORARIOS_CACHE_KEY = 'horarios_offline_cache_v1';
 
 function firebaseConfigured() {
   const f = APP_CONFIG.firebase;
@@ -2645,7 +2653,15 @@ function initFirebase() {
   }
   app = initializeApp(APP_CONFIG.firebase);
   auth = getAuth(app);
-  db = getFirestore(app);
+  authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch(err => console.warn('Persistencia Auth no disponible:', err));
+  try {
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+    });
+  } catch (err) {
+    console.warn('Caché offline Firestore no disponible, usando conexión normal:', err);
+    db = getFirestore(app);
+  }
   firebaseReady = true;
   return true;
 }
@@ -2693,6 +2709,33 @@ function setBusy(btn, busy, label="Procesando...") {
   else { btn.textContent = btn.dataset.oldText || btn.textContent; btn.disabled = false; }
 }
 
+function readHorariosCache() {
+  try { return JSON.parse(localStorage.getItem(HORARIOS_CACHE_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function writeHorariosCache(partial) {
+  const prev = readHorariosCache();
+  localStorage.setItem(HORARIOS_CACHE_KEY, JSON.stringify({ ...prev, ...partial, savedAt: Date.now() }));
+}
+function cacheCurrentState() {
+  writeHorariosCache({ users: state.users || [], overrides: state.overrides || {} });
+}
+function cacheProfile(profile) {
+  if (!profile?.uid && !profile?.id) return;
+  const id = profile.uid || profile.id;
+  const cache = readHorariosCache();
+  writeHorariosCache({ profiles: { ...(cache.profiles || {}), [id]: profile } });
+}
+function loadCachedStateForCurrentUser() {
+  const cache = readHorariosCache();
+  if (Array.isArray(cache.users)) state.users = cache.users;
+  if (cache.overrides && typeof cache.overrides === 'object') state.overrides = cache.overrides;
+  if ((cache.users || cache.overrides) && typeof render === 'function') render();
+}
+function offlineLoginMessage() {
+  return 'Sin conexión. Para iniciar sesión por primera vez necesitas internet. Si ya habías entrado antes, abre la app sin cerrar sesión.';
+}
+
 /* ══════════════════════════════════
    AUTENTICACIÓN
    ══════════════════════════════════ */
@@ -2703,6 +2746,8 @@ function pinToFirebasePassword(pin) {
 
 async function login(employeeId, pin) {
   if (!firebaseReady) return;
+  if (!navigator.onLine) throw new Error('OFFLINE_LOGIN');
+  await authPersistenceReady;
   await signInWithEmailAndPassword(auth, employeeToEmail(employeeId), pinToFirebasePassword(pin));
 }
 
@@ -2712,6 +2757,7 @@ async function setupOwner(employeeId, pin) {
   if (pin !== APP_CONFIG.OWNER_BOOTSTRAP_PIN) throw new Error("PIN inicial incorrecto.");
   isBootstrappingOwner = true;
   try {
+    await authPersistenceReady;
     const cred = await createUserWithEmailAndPassword(auth, employeeToEmail(clean), pinToFirebasePassword(pin));
     await setDoc(doc(db, "profiles", cred.user.uid), {
       uid: cred.user.uid,
@@ -2737,11 +2783,21 @@ async function setupOwner(employeeId, pin) {
 }
 
 async function loadProfile(user) {
-  const snap = await getDoc(doc(db, "profiles", user.uid));
-  if (!snap.exists()) throw new Error("Tu usuario no tiene perfil activo en Horarios.");
-  const profile = { id: snap.id, ...snap.data() };
-  if (profile.active === false) throw new Error("Tu acceso fue desactivado. Contacta al administrador.");
-  return profile;
+  try {
+    const snap = await getDoc(doc(db, "profiles", user.uid));
+    if (!snap.exists()) throw new Error("Tu usuario no tiene perfil activo en Horarios.");
+    const profile = { id: snap.id, ...snap.data() };
+    if (profile.active === false) throw new Error("Tu acceso fue desactivado. Contacta al administrador.");
+    cacheProfile(profile);
+    return profile;
+  } catch (err) {
+    const cached = readHorariosCache().profiles?.[user.uid];
+    if (cached && cached.active !== false) {
+      console.warn('Perfil cargado desde caché offline:', err);
+      return cached;
+    }
+    throw err;
+  }
 }
 
 function startRealtime() {
@@ -2750,8 +2806,9 @@ function startRealtime() {
     state.users = snap.docs.map(d => ({ id: d.id, ...d.data() }))
       .filter(u => u.active !== false)
       .sort((a,b) => (a.name || "").localeCompare(b.name || "", "es"));
+    cacheCurrentState();
     render();
-  }, (err) => console.warn("profiles", err));
+  }, (err) => { console.warn("profiles", err); loadCachedStateForCurrentUser(); });
 
   unsubOverrides = onSnapshot(collection(db, "overrides"), (snap) => {
     const data = {};
@@ -2760,8 +2817,9 @@ function startRealtime() {
       if (ov.userId && ov.date) data[overrideKey(ov.userId, ov.date)] = ov;
     });
     state.overrides = data;
+    cacheCurrentState();
     render();
-  }, (err) => console.warn("overrides", err));
+  }, (err) => { console.warn("overrides", err); loadCachedStateForCurrentUser(); });
 }
 function stopRealtime() {
   if (unsubProfiles) unsubProfiles();
@@ -3288,7 +3346,10 @@ $("#loginForm").addEventListener("submit", async e=>{
   e.preventDefault(); authError("");
   const btn=e.submitter;
   try { setBusy(btn,true,"Entrando..."); await login($("#loginEmployee").value,$("#loginPin").value); }
-  catch(err) { authError("No se pudo entrar. Revisa número de empleado y PIN."); console.warn(err); }
+  catch(err) {
+    authError(err?.message === 'OFFLINE_LOGIN' ? offlineLoginMessage() : "No se pudo entrar. Revisa número de empleado y PIN.");
+    console.warn(err);
+  }
   finally { setBusy(btn,false); }
 });
 $("#logoutBtn").addEventListener("click",()=>signOut(auth));
@@ -3433,6 +3494,7 @@ if (initFirebase()) {
     try {
       currentProfile = await loadProfile(user);
       showApp();
+      loadCachedStateForCurrentUser();
       startRealtime();
     } catch(err) {
       console.warn(err);

@@ -796,6 +796,9 @@ const DATOS_INICIALES = [
 let data=[], secciones=[...SECCIONES_DEFAULT], activeCat="Todos", isEditor=false;
 let db=null, storage=null, selectedColor=PALETTE[0].hex;
 let pendingFile=null, editingId=null, editingCurrentImgUrl="";
+const NP_CACHE_KEY = 'np_firestore_cache_v1';
+function readNPCache(){ try { return JSON.parse(localStorage.getItem(NP_CACHE_KEY) || 'null'); } catch(e) { return null; } }
+function writeNPCache(){ try { localStorage.setItem(NP_CACHE_KEY, JSON.stringify({ secciones, data, savedAt: Date.now() })); } catch(e) {} }
 
 /* ── Helpers ── */
 const getColor=n=>{const s=secciones.find(s=>s.name===n);return s?s.color:"#6b7280";};
@@ -808,10 +811,15 @@ function initFirebase(){
     firebase.initializeApp(firebaseConfig);
     db=firebase.firestore();
     storage=firebase.storage();
-    // Autenticación anónima para cumplir reglas de seguridad
-    firebase.auth().signInAnonymously().then(()=>{
-      setStatus(true); loadData();
-    }).catch(e=>{setStatus(false);usarDatosLocales();});
+    try { db.enablePersistence({ synchronizeTabs:true }).catch(()=>{}); } catch(e) {}
+    const auth = firebase.auth();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{}).finally(()=>{
+      auth.onAuthStateChanged(user=>{
+        if(user){ setStatus(true); loadData(); return; }
+        if(!navigator.onLine){ setStatus(false); usarDatosLocales(); return; }
+        auth.signInAnonymously().then(()=>{ setStatus(true); loadData(); }).catch(()=>{ setStatus(false); usarDatosLocales(); });
+      });
+    });
   }catch(e){setStatus(false);usarDatosLocales();}
 }
 function setStatus(on){
@@ -825,9 +833,9 @@ async function loadData(){
     else await seedSecciones();
     const sn=await db.collection("pinturas").orderBy("orden").get();
     if(sn.empty) await seedData();
-    else{data=sn.docs.map(d=>({id:d.id,...d.data()}));buildTabs();render();}
-    db.collection("pinturas").orderBy("orden").onSnapshot(sn=>{data=sn.docs.map(d=>({id:d.id,...d.data()}));buildTabs();render();});
-    db.collection("secciones").orderBy("orden").onSnapshot(sn=>{secciones=sn.docs.map(d=>({id:d.id,...d.data()}));rebuildSelects();buildTabs();render();});
+    else{data=sn.docs.map(d=>({id:d.id,...d.data()}));writeNPCache();buildTabs();render();}
+    db.collection("pinturas").orderBy("orden").onSnapshot(sn=>{data=sn.docs.map(d=>({id:d.id,...d.data()}));writeNPCache();buildTabs();render();},()=>usarDatosLocales());
+    db.collection("secciones").orderBy("orden").onSnapshot(sn=>{secciones=sn.docs.map(d=>({id:d.id,...d.data()}));writeNPCache();rebuildSelects();buildTabs();render();},()=>usarDatosLocales());
   }catch(e){setStatus(false);usarDatosLocales();}
 }
 async function seedSecciones(){const b=db.batch();SECCIONES_DEFAULT.forEach((s,i)=>{b.set(db.collection("secciones").doc(),{...s,orden:i});});await b.commit();}
@@ -838,8 +846,14 @@ async function seedData(){
   await b.commit();toast("✓","Base de datos lista");
 }
 function usarDatosLocales(){
-  secciones=[...SECCIONES_DEFAULT];
-  data=DATOS_INICIALES.map((r,i)=>({...r,id:String(i),imgUrl:""}));
+  const cache = readNPCache();
+  if(cache && Array.isArray(cache.secciones) && Array.isArray(cache.data)){
+    secciones = cache.secciones;
+    data = cache.data;
+  }else{
+    secciones=[...SECCIONES_DEFAULT];
+    data=DATOS_INICIALES.map((r,i)=>({...r,id:String(i),imgUrl:""}));
+  }
   rebuildSelects();buildTabs();render();
 }
 
@@ -1034,7 +1048,7 @@ async function addRow(){
     if(db){
       const ref=await db.collection("pinturas").add({cat,np,desc,app,orden,imgUrl:""});
       if(pendingFile){toast("⏳","Subiendo imagen…");const url=await uploadImg(pendingFile,ref.id,"uploadProgress","uploadProgressBar");await ref.update({imgUrl:url});}
-    }else{data.push({cat,np,desc,app,orden,imgUrl:"",id:Date.now().toString()});}
+    }else{data.push({cat,np,desc,app,orden,imgUrl:"",id:Date.now().toString()});writeNPCache();}
     closePanel("addOverlay");activeCat=cat;clearPendingImg();buildTabs();render();
     toast("✓",`"${np}" agregado`);
   }catch(e){toast("⚠","Error: "+e.message);}
@@ -1114,7 +1128,7 @@ async function saveEdit(){
   if(!np||!desc){toast("⚠","N/P y Descripción son requeridos");return;}
   try{
     if(db)await db.collection("pinturas").doc(editingId).update({cat,np,desc,app});
-    else{const it=data.find(r=>r.id===editingId);if(it)Object.assign(it,{cat,np,desc,app});buildTabs();render();}
+    else{const it=data.find(r=>r.id===editingId);if(it)Object.assign(it,{cat,np,desc,app});writeNPCache();buildTabs();render();}
     closePanel("editOverlay");
     toast("✓",`"${np}" actualizado`);
   }catch(e){toast("⚠","Error al guardar");}
