@@ -5,1344 +5,372 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 <meta name="theme-color" content="#06020f">
 <link rel="manifest" href="./manifest-paint.json">
 <link rel="apple-touch-icon" href="./icon-paint-192.png">
-<title>ROG Paint — Hub</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<title>VolPaint — Calculadora Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Allura&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{min-height:100%;font-family:'Nunito',sans-serif;background:#06020f;color:#e2d0ff;overflow-x:hidden;}
-
-/* ── VARIABLES POR PESTAÑA ── */
-body.tab-ext  {--c1:#7c3aed;--c2:#a78bfa;--c3:rgba(124,58,237,0.18);--cb:rgba(124,58,237,0.35);--bg1:#150040;--bg2:#000833;}
-body.tab-int  {--c1:#0e7490;--c2:#67e8f9;--c3:rgba(14,116,144,0.18);--cb:rgba(14,116,144,0.35);--bg1:#001830;--bg2:#000c20;}
-body.tab-h2o  {--c1:#0369a1;--c2:#38bdf8;--c3:rgba(3,105,161,0.18);--cb:rgba(3,105,161,0.35);--bg1:#001428;--bg2:#000818;}
-body.tab-pri  {--c1:#16a34a;--c2:#4ade80;--c3:rgba(22,163,74,0.18);--cb:rgba(22,163,74,0.35);--bg1:#002a1a;--bg2:#000a08;}
-body.tab-tra  {--c1:#b45309;--c2:#fbbf24;--c3:rgba(180,83,9,0.18);--cb:rgba(180,83,9,0.35);--bg1:#1a0e00;--bg2:#0a0600;}
-
-body::before{content:'';position:fixed;inset:0;z-index:0;
-  background:radial-gradient(ellipse 130% 50% at 50% 0%, var(--bg1) 0%,#001030 35%,transparent 70%),
-             radial-gradient(ellipse 110% 55% at 60% 100%, var(--bg2) 0%,#000515 45%,transparent 75%),
-             #06020f;
-  pointer-events:none;transition:background 0.4s;}
-
-.wrap{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:0 0 80px;}
-
-/* ── TOPBAR ── */
-.topbar{display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;background:rgba(6,2,15,0.9);
-  border-bottom:1px solid var(--cb);backdrop-filter:blur(12px);
-  position:sticky;top:0;z-index:50;}
-.brand-main{font-size:18px;font-weight:900;letter-spacing:3px;color:#fff;}
-.brand-main span{color:var(--c2);transition:color .3s;}
-.brand-sub{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-top:1px;}
-.brand-badge{font-size:9px;font-weight:800;letter-spacing:2px;padding:4px 10px;
-  border-radius:6px;background:var(--c3);border:1px solid var(--cb);color:var(--c2);
-  text-transform:uppercase;transition:all .3s;}
-
-/* ── NAV PESTAÑAS ── */
-.nav-scroll{overflow-x:auto;background:rgba(6,2,15,0.85);border-bottom:1px solid rgba(255,255,255,0.05);
-  position:sticky;top:57px;z-index:40;scrollbar-width:none;}
-.nav-scroll::-webkit-scrollbar{display:none;}
-.nav-inner{display:flex;min-width:max-content;padding:0 8px;}
-.nav-btn{flex-shrink:0;padding:10px 14px;background:none;border:none;cursor:pointer;
-  font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;letter-spacing:1.5px;
-  text-transform:uppercase;color:rgba(255,255,255,0.3);border-bottom:2px solid transparent;
-  transition:all .2s;white-space:nowrap;}
-.nav-btn.active{color:#fff;border-bottom-color:var(--c2);}
-.nav-btn:active{opacity:.7;}
-
-/* ── CONTENIDO ── */
-.tab-panel{display:none;padding:20px 14px 10px;}
-.tab-panel.active{display:block;}
-
-/* ── RATIO PILLS ── */
-.ratio-pills{display:flex;gap:6px;margin-bottom:16px;}
-.rp{flex:1;text-align:center;padding:8px 4px;border-radius:8px;
-  font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
-  background:var(--c3);border:1px solid var(--cb);color:var(--c2);}
-.rp-top{font-size:16px;display:block;margin-bottom:2px;}
-
-/* ── INPUT BLOCK ── */
-.input-block{background:var(--c3);border:1px solid var(--cb);border-top:2px solid var(--c1);
-  border-radius:10px;padding:18px 16px 20px;margin-bottom:14px;}
-.input-lbl{font-size:12px;font-weight:800;letter-spacing:2px;color:var(--c2);
-  text-transform:uppercase;margin-bottom:5px;display:block;opacity:.8;}
-.input-hint{font-size:10px;color:var(--c2);letter-spacing:1px;margin-bottom:10px;opacity:.45;}
-.input-row{display:flex;align-items:flex-end;gap:10px;}
-.num-input{flex:1;background:transparent;border:none;border-bottom:2px solid var(--cb);
-  color:#fff;font-size:48px;font-weight:900;font-family:'Nunito',sans-serif;
-  outline:none;-webkit-appearance:none;appearance:none;padding:4px 0;width:100%;
-  caret-color:var(--c2);-webkit-text-fill-color:#fff;}
-.num-input:focus{border-bottom-color:var(--c2);}
-.num-input::placeholder{color:var(--cb);-webkit-text-fill-color:var(--cb);}
-.num-input::-webkit-inner-spin-button,.num-input::-webkit-outer-spin-button{-webkit-appearance:none;}
-.unit-lbl{font-size:18px;font-weight:900;color:var(--c1);padding-bottom:8px;flex-shrink:0;}
-
-/* ── MODE BTNS ── */
-.mode-row{display:flex;gap:7px;margin-bottom:14px;}
-.mode-btn{flex:1;padding:11px 4px;background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.08);border-radius:8px;
-  color:rgba(255,255,255,0.35);font-family:'Nunito',sans-serif;font-size:11px;
-  font-weight:800;letter-spacing:1px;text-align:center;cursor:pointer;
-  -webkit-appearance:none;transition:all .15s;line-height:1.3;}
-.mode-btn.active{background:var(--c3);border-color:var(--c1);color:#fff;}
-.mode-btn:active{opacity:.7;}
-.mode-top{display:block;font-size:13px;margin-bottom:2px;}
-.mode-sub{display:block;font-size:9px;opacity:.6;letter-spacing:1px;}
-
-/* ── WARN ── */
-.warn-min{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);
-  border-radius:8px;padding:11px 14px;font-size:11px;font-weight:800;letter-spacing:1px;
-  color:#fbbf24;text-align:center;margin-bottom:10px;}
-
-/* ── RESULT CARDS ── */
-.results{display:flex;flex-direction:column;gap:9px;margin-bottom:10px;}
-.result-card{background:rgba(10,5,30,0.85);border:1px solid rgba(255,255,255,0.06);
-  border-left:3px solid var(--c1);border-radius:10px;padding:14px 16px;
-  display:flex;justify-content:space-between;align-items:center;}
-.result-card.c-hard{border-left-color:#3b82f6;}
-.result-card.c-thin{border-left-color:#f59e0b;}
-.result-card.c-thin2{border-left-color:#d97706;}
-.result-card.c-water{border-left-color:#06b6d4;}
-.result-card.c-water2{border-left-color:#0891b2;}
-.rc-left{display:flex;align-items:center;gap:12px;}
-.rc-emoji{font-size:24px;line-height:1;}
-.rc-name{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,0.3);margin-bottom:3px;}
-.rc-desc{font-size:14px;font-weight:700;color:#e2d0ff;}
-.rc-right{text-align:right;}
-.rc-val{font-size:30px;font-weight:900;color:#fff;line-height:1;letter-spacing:1px;}
-.rc-unit{font-size:11px;font-weight:800;letter-spacing:2px;margin-top:3px;color:var(--c2);}
-.c-hard .rc-unit{color:#3b82f6;}
-.c-thin .rc-unit{color:#f59e0b;}
-.c-thin2 .rc-unit{color:#d97706;}
-.c-water .rc-unit{color:#06b6d4;}
-.c-water2 .rc-unit{color:#0891b2;}
-
-/* ── TOTAL ── */
-.total-row{background:transparent;border:1px solid var(--cb);border-radius:8px;
-  padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
-.total-lbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);}
-.total-val{font-size:17px;font-weight:900;color:var(--c2);}
-
-/* ── PROP BAR ── */
-.prop-bar{background:var(--c3);border:1px solid var(--cb);border-radius:8px;
-  padding:13px 16px;margin-bottom:9px;}
-.prop-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,0.3);margin-bottom:9px;}
-.prop-track{display:flex;height:5px;gap:3px;border-radius:3px;overflow:hidden;}
-.pf{border-radius:3px;}
-.prop-key{display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;}
-.pk{display:flex;align-items:center;gap:5px;font-size:12px;
-  color:rgba(255,255,255,0.5);font-weight:700;}
-.pd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-
-/* ── PSI INFO ── */
-.psi-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
-  border-radius:8px;padding:11px 14px;margin-bottom:9px;
-  font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:.5px;line-height:1.6;}
-.psi-box strong{color:var(--c2);}
-
-/* ── RESET ── */
-.reset-btn{width:100%;padding:13px;background:transparent;border:1px solid var(--cb);
-  border-radius:8px;color:rgba(255,255,255,0.3);font-family:'Nunito',sans-serif;
-  font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;-webkit-appearance:none;margin-top:3px;}
-.reset-btn:active{background:var(--c3);color:var(--c2);border-color:var(--c1);}
-
-/* ── FOOTER ── */
-.footer{text-align:center;padding:20px 14px 0;font-size:9px;letter-spacing:3px;
-  color:rgba(255,255,255,0.1);text-transform:uppercase;}
-
-.hidden{display:none!important;}
-
-/* ── PISTOLAS SCHEMA ── */
-.gun-schema{margin-bottom:9px;}
-.gun-schema-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,0.3);margin-bottom:8px;padding:0 2px;}
-.gun-tabs{display:flex;gap:5px;margin-bottom:8px;}
-.gun-tab{flex:1;padding:8px 4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);
-  border-radius:7px;color:rgba(255,255,255,0.3);font-family:'Nunito',sans-serif;font-size:10px;
-  font-weight:800;letter-spacing:.5px;text-align:center;cursor:pointer;-webkit-appearance:none;
-  transition:all .15s;line-height:1.3;}
-.gun-tab.active{background:var(--c3);border-color:var(--c1);color:var(--c2);}
-.gun-tab:active{opacity:.7;}
-.gun-tab-icon{display:block;font-size:14px;margin-bottom:2px;}
-.gun-panel{display:none;}
-.gun-panel.active{display:block;}
-.gun-card{background:rgba(10,5,30,0.85);border:1px solid rgba(255,255,255,0.06);
-  border-left:3px solid var(--c1);border-radius:9px;padding:12px 14px;margin-bottom:6px;}
-.gun-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.gun-card-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,0.3);}
-.gun-card-badge{font-size:9px;font-weight:800;letter-spacing:1px;padding:3px 7px;
-  border-radius:5px;background:var(--c3);border:1px solid var(--cb);color:var(--c2);}
-.gun-rows{display:flex;flex-direction:column;gap:5px;}
-.gun-row{display:flex;justify-content:space-between;align-items:center;
-  padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
-.gun-row:last-child{border-bottom:none;}
-.gun-row-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.55);}
-.gun-row-val{font-size:12px;font-weight:900;color:#fff;letter-spacing:.5px;}
-.gun-row-val.accent{color:var(--c2);}
-.gun-config{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
-  border-left:3px solid #f59e0b;border-radius:9px;padding:11px 14px;margin-bottom:6px;}
-.gun-config-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-  color:#f59e0b;margin-bottom:8px;opacity:.8;}
-.gun-config-rows{display:flex;flex-direction:column;gap:4px;}
-.gun-config-row{display:flex;justify-content:space-between;align-items:center;}
-.gun-config-label{font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:.5px;}
-.gun-config-val{font-size:11px;font-weight:900;color:#fbbf24;}
-.gun-config-val[contenteditable="true"]{outline:none;border-bottom:1px dashed #f59e0b;min-width:60px;display:inline-block;cursor:text;}
-.edit-config-btn{margin-top:8px;width:100%;padding:7px;background:transparent;border:1px dashed rgba(251,191,36,0.3);
-  border-radius:6px;color:rgba(251,191,36,0.5);font-family:'Nunito',sans-serif;font-size:10px;
-  font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;-webkit-appearance:none;transition:all .2s;}
-.edit-config-btn:active{background:rgba(251,191,36,0.1);color:#fbbf24;border-color:#f59e0b;}
-.edit-config-btn.editing{background:rgba(251,191,36,0.12);color:#fbbf24;border-color:#f59e0b;border-style:solid;}
+body.tab-ext{--c1:#7c3aed;--c2:#a78bfa;--c3:rgba(124,58,237,.18);--cb:rgba(124,58,237,.35);--bg1:#150040;--bg2:#000833;}
+body.tab-int{--c1:#0e7490;--c2:#67e8f9;--c3:rgba(14,116,144,.18);--cb:rgba(14,116,144,.35);--bg1:#001830;--bg2:#000c20;}
+body.tab-h2o{--c1:#0369a1;--c2:#38bdf8;--c3:rgba(3,105,161,.18);--cb:rgba(3,105,161,.35);--bg1:#001428;--bg2:#000818;}
+body.tab-pri{--c1:#16a34a;--c2:#4ade80;--c3:rgba(22,163,74,.18);--cb:rgba(22,163,74,.35);--bg1:#002a1a;--bg2:#000a08;}
+body.tab-tra{--c1:#b45309;--c2:#fbbf24;--c3:rgba(180,83,9,.18);--cb:rgba(180,83,9,.35);--bg1:#1a0e00;--bg2:#0a0600;}
+:root{--glass:rgba(24,8,48,.64);--line:rgba(210,135,255,.20);--line2:rgba(210,135,255,.12);--shadow:0 14px 36px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);--blur:blur(22px) saturate(1.22);}
+body{background:radial-gradient(900px 540px at 50% -18%,color-mix(in srgb,var(--c2) 22%,transparent),transparent 70%),radial-gradient(680px 540px at 4% 96%,rgba(83,205,255,.10),transparent 72%),radial-gradient(520px 440px at 94% 20%,rgba(170,34,255,.13),transparent 70%),linear-gradient(160deg,#05000f 0%,#0d0223 48%,#1b0645 100%)!important;-webkit-font-smoothing:antialiased;}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(850px 460px at 50% -8%,var(--bg1) 0%,transparent 72%),radial-gradient(650px 460px at 58% 100%,var(--bg2) 0%,transparent 76%),linear-gradient(115deg,transparent 0 42%,rgba(255,255,255,.045) 49%,transparent 56% 100%);pointer-events:none;opacity:.96;}
+.wrap{position:relative;z-index:1;width:min(100%,480px);max-width:480px;margin:0 auto;padding:8px 10px calc(88px + env(safe-area-inset-bottom));}
+.topbar{display:flex;align-items:center;justify-content:space-between;position:sticky;top:8px;z-index:60;margin-bottom:8px;padding:13px 14px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 20%,transparent),rgba(85,204,255,.045)),var(--glass);box-shadow:var(--shadow);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);}
+.brand-main{font-size:18px;font-weight:900;letter-spacing:2.5px;color:#fff;text-shadow:0 0 28px color-mix(in srgb,var(--c2) 24%,transparent);}
+.brand-main span{color:var(--c2);filter:drop-shadow(0 0 12px color-mix(in srgb,var(--c2) 34%,transparent));}
+.brand-sub{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.40);margin-top:1px;}
+.brand-badge{font-size:8.5px;font-weight:900;letter-spacing:1.5px;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--c1) 18%,transparent);border:1px solid color-mix(in srgb,var(--c2) 36%,transparent);color:var(--c2);text-transform:uppercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+.nav-scroll{position:sticky;top:73px;z-index:50;overflow-x:auto;margin-bottom:10px;padding:7px;border:1px solid var(--line);border-radius:999px;background:rgba(16,2,35,.58);box-shadow:var(--shadow);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);scrollbar-width:none;}
+.nav-scroll::-webkit-scrollbar{display:none}.nav-inner{display:flex;gap:6px;min-width:max-content}.nav-btn{min-height:38px;padding:9px 12px;border:1px solid transparent;border-radius:999px;background:transparent;color:rgba(235,222,255,.50);font-family:'Nunito',sans-serif;font-size:10px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:.18s}.nav-btn.active{color:#fff;border-color:rgba(255,255,255,.12);background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 88%,#7a19ff),color-mix(in srgb,var(--c2) 70%,#e454ff));box-shadow:0 10px 22px color-mix(in srgb,var(--c1) 28%,transparent),inset 0 1px 0 rgba(255,255,255,.20)}.nav-btn:active,.mode-btn:active,.gun-tab:active,.reset-btn:active,.edit-btn:active{transform:scale(.965)}
+.tab-panel{display:none}.tab-panel.active{display:block}.card,.input-block,.result-card,.total-row,.prop-bar,.psi-box,.param-box,.gun-card,.gun-config,.climate-box{border:1px solid var(--line)!important;border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.060),rgba(255,255,255,.015)),var(--glass);box-shadow:var(--shadow);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+.ratio-pills{display:flex;gap:8px;margin-bottom:12px}.rp{flex:1;text-align:center;padding:10px 6px;border:1px solid color-mix(in srgb,var(--c2) 28%,transparent);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.018)),color-mix(in srgb,var(--c1) 15%,transparent);font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--c2);box-shadow:var(--shadow)}.rp-top{display:block;font-size:18px;color:#fff;margin-bottom:2px}
+.input-block{position:relative;overflow:hidden;padding:17px 14px;margin-bottom:12px}.input-block::before,.result-card::before,.gun-card::before,.gun-config::before,.climate-box::before,.param-box::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;border-radius:999px;background:linear-gradient(180deg,var(--c2),var(--c1));opacity:.86}.input-lbl{display:block;margin-bottom:5px;font-size:11px;font-weight:900;letter-spacing:1.8px;color:var(--c2);text-transform:uppercase}.input-hint{font-size:10px;color:rgba(232,220,255,.52);letter-spacing:1px;margin-bottom:10px}.input-row{display:flex;align-items:flex-end;gap:8px}.num-input{flex:1;width:100%;min-height:58px;border:1px solid var(--line)!important;border-radius:20px;background:rgba(255,255,255,.055);color:#fff;font-family:'Nunito',sans-serif;font-size:42px;font-weight:900;line-height:1;outline:none;padding:6px 12px;caret-color:var(--c2);-webkit-text-fill-color:#fff}.num-input:focus{border-color:color-mix(in srgb,var(--c2) 70%,white)!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--c1) 18%,transparent)}.num-input::placeholder{color:var(--cb);-webkit-text-fill-color:var(--cb)}.num-input::-webkit-inner-spin-button,.num-input::-webkit-outer-spin-button{-webkit-appearance:none}.unit-lbl{font-size:14px;font-weight:900;color:var(--c2);padding-bottom:15px}
+.mode-row{display:flex;gap:7px;margin-bottom:12px}.mode-btn,.edit-btn,.reset-btn,.gun-tab{border:1px solid var(--line)!important;border-radius:17px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-family:'Nunito',sans-serif;cursor:pointer;-webkit-appearance:none}.mode-btn{flex:1;min-height:48px;padding:9px 4px;color:rgba(235,222,255,.52);font-size:10px;font-weight:900;letter-spacing:.8px;text-align:center}.mode-btn.active,.gun-tab.active{color:#fff;background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 72%,#7a19ff),color-mix(in srgb,var(--c2) 56%,#e454ff));border-color:rgba(255,255,255,.13)!important;box-shadow:0 10px 22px color-mix(in srgb,var(--c1) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.18)}.mode-top{display:block;font-size:12px;margin-bottom:2px}.mode-sub{display:block;font-size:8.5px;opacity:.72;letter-spacing:1px}
+.warn-min{display:none;margin-bottom:10px;padding:11px 14px;border-radius:18px;background:rgba(245,158,11,.11);border:1px solid rgba(245,158,11,.30);font-size:11px;font-weight:900;letter-spacing:1px;color:#fbbf24;text-align:center;box-shadow:var(--shadow)}.warn-min.show{display:block}.hidden{display:none!important}
+.results{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}.result-card{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:12px 13px}.result-card.c-hard::before{background:#3b82f6}.result-card.c-thin::before{background:#f59e0b}.result-card.c-water::before{background:#06b6d4}.rc-left{display:flex;align-items:center;gap:10px}.rc-emoji{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:14px;border:1px solid var(--line2);background:rgba(255,255,255,.055);font-size:21px}.rc-name{font-size:9px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;color:rgba(235,222,255,.48);margin-bottom:3px}.rc-desc{font-size:12.5px;font-weight:800;color:#f1e8ff}.rc-right{text-align:right}.rc-val{font-size:25px;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 22px color-mix(in srgb,var(--c2) 18%,transparent)}.rc-unit{margin-top:3px;font-size:10px;font-weight:900;letter-spacing:2px;color:var(--c2)}
+.total-row,.prop-bar,.psi-box{margin-bottom:10px}.total-row{display:flex;align-items:center;justify-content:space-between;padding:12px 15px}.total-lbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.38)}.total-val{font-size:16px;font-weight:900;color:var(--c2);text-align:right}.prop-bar{padding:13px 15px}.prop-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.34);margin-bottom:9px}.prop-track{display:flex;height:7px;gap:4px;border-radius:999px;overflow:hidden}.pf{border-radius:999px}.prop-key{display:flex;gap:10px;flex-wrap:wrap;margin-top:9px}.pk{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(255,255,255,.56);font-weight:800}.pd{width:7px;height:7px;border-radius:50%;flex-shrink:0}.psi-box{padding:11px 14px;font-size:12px;font-weight:800;color:rgba(235,222,255,.62);line-height:1.55}.psi-box strong{color:var(--c2)}
+.param-box,.climate-box{position:relative;overflow:hidden;margin-bottom:10px;padding:12px 14px}.param-box summary{list-style:none;cursor:pointer;color:var(--c2);font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.param-box summary::-webkit-details-marker{display:none}.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.p-field{display:flex;flex-direction:column;gap:5px}.p-field label{font-size:9px;font-weight:900;letter-spacing:1px;color:rgba(235,222,255,.52);text-transform:uppercase}.p-field input,.p-field select,.mini-input,.text-input{width:100%;border:1px solid var(--line2);border-radius:12px;background:rgba(255,255,255,.055);color:#fff;font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;outline:none;padding:9px 10px}.p-field input:focus,.mini-input:focus,.text-input:focus,.p-field select:focus{border-color:var(--c2)}.p-help{grid-column:1/-1;font-size:10px;color:rgba(235,222,255,.45);line-height:1.45}.mini-input{max-width:70px;text-align:center;padding:7px 8px;font-size:12px}.text-input{min-width:130px;padding:7px 8px;font-size:12px}.climate-title{font-size:9px;font-weight:900;letter-spacing:2px;color:rgba(235,222,255,.45);text-transform:uppercase;margin-bottom:9px}.climate-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:8px;align-items:end}.climate-note{grid-column:1/-1;color:rgba(235,222,255,.48);font-size:10px;line-height:1.4}.climate-note strong{color:var(--c2)}
+.gun-schema{margin-top:11px}.gun-schema-title{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(235,222,255,.45);margin-bottom:8px;padding-left:3px}.gun-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:9px}.gun-tab{min-height:48px;padding:8px 4px;color:rgba(235,222,255,.48);font-size:9.5px;font-weight:900;letter-spacing:.5px;text-align:center}.gun-tab-icon{display:block;font-size:15px;margin-bottom:2px}.gun-card,.gun-config{position:relative;overflow:hidden;margin-bottom:8px;padding:12px 14px}.gun-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.gun-card-title{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(235,222,255,.45)}.gun-card-badge{font-size:8.5px;font-weight:900;letter-spacing:1px;padding:3px 7px;border-radius:999px;background:color-mix(in srgb,var(--c1) 15%,transparent);border:1px solid color-mix(in srgb,var(--c2) 30%,transparent);color:var(--c2)}.gun-row{display:grid;grid-template-columns:1.15fr auto auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line2)}.gun-row:last-child{border-bottom:none}.gun-row-label{font-size:11px;font-weight:800;color:rgba(235,222,255,.62)}.gun-row-val{font-size:12px;font-weight:900;color:#fff;text-align:right}.gun-row-val.accent{color:var(--c2)}.gun-row.active-material{background:rgba(255,255,255,.045);margin-left:-8px;margin-right:-8px;padding-left:8px;padding-right:8px;border-radius:12px;border-bottom:none}.edit-line{display:flex;gap:5px;align-items:center;justify-content:flex-end}.gun-config::before{background:linear-gradient(180deg,#fbbf24,#f59e0b)}.gun-config-title{font-size:9px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#fbbf24;margin-bottom:8px}.gun-config-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:4px 0}.gun-config-label{font-size:10px;font-weight:800;color:rgba(235,222,255,.58);letter-spacing:.5px}.gun-config-val{font-size:11px;font-weight:900;color:#fff;text-align:right}.edit-btn,.reset-btn{width:100%;min-height:42px;margin-top:6px;padding:10px;color:rgba(235,222,255,.62);font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase}.edit-btn.warning{color:#fbbf24;border-color:rgba(251,191,36,.32)!important}.reset-btn{margin-top:8px}.footer{text-align:center;padding:18px 14px 0;font-size:9px;letter-spacing:3px;color:rgba(235,222,255,.16);text-transform:uppercase}.small-note{font-size:10px;line-height:1.45;color:rgba(235,222,255,.48);margin-top:7px}.small-note strong{color:var(--c2)}
+@media(max-width:380px){.brand-main{font-size:16px}.nav-btn{font-size:9.2px;padding:8px 9px}.num-input{font-size:36px}.rc-val{font-size:22px}.param-grid,.climate-grid{grid-template-columns:1fr}.gun-tabs{grid-template-columns:1fr}.gun-row{grid-template-columns:1fr;align-items:start}.edit-line{justify-content:flex-start}.mini-input{max-width:90px}.text-input{min-width:0}}
 
 
 /* ════════════════════════════════════════
-   VISUAL IOS / MODO DIOS — PAINT APP
-   Capa visual únicamente: no modifica funciones ni JavaScript
+   VOLPAINT · iOS premium header
+   Apariencia visual tipo iPhone / firma elegante
    ════════════════════════════════════════ */
-:root{
-  --ios-bg-0:#05000f;
-  --ios-bg-1:#0d0223;
-  --ios-bg-2:#1b0645;
-  --ios-glass:rgba(24,8,48,.64);
-  --ios-glass-strong:rgba(35,11,70,.78);
-  --ios-line:rgba(210,135,255,.20);
-  --ios-line-soft:rgba(210,135,255,.12);
-  --ios-shadow:0 22px 60px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
-  --ios-shadow-soft:0 14px 36px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);
-  --ios-blur:blur(22px) saturate(1.22);
-  --ios-radius-xl:28px;
-  --ios-radius-lg:22px;
-  --ios-radius-md:17px;
-}
-html{background:var(--ios-bg-0);scroll-behavior:smooth;}
-body{
-  background:
-    radial-gradient(900px 540px at 50% -18%,color-mix(in srgb,var(--c2) 22%,transparent),transparent 70%),
-    radial-gradient(680px 540px at 4% 96%,rgba(83,205,255,.10),transparent 72%),
-    radial-gradient(520px 440px at 94% 20%,rgba(170,34,255,.13),transparent 70%),
-    linear-gradient(160deg,var(--ios-bg-0) 0%,var(--ios-bg-1) 48%,var(--ios-bg-2) 100%) !important;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:geometricPrecision;
-  padding-bottom:env(safe-area-inset-bottom);
-}
 body::before{
   background:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px),
     radial-gradient(850px 460px at 50% -8%,var(--bg1) 0%,transparent 72%),
     radial-gradient(650px 460px at 58% 100%,var(--bg2) 0%,transparent 76%),
-    linear-gradient(115deg,transparent 0 42%,rgba(255,255,255,.045) 49%,transparent 56% 100%),
-    radial-gradient(circle at 18% 18%,rgba(255,255,255,.055) 0 1px,transparent 2px),
-    radial-gradient(circle at 76% 32%,color-mix(in srgb,var(--c2) 13%,transparent) 0 1px,transparent 2px) !important;
-  background-size:auto,auto,auto,92px 92px,124px 124px !important;
-  opacity:.96;
-  mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.92) 62%,transparent 100%);
-  -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.92) 62%,transparent 100%);
+    linear-gradient(115deg,transparent 0 42%,rgba(255,255,255,.045) 49%,transparent 56% 100%)!important;
+  background-size:24px 24px,24px 24px,auto,auto,auto!important;
+  mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.94) 70%,transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.94) 70%,transparent 100%);
 }
-body::after{
-  content:'';
-  position:fixed;
-  inset:auto 18px calc(9px + env(safe-area-inset-bottom)) 18px;
-  height:5px;
-  max-width:145px;
-  margin:auto;
-  border-radius:999px;
-  background:rgba(222,191,255,.25);
-  pointer-events:none;
-  z-index:500;
-  box-shadow:0 0 18px color-mix(in srgb,var(--c2) 24%,transparent);
+.ios-header{
+  min-height:86px;
+  gap:10px;
+  padding:13px 14px!important;
+  border-radius:30px!important;
+  border-color:color-mix(in srgb,var(--c2) 32%,transparent)!important;
+  background:
+    linear-gradient(135deg,color-mix(in srgb,var(--c1) 22%,transparent),rgba(255,255,255,.025) 44%,color-mix(in srgb,var(--c2) 11%,transparent)),
+    rgba(13,2,30,.72)!important;
+  box-shadow:
+    0 26px 70px rgba(0,0,0,.42),
+    0 0 0 1px rgba(255,255,255,.045) inset,
+    0 0 34px color-mix(in srgb,var(--c1) 22%,transparent)!important;
 }
-.wrap{width:min(100%,480px);max-width:480px;padding:0 10px calc(82px + env(safe-area-inset-bottom));}
-.topbar{
-  top:8px;
-  margin:8px 0 8px;
-  padding:13px 14px;
-  border:1px solid var(--ios-line) !important;
-  border-radius:24px;
-  background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 20%,transparent),rgba(85,204,255,.045)),var(--ios-glass) !important;
-  box-shadow:var(--ios-shadow-soft);
-  backdrop-filter:var(--ios-blur);
-  -webkit-backdrop-filter:var(--ios-blur);
+.status-pill{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-width:102px;height:36px;padding:0 13px;border-radius:999px;
+  border:1px solid rgba(102,255,145,.27);
+  background:linear-gradient(180deg,rgba(19,255,78,.10),rgba(0,0,0,.24));
+  color:#baffc9;font-size:10px;font-weight:900;letter-spacing:2px;white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(34,197,94,.12);
 }
-.brand-main{font-size:18px;letter-spacing:2.5px;text-shadow:0 0 28px color-mix(in srgb,var(--c2) 24%,transparent);}
-.brand-main span{color:var(--c2);filter:drop-shadow(0 0 12px color-mix(in srgb,var(--c2) 34%,transparent));}
-.brand-sub{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.40);}
+.status-dot{width:16px;height:16px;border-radius:50%;background:#37f255;box-shadow:0 0 0 3px rgba(55,242,85,.12),0 0 18px rgba(55,242,85,.70);}
+.ios-avatar{
+  position:relative;flex:0 0 auto;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:21px;font-weight:900;letter-spacing:1px;
+  background:
+    radial-gradient(circle at 30% 22%,rgba(255,255,255,.48),transparent 30%),
+    radial-gradient(circle at 72% 78%,color-mix(in srgb,var(--c2) 48%,transparent),transparent 36%),
+    linear-gradient(145deg,color-mix(in srgb,var(--c1) 74%,#e879f9),#240848 82%);
+  border:1px solid color-mix(in srgb,var(--c2) 50%,transparent);
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--c1) 12%,transparent),0 0 35px color-mix(in srgb,var(--c2) 42%,transparent),inset 0 1px 0 rgba(255,255,255,.34);
+  text-shadow:0 0 16px rgba(255,255,255,.42);
+}
+.avatar-dot{position:absolute;right:0;bottom:5px;width:15px;height:15px;border-radius:50%;background:#45ff5c;border:3px solid #140526;box-shadow:0 0 12px rgba(69,255,92,.9);}
+.brand-script-wrap{min-width:0;flex:1;padding-left:2px;}
+.brand-script{
+  font-family:'Allura','Brush Script MT','Segoe Script',cursive!important;
+  font-size:40px!important;line-height:.82;font-weight:400!important;letter-spacing:.8px!important;color:#fff!important;
+  text-shadow:0 0 12px rgba(255,255,255,.38),0 0 24px color-mix(in srgb,var(--c2) 28%,transparent)!important;
+  transform:translateY(2px);
+  white-space:nowrap;
+}
+.brand-script::after{
+  content:'';display:block;width:112px;height:2px;margin-top:5px;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--c2) 75%,white),transparent);
+  opacity:.65;border-radius:999px;
+}
+.brand-sub{font-size:8px!important;letter-spacing:2.3px!important;color:rgba(235,222,255,.43)!important;margin-top:7px!important;}
 .brand-badge{
-  border:1px solid color-mix(in srgb,var(--c2) 36%,transparent);
-  border-radius:999px;
-  background:color-mix(in srgb,var(--c1) 18%,transparent);
-  color:var(--c2);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 18px color-mix(in srgb,var(--c1) 15%,transparent);
+  min-width:82px;text-align:center;height:36px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(0,0,0,.19)),color-mix(in srgb,var(--c1) 13%,transparent)!important;
+  color:#ffe58a!important;border-color:rgba(255,212,112,.28)!important;
+  box-shadow:0 0 18px rgba(255,212,112,.10),inset 0 1px 0 rgba(255,255,255,.08)!important;
 }
-.nav-scroll{
-  top:73px;
-  margin:0 0 10px;
-  padding:7px;
-  border:1px solid var(--ios-line) !important;
-  border-radius:999px;
-  background:rgba(16,2,35,.58) !important;
-  box-shadow:var(--ios-shadow-soft);
-  backdrop-filter:var(--ios-blur);
-  -webkit-backdrop-filter:var(--ios-blur);
-}
-.nav-inner{gap:6px;padding:0;}
-.nav-btn{
-  min-height:38px;
-  padding:9px 12px;
-  border:1px solid transparent;
-  border-radius:999px;
-  color:rgba(235,222,255,.50);
-  border-bottom:1px solid transparent;
-  letter-spacing:.9px;
-  position:relative;
-  overflow:hidden;
-}
-.nav-btn:hover{background:color-mix(in srgb,var(--c1) 12%,transparent);color:#fff;}
-.nav-btn.active{
-  color:#fff;
-  border-color:rgba(255,255,255,.12);
-  border-bottom-color:rgba(255,255,255,.12);
-  background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 88%,#7a19ff),color-mix(in srgb,var(--c2) 70%,#e454ff)) !important;
-  box-shadow:0 10px 22px color-mix(in srgb,var(--c1) 28%,transparent),inset 0 1px 0 rgba(255,255,255,.20);
-}
-.tab-panel{padding:6px 0 10px;}
-.ratio-pills{gap:8px;margin-bottom:12px;}
-.rp{
-  padding:10px 6px;
-  border:1px solid color-mix(in srgb,var(--c2) 28%,transparent);
-  border-radius:18px;
-  background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.018)),color-mix(in srgb,var(--c1) 15%,transparent);
-  box-shadow:var(--ios-shadow-soft);
-  backdrop-filter:var(--ios-blur);
-  -webkit-backdrop-filter:var(--ios-blur);
-}
-.rp-top{font-size:18px;}
-.input-block,.result-card,.total-row,.prop-bar,.psi-box,.gun-card,.gun-config{
-  border:1px solid var(--ios-line) !important;
-  border-radius:var(--ios-radius-lg) !important;
-  background:linear-gradient(145deg,rgba(255,255,255,.060),rgba(255,255,255,.015)),var(--ios-glass) !important;
-  box-shadow:var(--ios-shadow-soft);
-  backdrop-filter:var(--ios-blur);
-  -webkit-backdrop-filter:var(--ios-blur);
-}
-.input-block{
-  position:relative;
-  overflow:hidden;
-  padding:18px 16px 19px;
-  margin-bottom:12px;
-  border-top:1px solid var(--ios-line) !important;
-}
-.input-block::before,.result-card::before,.gun-card::before,.gun-config::before{
-  content:'';
-  position:absolute;
-  inset:0 auto 0 0;
-  width:3px;
-  background:linear-gradient(180deg,var(--c2),var(--c1));
-  border-radius:999px;
-  opacity:.86;
-}
-.input-lbl{font-size:11px;letter-spacing:1.8px;color:var(--c2);}
-.input-hint{font-size:10px;color:rgba(232,220,255,.50);}
-.num-input{
-  min-height:58px;
-  border:1px solid var(--ios-line) !important;
-  border-radius:20px;
-  padding:6px 12px !important;
-  background:rgba(255,255,255,.055) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.08);
-  font-size:44px;
-  line-height:1;
-}
-.num-input:focus{border-color:color-mix(in srgb,var(--c2) 70%,white) !important;box-shadow:0 0 0 4px color-mix(in srgb,var(--c1) 18%,transparent),0 12px 28px color-mix(in srgb,var(--c1) 12%,transparent);}
-.unit-lbl{color:var(--c2);font-size:16px;padding-bottom:14px;}
-.mode-row{gap:8px;margin-bottom:12px;}
-.mode-btn,.gun-tab,.reset-btn,.edit-config-btn{
-  border-radius:17px !important;
-  border:1px solid var(--ios-line) !important;
-  background:rgba(255,255,255,.045) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-  -webkit-tap-highlight-color:transparent;
-}
-.mode-btn{min-height:50px;color:rgba(235,222,255,.52);}
-.mode-btn.active,.gun-tab.active{
-  color:#fff;
-  background:linear-gradient(135deg,color-mix(in srgb,var(--c1) 72%,#7a19ff),color-mix(in srgb,var(--c2) 56%,#e454ff)) !important;
-  border-color:rgba(255,255,255,.13) !important;
-  box-shadow:0 10px 22px color-mix(in srgb,var(--c1) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.18);
-}
-.mode-btn:active,.gun-tab:active,.reset-btn:active,.edit-config-btn:active,.nav-btn:active{transform:scale(.965);}
-.warn-min{
-  border-radius:18px;
-  background:rgba(245,158,11,.11);
-  border:1px solid rgba(245,158,11,.30);
-  box-shadow:var(--ios-shadow-soft);
-  backdrop-filter:var(--ios-blur);
-  -webkit-backdrop-filter:var(--ios-blur);
-}
-.results{gap:10px;}
-.result-card{
-  position:relative;
-  overflow:hidden;
-  padding:13px 15px;
-  border-left:1px solid var(--ios-line) !important;
-}
-.result-card.c-hard::before{background:#3b82f6;}
-.result-card.c-thin::before{background:#f59e0b;}
-.result-card.c-thin2::before{background:#d97706;}
-.result-card.c-water::before{background:#06b6d4;}
-.result-card.c-water2::before{background:#0891b2;}
-.rc-left{gap:10px;}
-.rc-emoji{
-  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
-  border-radius:15px;border:1px solid var(--ios-line-soft);background:rgba(255,255,255,.055);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-}
-.rc-name{color:rgba(235,222,255,.48);font-size:9px;}
-.rc-desc{color:#f1e8ff;font-size:13px;}
-.rc-val{font-size:28px;text-shadow:0 0 22px color-mix(in srgb,var(--c2) 18%,transparent);}
-.total-row,.prop-bar,.psi-box{margin-bottom:10px;}
-.total-row{padding:12px 15px;}
-.total-val{color:var(--c2);text-shadow:0 0 16px color-mix(in srgb,var(--c2) 25%,transparent);}
-.prop-track{height:7px;gap:4px;}
-.pf{box-shadow:0 0 14px color-mix(in srgb,var(--c2) 20%,transparent);}
-.pk,.psi-box{color:rgba(235,222,255,.58);}
-.psi-box strong{color:var(--c2);}
-.gun-schema{margin-top:11px;}
-.gun-schema-title{color:rgba(235,222,255,.45);padding-left:3px;}
-.gun-tabs{gap:7px;margin-bottom:9px;}
-.gun-tab{min-height:52px;color:rgba(235,222,255,.48);}
-.gun-tab-icon{font-size:15px;}
-.gun-card,.gun-config{position:relative;overflow:hidden;margin-bottom:8px;padding:12px 14px;}
-.gun-card-header{margin-bottom:9px;}
-.gun-card-title{color:rgba(235,222,255,.45);}
-.gun-card-badge{
-  border:1px solid color-mix(in srgb,var(--c2) 30%,transparent);
-  border-radius:999px;
-  background:color-mix(in srgb,var(--c1) 15%,transparent);
-  color:var(--c2);
-}
-.gun-row{border-bottom:1px solid var(--ios-line-soft);}
-.gun-row-label,.gun-config-label{color:rgba(235,222,255,.58);}
-.gun-row-val,.gun-config-val{color:#fff;}
-.gun-row-val.accent,.gun-config-title,.gun-config-val{color:var(--c2);}
-.gun-config::before{background:linear-gradient(180deg,#fbbf24,#f59e0b);}
-.gun-config-title{color:#fbbf24;}
-.edit-config-btn{color:rgba(251,191,36,.65);border-color:rgba(251,191,36,.22) !important;}
-.edit-config-btn.editing,.edit-config-btn:active{background:rgba(251,191,36,.12) !important;color:#fbbf24;border-color:rgba(251,191,36,.52) !important;}
-.reset-btn{
-  min-height:44px;
-  margin-top:8px;
-  color:rgba(235,222,255,.48);
-}
-.reset-btn:active{color:#fff;border-color:color-mix(in srgb,var(--c2) 45%,transparent) !important;background:color-mix(in srgb,var(--c1) 14%,transparent) !important;}
-.footer{padding-top:18px;color:rgba(235,222,255,.16);}
-@media(min-width:769px){
-  .input-block,.result-card,.total-row,.prop-bar,.psi-box,.gun-card,.gun-config,.topbar,.nav-scroll{transition:transform .20s ease,border-color .20s ease,box-shadow .20s ease,background .20s ease;}
-  .input-block:hover,.result-card:hover,.total-row:hover,.prop-bar:hover,.psi-box:hover,.gun-card:hover,.gun-config:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--c2) 34%,transparent) !important;box-shadow:0 18px 48px rgba(0,0,0,.30),0 0 0 1px color-mix(in srgb,var(--c2) 8%,transparent) inset;}
-}
+.nav-scroll{top:104px!important;background:rgba(10,1,24,.72)!important;}
 @media(max-width:480px){
-  .wrap{padding-left:9px;padding-right:9px;}
-  .topbar{top:7px;border-radius:22px;padding:12px;}
-  .brand-main{font-size:17px;letter-spacing:2px;}
-  .brand-sub{font-size:8.5px;}
-  .brand-badge{font-size:8px;padding:4px 9px;}
-  .nav-scroll{top:70px;border-radius:22px;margin-bottom:9px;}
-  .nav-btn{font-size:10px;padding:8px 10px;min-height:36px;}
-  .tab-panel{padding-top:4px;}
-  .ratio-pills{gap:6px;}
-  .rp{border-radius:16px;padding:8px 4px;font-size:10px;}
-  .rp-top{font-size:16px;}
-  .input-block{border-radius:22px !important;padding:16px 14px 17px;}
-  .input-row{gap:8px;}
-  .num-input{font-size:40px;min-height:56px;border-radius:18px;}
-  .unit-lbl{font-size:14px;}
-  .mode-row{gap:6px;}
-  .mode-btn{font-size:10px;min-height:48px;padding:9px 4px;}
-  .mode-top{font-size:12px;}
-  .result-card{border-radius:20px !important;padding:12px 13px;}
-  .rc-emoji{width:36px;height:36px;border-radius:14px;font-size:21px;}
-  .rc-desc{font-size:12.5px;}
-  .rc-val{font-size:25px;}
-  .rc-unit{font-size:10px;}
-  .gun-tabs{display:grid;grid-template-columns:1fr 1fr;}
-  .gun-tab{min-height:46px;}
-  .gun-card,.gun-config,.total-row,.prop-bar,.psi-box{border-radius:20px !important;}
-  body::after{bottom:7px;}
+  .ios-header{min-height:82px;gap:8px;padding:12px 11px!important;border-radius:26px!important;}
+  .status-pill{min-width:auto;width:38px;padding:0;font-size:0;gap:0;}
+  .status-dot{width:17px;height:17px;}
+  .ios-avatar{width:52px;height:52px;font-size:19px;box-shadow:0 0 0 5px color-mix(in srgb,var(--c1) 12%,transparent),0 0 28px color-mix(in srgb,var(--c2) 38%,transparent),inset 0 1px 0 rgba(255,255,255,.34);}
+  .brand-script{font-size:37px!important;letter-spacing:.6px!important;}
+  .brand-script::after{width:94px;margin-top:4px;}
+  .brand-sub{font-size:7px!important;letter-spacing:1.7px!important;margin-top:6px!important;}
+  .brand-badge{min-width:70px;height:34px;font-size:8px!important;padding:4px 8px!important;}
+  .nav-scroll{top:101px!important;}
 }
-@media(max-width:360px){
-  .nav-btn{font-size:9.5px;padding:8px 9px;}
-  .num-input{font-size:36px;}
-  .rc-val{font-size:23px;}
-  .rc-left{gap:8px;}
+@media(max-width:380px){
+  .ios-header{gap:6px;padding:11px 9px!important;}
+  .ios-avatar{width:46px;height:46px;font-size:17px;}
+  .avatar-dot{width:13px;height:13px;border-width:2px;}
+  .brand-script{font-size:33px!important;}
+  .brand-sub{display:none;}
+  .brand-badge{min-width:62px;}
 }
 
 </style>
 </head>
 <body class="tab-ext">
 <div class="wrap">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div>
-      <div class="brand-main">ROG <span>PAINT</span></div>
-      <div class="brand-sub">CALCULADORA DE MEZCLAS</div>
+  <div class="topbar ios-header">
+    <div class="status-pill"><span class="status-dot"></span> EN LÍNEA</div>
+    <div class="ios-avatar">VP<span class="avatar-dot"></span></div>
+    <div class="brand-script-wrap">
+      <div class="brand-main brand-script">VolPaint</div>
+      <div class="brand-sub">CALCULADORA DE MEZCLAS PRO</div>
     </div>
     <div class="brand-badge" id="topBadge">Exterior</div>
   </div>
 
-  <!-- NAV -->
   <div class="nav-scroll">
-    <div class="nav-inner">
-      <button class="nav-btn active" onclick="switchTab('ext')">🎨 Exterior</button>
-      <button class="nav-btn" onclick="switchTab('int')">🏠 Interior</button>
-      <button class="nav-btn" onclick="switchTab('h2o')">💧 H₂O</button>
-      <button class="nav-btn" onclick="switchTab('pri')">🟢 Primer</button>
-      <button class="nav-btn" onclick="switchTab('tra')">✨ Transparente</button>
-    </div>
+    <div class="nav-inner" id="navInner"></div>
   </div>
 
-  <!-- ══════════════════════════════════════
-       TAB: EXTERIOR  3:1:1
-  ══════════════════════════════════════ -->
-  <div class="tab-panel active" id="panel-ext">
-    <div class="ratio-pills">
-      <div class="rp"><span class="rp-top">×3</span>Pintura</div>
-      <div class="rp"><span class="rp-top">×1</span>Hardener</div>
-      <div class="rp"><span class="rp-top">×1</span>Thinner</div>
-    </div>
-    <div class="input-block">
-      <label class="input-lbl" for="ext-in">🎨 ¿Cuánta pintura tienes?</label>
-      <div class="input-hint">Mínimo 50 ML · Proporción 3 : 1 : 1</div>
-      <div class="input-row">
-        <input class="num-input" type="number" id="ext-in" placeholder="300"
-          inputmode="decimal" autocomplete="off" oninput="calcExt()">
-        <span class="unit-lbl">ML</span>
-      </div>
-    </div>
-    <div id="ext-warn" class="warn-min hidden">⚠️ Ingresa mínimo 50 ML de pintura</div>
-    <div id="ext-out" class="hidden">
-      <div class="results">
-        <div class="result-card">
-          <div class="rc-left"><div class="rc-emoji">🎨</div>
-            <div><div class="rc-name">Base · ×3</div><div class="rc-desc">Pintura</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="ext-vp">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-hard">
-          <div class="rc-left"><div class="rc-emoji">⚗️</div>
-            <div><div class="rc-name">Agregar · ×1</div><div class="rc-desc">Hardener</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="ext-vh">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-thin">
-          <div class="rc-left"><div class="rc-emoji">🪣</div>
-            <div><div class="rc-name">Agregar · ×1</div><div class="rc-desc">Thinner</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="ext-vt">0</div><div class="rc-unit">ML</div></div>
-        </div>
-      </div>
-      <div class="total-row">
-        <span class="total-lbl">Total mezcla</span>
-        <span class="total-val" id="ext-tot">— ML</span>
-      </div>
-      <div class="prop-bar">
-        <div class="prop-lbl">Proporción visual · 3 : 1 : 1</div>
-        <div class="prop-track">
-          <div class="pf" style="background:var(--c1);flex:3"></div>
-          <div class="pf" style="background:#3b82f6;flex:1"></div>
-          <div class="pf" style="background:#f59e0b;flex:1"></div>
-        </div>
-        <div class="prop-key">
-          <div class="pk"><div class="pd" style="background:var(--c1)"></div>Pintura ×3</div>
-          <div class="pk"><div class="pd" style="background:#3b82f6"></div>Hardener ×1</div>
-          <div class="pk"><div class="pd" style="background:#f59e0b"></div>Thinner ×1</div>
-        </div>
-      </div>
-      <div class="psi-box">🔫 <strong>Base color:</strong> 26–30 PSI con el gatillo jalado</div>
-      <!-- PISTOLAS SCHEMA -->
-      <div class="gun-schema">
-        <div class="gun-schema-title">🔫 Configuración por pistola · Base solvente</div>
-        <div class="gun-tabs">
-          <button class="gun-tab active" data-gun="08" onclick="switchGun('ext','08')"><span class="gun-tab-icon">🔧</span>0.8 mm</button>
-          <button class="gun-tab" data-gun="14" onclick="switchGun('ext','14')"><span class="gun-tab-icon">🔫</span>1.4 HVLP</button>
-          <button class="gun-tab" data-gun="graco" onclick="switchGun('ext','graco')"><span class="gun-tab-icon">🏆</span>Graco</button>
-          <button class="gun-tab" data-gun="aero" onclick="switchGun('ext','aero')"><span class="gun-tab-icon">✏️</span>Aerógrafo</button>
-        </div>
-        <div class="gun-panel OLD-AERO" id="ext-gun-aero-OLD" style="display:none">
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Aerógrafo</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">20–25 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">20–25 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">22–25 PSI</span></div>
-            </div>
-          </div>
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">Vueltas · Ajuste</span><span class="gun-card-badge">Aerógrafo</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div>
-              <div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div>
-              <div class="gun-row"><span class="gun-row-label">Relleno pequeño</span><span class="gun-row-val">1 – 1.5 vueltas</span></div>
-            </div>
-          </div>
-          <div class="gun-config">
-            <div class="gun-config-title">⭐ Config recomendada</div>
-            <div class="gun-config-rows">
-              <div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">20 PSI</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">0.5 – 1 vuelta</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Más reducida</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">3 – 7 cm</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="gun-panel active" id="ext-gun-08">
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Pistola 0.8</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">22–26 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">24–28 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Primer reducido</span><span class="gun-row-val accent">24–30 PSI</span></div>
-            </div>
-          </div>
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">Vueltas · Trabajo</span><span class="gun-card-badge">Pistola 0.8</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Línea fina</span><span class="gun-row-val">1 vuelta</span></div>
-              <div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">1.5 vueltas</span></div>
-              <div class="gun-row"><span class="gun-row-label">Aplicación normal</span><span class="gun-row-val">2 vueltas</span></div>
-            </div>
-          </div>
-          <div class="gun-config">
-            <div class="gun-config-title">⭐ Config recomendada</div>
-            <div class="gun-config-rows">
-              <div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">24 PSI</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">1.5 vueltas</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Medio</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="gun-panel" id="ext-gun-14">
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">1.4 HVLP</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">24–28 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">26–30 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">28–32 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">30–35 PSI</span></div>
-            </div>
-          </div>
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">Vueltas ideales · 1.4</span><span class="gun-card-badge">1.4 HVLP</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div>
-              <div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div>
-              <div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div>
-              <div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div>
-            </div>
-          </div>
-          <div class="gun-config">
-            <div class="gun-config-title">⭐ Config recomendada</div>
-            <div class="gun-config-rows">
-              <div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">29 PSI</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="gun-panel" id="ext-gun-graco">
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Graco Stellair ACE</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">22–26 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">24–28 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">26–30 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">28–32 PSI</span></div>
-            </div>
-          </div>
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">Vueltas · Graco 1.4</span><span class="gun-card-badge">Graco Stellair ACE</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div>
-              <div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div>
-              <div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div>
-              <div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div>
-            </div>
-          </div>
-          <div class="gun-config">
-            <div class="gun-config-title">⭐ Config recomendada</div>
-            <div class="gun-config-rows">
-              <div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">25 PSI</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">15–20 cm</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="gun-panel" id="ext-gun-aero">
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">PSI · Juemel 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Base solvente reducida</span><span class="gun-row-val accent">12–18 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">15–20 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">15–20 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">18–22 PSI</span></div>
-              <div class="gun-row"><span class="gun-row-label">Máx. compresor</span><span class="gun-row-val accent">25 PSI</span></div>
-            </div>
-          </div>
-          <div class="gun-card">
-            <div class="gun-card-header"><span class="gun-card-title">Vueltas · Boquilla 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div>
-            <div class="gun-rows">
-              <div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div>
-              <div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div>
-              <div class="gun-row"><span class="gun-row-label">Relleno</span><span class="gun-row-val">1 – 1.5 vueltas</span></div>
-            </div>
-          </div>
-          <div class="gun-config">
-            <div class="gun-config-title">⭐ Config recomendada</div>
-            <div class="gun-config-rows">
-              <div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">15 PSI</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">½ – 1 vuelta</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Muy reducida</span></div>
-              <div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">5–10 cm</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button class="reset-btn" onclick="resetTab('ext')">↺ Limpiar</button>
-    </div>
-    <div class="footer">ROG PAINT · EXTERIOR · 3:1:1</div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       TAB: INTERIOR  20:1 + thinner
-  ══════════════════════════════════════ -->
-  <div class="tab-panel" id="panel-int">
-    <div class="input-block">
-      <label class="input-lbl" for="int-in">🏠 ¿Cuánta pintura tienes?</label>
-      <div class="input-hint">Mínimo 50 ML · Proporción 20 : 1 + Thinner 5–10%</div>
-      <div class="input-row">
-        <input class="num-input" type="number" id="int-in" placeholder="500"
-          inputmode="decimal" autocomplete="off" oninput="calcInt()">
-        <span class="unit-lbl">ML</span>
-      </div>
-    </div>
-    <div class="mode-row">
-      <button class="mode-btn active" id="int-btn-night" onclick="setIntMode('night')">
-        <span class="mode-top">🌙 5–6%</span><span class="mode-sub">NOCHE</span>
-      </button>
-      <button class="mode-btn" id="int-btn-day" onclick="setIntMode('day')">
-        <span class="mode-top">☀️ 7–10%</span><span class="mode-sub">DÍA</span>
-      </button>
-      <button class="mode-btn" id="int-btn-both" onclick="setIntMode('both')">
-        <span class="mode-top">⚡ AMBOS</span><span class="mode-sub">MOSTRAR</span>
-      </button>
-    </div>
-    <div id="int-warn" class="warn-min hidden">⚠️ Ingresa mínimo 50 ML de pintura</div>
-    <div id="int-out" class="hidden">
-      <div class="results">
-        <div class="result-card">
-          <div class="rc-left"><div class="rc-emoji">🎨</div>
-            <div><div class="rc-name">Base · ×20</div><div class="rc-desc">Pintura</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="int-vp">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-hard">
-          <div class="rc-left"><div class="rc-emoji">⚗️</div>
-            <div><div class="rc-name">Agregar · ×1</div><div class="rc-desc">Hardener</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="int-vh">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-thin" id="int-card-night">
-          <div class="rc-left"><div class="rc-emoji">🪣</div>
-            <div><div class="rc-name" id="int-lbl-n">Thinner · Noche</div><div class="rc-desc" id="int-pct-n">5–6%</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="int-vn">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-thin2 hidden" id="int-card-day">
-          <div class="rc-left"><div class="rc-emoji">🪣</div>
-            <div><div class="rc-name">Thinner · Día</div><div class="rc-desc">7–10%</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="int-vd">0</div><div class="rc-unit">ML</div></div>
-        </div>
-      </div>
-      <div class="total-row">
-        <span class="total-lbl">Total mezcla</span>
-        <span class="total-val" id="int-tot">— ML</span>
-      </div>
-      <div class="prop-bar">
-        <div class="prop-lbl" id="int-prop-lbl">Proporción visual · 20 : 1 : Thinner</div>
-        <div class="prop-track">
-          <div class="pf" style="background:var(--c1);flex:20"></div>
-          <div class="pf" style="background:#3b82f6;flex:1"></div>
-          <div class="pf" style="background:#f59e0b;flex:1"></div>
-        </div>
-        <div class="prop-key">
-          <div class="pk"><div class="pd" style="background:var(--c1)"></div>Pintura ×20</div>
-          <div class="pk"><div class="pd" style="background:#3b82f6"></div>Hardener ×1</div>
-          <div class="pk"><div class="pd" style="background:#f59e0b"></div>Thinner</div>
-        </div>
-      </div>
-      <div class="psi-box">🔫 <strong>Base color:</strong> 26–30 PSI con el gatillo jalado</div>
-      <!-- PISTOLAS SCHEMA -->
-      <div class="gun-schema">
-        <div class="gun-schema-title">🔫 Configuración por pistola · Base solvente</div>
-        <div class="gun-tabs">
-          <button class="gun-tab active" data-gun="08" onclick="switchGun('int','08')"><span class="gun-tab-icon">🔧</span>0.8 mm</button>
-          <button class="gun-tab" data-gun="14" onclick="switchGun('int','14')"><span class="gun-tab-icon">🔫</span>1.4 HVLP</button>
-          <button class="gun-tab" data-gun="graco" onclick="switchGun('int','graco')"><span class="gun-tab-icon">🏆</span>Graco</button>
-          <button class="gun-tab" data-gun="aero" onclick="switchGun('int','aero')"><span class="gun-tab-icon">✏️</span>Aerógrafo</button>
-        </div>
-        <div class="gun-panel OLD-AERO" id="int-gun-aero-OLD" style="display:none">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">22–25 PSI</span></div></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Ajuste</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno pequeño</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div>
-          <div class="gun-config"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">20 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">0.5 – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Más reducida</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">3 – 7 cm</span></div></div></div>
-        </div>
-        <div class="gun-panel active" id="int-gun-08">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer reducido</span><span class="gun-row-val accent">24–30 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Trabajo</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Línea fina</span><span class="gun-row-val">1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">1.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Aplicación normal</span><span class="gun-row-val">2 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="int-08"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">24 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">1.5 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Medio</span></div></div></div>
-        </div>
-        <div class="gun-panel" id="ext-gun-graco"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">26–30 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">28–32 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Graco 1.4</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div></div></div><div class="gun-config" data-key="ext-graco"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">25 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">15–20 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="ext-gun-aero"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Juemel 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente reducida</span><span class="gun-row-val accent">12–18 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Máx. compresor</span><span class="gun-row-val accent">25 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Boquilla 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div><div class="gun-config" data-key="ext-aero"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">15 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">½ – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Muy reducida</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">5–10 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="int-gun-14">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">26–30 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">28–32 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">30–35 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas ideales · 1.4</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="int-14"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">29 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div></div></div>
-        </div>
-      </div>
-      <button class="reset-btn" onclick="resetTab('int')">↺ Limpiar</button>
-    </div>
-    <div class="footer">ROG PAINT · INTERIOR · 20:1 + THINNER</div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       TAB: H2O  6:1 + agua
-  ══════════════════════════════════════ -->
-  <div class="tab-panel" id="panel-h2o">
-    <div class="input-block">
-      <label class="input-lbl" for="h2o-in">💧 ¿Cuánta pintura tienes?</label>
-      <div class="input-hint">Mínimo 50 ML · Proporción 6 : 1 + Agua 5–20%</div>
-      <div class="input-row">
-        <input class="num-input" type="number" id="h2o-in" placeholder="400"
-          inputmode="decimal" autocomplete="off" oninput="calcH2o()">
-        <span class="unit-lbl">ML</span>
-      </div>
-    </div>
-    <div class="mode-row">
-      <button class="mode-btn active" id="h2o-btn-night" onclick="setH2oMode('night')">
-        <span class="mode-top">🌙 5–18%</span><span class="mode-sub">NOCHE</span>
-      </button>
-      <button class="mode-btn" id="h2o-btn-day" onclick="setH2oMode('day')">
-        <span class="mode-top">☀️ 18–20%</span><span class="mode-sub">DÍA</span>
-      </button>
-      <button class="mode-btn" id="h2o-btn-both" onclick="setH2oMode('both')">
-        <span class="mode-top">⚡ AMBOS</span><span class="mode-sub">MOSTRAR</span>
-      </button>
-    </div>
-    <div id="h2o-warn" class="warn-min hidden">⚠️ Ingresa mínimo 50 ML de pintura</div>
-    <div id="h2o-out" class="hidden">
-      <div class="results">
-        <div class="result-card">
-          <div class="rc-left"><div class="rc-emoji">🎨</div>
-            <div><div class="rc-name">Base · ×6</div><div class="rc-desc">Pintura H₂O</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="h2o-vp">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-hard">
-          <div class="rc-left"><div class="rc-emoji">⚗️</div>
-            <div><div class="rc-name">Agregar · ×1</div><div class="rc-desc">Hardener</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="h2o-vh">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-water" id="h2o-card-night">
-          <div class="rc-left"><div class="rc-emoji">💧</div>
-            <div><div class="rc-name" id="h2o-lbl-n">Agua · Noche</div><div class="rc-desc" id="h2o-pct-n">5–18%</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="h2o-vn">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-water2 hidden" id="h2o-card-day">
-          <div class="rc-left"><div class="rc-emoji">💧</div>
-            <div><div class="rc-name">Agua · Día</div><div class="rc-desc">18–20%</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="h2o-vd">0</div><div class="rc-unit">ML</div></div>
-        </div>
-      </div>
-      <div class="total-row">
-        <span class="total-lbl">Total mezcla</span>
-        <span class="total-val" id="h2o-tot">— ML</span>
-      </div>
-      <div class="prop-bar">
-        <div class="prop-lbl">Proporción visual · 6 : 1 : Agua</div>
-        <div class="prop-track">
-          <div class="pf" style="background:var(--c1);flex:6"></div>
-          <div class="pf" style="background:#3b82f6;flex:1"></div>
-          <div class="pf" style="background:#06b6d4;flex:1"></div>
-        </div>
-        <div class="prop-key">
-          <div class="pk"><div class="pd" style="background:var(--c1)"></div>Pintura ×6</div>
-          <div class="pk"><div class="pd" style="background:#3b82f6"></div>Hardener ×1</div>
-          <div class="pk"><div class="pd" style="background:#06b6d4"></div>Agua</div>
-        </div>
-      </div>
-      <div class="psi-box">🔫 <strong>Base color:</strong> 26–30 PSI con el gatillo jalado</div>
-      <!-- PISTOLAS SCHEMA -->
-      <div class="gun-schema">
-        <div class="gun-schema-title">🔫 Configuración por pistola · Base H₂O</div>
-        <div class="gun-tabs">
-          <button class="gun-tab active" data-gun="08" onclick="switchGun('h2o','08')"><span class="gun-tab-icon">🔧</span>0.8 mm</button>
-          <button class="gun-tab" data-gun="14" onclick="switchGun('h2o','14')"><span class="gun-tab-icon">🔫</span>1.4 HVLP</button>
-          <button class="gun-tab" data-gun="graco" onclick="switchGun('h2o','graco')"><span class="gun-tab-icon">🏆</span>Graco</button>
-          <button class="gun-tab" data-gun="aero" onclick="switchGun('h2o','aero')"><span class="gun-tab-icon">✏️</span>Aerógrafo</button>
-        </div>
-        <div class="gun-panel OLD-AERO" id="h2o-gun-aero-OLD" style="display:none">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">22–25 PSI</span></div></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Ajuste</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno pequeño</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div>
-          <div class="gun-config"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">20 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">0.5 – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Más reducida</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">3 – 7 cm</span></div></div></div>
-        </div>
-        <div class="gun-panel active" id="h2o-gun-08">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer reducido</span><span class="gun-row-val accent">24–30 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Trabajo</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Línea fina</span><span class="gun-row-val">1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">1.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Aplicación normal</span><span class="gun-row-val">2 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="h2o-08"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">24 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">1.5 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Medio</span></div></div></div>
-        </div>
-        <div class="gun-panel" id="int-gun-graco"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">20–24 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">26–30 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Graco 1.4</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 vueltas</span></div></div></div><div class="gun-config" data-key="int-graco"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">23 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">1.5 – 2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">15–20 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="int-gun-aero"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Juemel 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente reducida</span><span class="gun-row-val accent">12–18 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Máx. compresor</span><span class="gun-row-val accent">25 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Boquilla 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div><div class="gun-config" data-key="int-aero"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">14 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">½ – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Muy reducida</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">5–10 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="h2o-gun-14">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">26–30 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">28–32 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">30–35 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas ideales · 1.4</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="h2o-14"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">29 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div></div></div>
-        </div>
-      </div>
-      <button class="reset-btn" onclick="resetTab('h2o')">↺ Limpiar</button>
-    </div>
-    <div class="footer">ROG PAINT · H₂O · 6:1 + AGUA</div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       TAB: PRIMER AkzoNobel  15:1
-  ══════════════════════════════════════ -->
-  <div class="tab-panel" id="panel-pri">
-    <div class="ratio-pills">
-      <div class="rp"><span class="rp-top">×15</span>Primer</div>
-      <div class="rp"><span class="rp-top">×1</span>Hardener</div>
-    </div>
-    <div class="input-block">
-      <label class="input-lbl" for="pri-in">🟢 ¿Cuánto primer tienes?</label>
-      <div class="input-hint">Mínimo 50 ML · Proporción 15 : 1 · Sin thinner</div>
-      <div class="input-row">
-        <input class="num-input" type="number" id="pri-in" placeholder="300"
-          inputmode="decimal" autocomplete="off" oninput="calcPri()">
-        <span class="unit-lbl">ML</span>
-      </div>
-    </div>
-    <div id="pri-warn" class="warn-min hidden">⚠️ Ingresa mínimo 50 ML de primer</div>
-    <div id="pri-out" class="hidden">
-      <div class="results">
-        <div class="result-card">
-          <div class="rc-left"><div class="rc-emoji">🟢</div>
-            <div><div class="rc-name">Base · ×15</div><div class="rc-desc">Primer AkzoNobel</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="pri-vp">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-hard">
-          <div class="rc-left"><div class="rc-emoji">⚗️</div>
-            <div><div class="rc-name">Agregar · ×1</div><div class="rc-desc">Hardener</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="pri-vh">0</div><div class="rc-unit">ML</div></div>
-        </div>
-      </div>
-      <div class="total-row">
-        <span class="total-lbl">Total mezcla</span>
-        <span class="total-val" id="pri-tot">— ML</span>
-      </div>
-      <div class="prop-bar">
-        <div class="prop-lbl">Proporción visual · 15 : 1</div>
-        <div class="prop-track">
-          <div class="pf" style="background:var(--c1);flex:15"></div>
-          <div class="pf" style="background:#3b82f6;flex:1"></div>
-        </div>
-        <div class="prop-key">
-          <div class="pk"><div class="pd" style="background:var(--c1)"></div>Primer ×15</div>
-          <div class="pk"><div class="pd" style="background:#3b82f6"></div>Hardener ×1</div>
-        </div>
-      </div>
-      <div class="psi-box">🔫 <strong>Primer alto sólidos:</strong> 30–35 PSI porque es más espeso</div>
-      <!-- PISTOLAS SCHEMA -->
-      <div class="gun-schema">
-        <div class="gun-schema-title">🔫 Configuración por pistola · Primer</div>
-        <div class="gun-tabs">
-          <button class="gun-tab active" data-gun="08" onclick="switchGun('pri','08')"><span class="gun-tab-icon">🔧</span>0.8 mm</button>
-          <button class="gun-tab" data-gun="14" onclick="switchGun('pri','14')"><span class="gun-tab-icon">🔫</span>1.4 HVLP</button>
-          <button class="gun-tab" data-gun="graco" onclick="switchGun('pri','graco')"><span class="gun-tab-icon">🏆</span>Graco</button>
-          <button class="gun-tab" data-gun="aero" onclick="switchGun('pri','aero')"><span class="gun-tab-icon">✏️</span>Aerógrafo</button>
-        </div>
-        <div class="gun-panel OLD-AERO" id="pri-gun-aero-OLD" style="display:none">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">22–25 PSI</span></div></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Ajuste</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno pequeño</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div>
-          <div class="gun-config"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">20 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">0.5 – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Más reducida</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">3 – 7 cm</span></div></div></div>
-        </div>
-        <div class="gun-panel active" id="pri-gun-08">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer reducido</span><span class="gun-row-val accent">24–30 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Trabajo</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Línea fina</span><span class="gun-row-val">1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">1.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Aplicación normal</span><span class="gun-row-val">2 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="pri-08"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">24 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">1.5 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Medio</span></div></div></div>
-        </div>
-        <div class="gun-panel" id="h2o-gun-graco"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">20–24 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">26–30 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Graco 1.4</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 vueltas</span></div></div></div><div class="gun-config" data-key="h2o-graco"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">24 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">15–20 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="h2o-gun-aero"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Juemel 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente reducida</span><span class="gun-row-val accent">12–18 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Máx. compresor</span><span class="gun-row-val accent">25 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Boquilla 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div><div class="gun-config" data-key="h2o-aero"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">15–18 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">½ – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Dilución</span><span class="gun-config-val">18–25% agua</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">5–10 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="pri-gun-14">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">26–30 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">28–32 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">30–35 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas ideales · 1.4</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="pri-14"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">29 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div></div></div>
-        </div>
-      </div>
-      <button class="reset-btn" onclick="resetTab('pri')">↺ Limpiar</button>
-    </div>
-    <div class="footer">ROG PAINT · PRIMER AKZONOBEL · 15:1</div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       TAB: TRANSPARENTE 4044  10:1 + 5% thinner
-  ══════════════════════════════════════ -->
-  <div class="tab-panel" id="panel-tra">
-    <div class="ratio-pills">
-      <div class="rp"><span class="rp-top">×10</span>Transparente</div>
-      <div class="rp"><span class="rp-top">×1</span>Hardener</div>
-      <div class="rp"><span class="rp-top">5%</span>Thinner</div>
-    </div>
-    <div class="input-block">
-      <label class="input-lbl" for="tra-in">✨ ¿Cuánto transparente tienes?</label>
-      <div class="input-hint">Mínimo 50 ML · Proporción 10 : 1 + 5% Thinner</div>
-      <div class="input-row">
-        <input class="num-input" type="number" id="tra-in" placeholder="200"
-          inputmode="decimal" autocomplete="off" oninput="calcTra()">
-        <span class="unit-lbl">ML</span>
-      </div>
-    </div>
-    <div id="tra-warn" class="warn-min hidden">⚠️ Ingresa mínimo 50 ML de transparente</div>
-    <div id="tra-out" class="hidden">
-      <div class="results">
-        <div class="result-card">
-          <div class="rc-left"><div class="rc-emoji">✨</div>
-            <div><div class="rc-name">Base · ×10</div><div class="rc-desc">Transparente 4044</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="tra-vp">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-hard">
-          <div class="rc-left"><div class="rc-emoji">⚗️</div>
-            <div><div class="rc-name">Agregar · ×1</div><div class="rc-desc">Hardener</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="tra-vh">0</div><div class="rc-unit">ML</div></div>
-        </div>
-        <div class="result-card c-thin">
-          <div class="rc-left"><div class="rc-emoji">🪣</div>
-            <div><div class="rc-name">Agregar · 5%</div><div class="rc-desc">Thinner</div></div>
-          </div>
-          <div class="rc-right"><div class="rc-val" id="tra-vt">0</div><div class="rc-unit">ML</div></div>
-        </div>
-      </div>
-      <div class="total-row">
-        <span class="total-lbl">Total mezcla</span>
-        <span class="total-val" id="tra-tot">— ML</span>
-      </div>
-      <div class="prop-bar">
-        <div class="prop-lbl">Proporción visual · 10 : 1 + 5% Thinner</div>
-        <div class="prop-track">
-          <div class="pf" style="background:var(--c1);flex:10"></div>
-          <div class="pf" style="background:#3b82f6;flex:1"></div>
-          <div class="pf" style="background:#f59e0b;flex:0.5"></div>
-        </div>
-        <div class="prop-key">
-          <div class="pk"><div class="pd" style="background:var(--c1)"></div>Transparente ×10</div>
-          <div class="pk"><div class="pd" style="background:#3b82f6"></div>Hardener ×1</div>
-          <div class="pk"><div class="pd" style="background:#f59e0b"></div>Thinner 5%</div>
-        </div>
-      </div>
-      <div class="psi-box">🔫 <strong>Transparente:</strong> 28–32 PSI</div>
-      <!-- PISTOLAS SCHEMA -->
-      <div class="gun-schema">
-        <div class="gun-schema-title">🔫 Configuración por pistola · Transparente</div>
-        <div class="gun-tabs">
-          <button class="gun-tab active" data-gun="08" onclick="switchGun('tra','08')"><span class="gun-tab-icon">🔧</span>0.8 mm</button>
-          <button class="gun-tab" data-gun="14" onclick="switchGun('tra','14')"><span class="gun-tab-icon">🔫</span>1.4 HVLP</button>
-          <button class="gun-tab" data-gun="graco" onclick="switchGun('tra','graco')"><span class="gun-tab-icon">🏆</span>Graco</button>
-          <button class="gun-tab" data-gun="aero" onclick="switchGun('tra','aero')"><span class="gun-tab-icon">✏️</span>Aerógrafo</button>
-        </div>
-        <div class="gun-panel OLD-AERO" id="tra-gun-aero-OLD" style="display:none">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">20–25 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">22–25 PSI</span></div></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Ajuste</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno pequeño</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div>
-          <div class="gun-config"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">20 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">0.5 – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Pintura</span><span class="gun-config-val">Más reducida</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">3 – 7 cm</span></div></div></div>
-        </div>
-        <div class="gun-panel active" id="tra-gun-08">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer reducido</span><span class="gun-row-val accent">24–30 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Trabajo</span><span class="gun-card-badge">Pistola 0.8</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Línea fina</span><span class="gun-row-val">1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">1.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Aplicación normal</span><span class="gun-row-val">2 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="tra-08"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">24 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">1.5 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Medio</span></div></div></div>
-        </div>
-        <div class="gun-panel" id="pri-gun-graco"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Primer alto sólidos</span><span class="gun-row-val accent">28–34 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer reducido</span><span class="gun-row-val accent">26–30 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">24–28 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Graco 1.4</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 vueltas</span></div></div></div><div class="gun-config" data-key="pri-graco"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">30 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2.5 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto completo</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">15–20 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="pri-gun-aero"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Juemel 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente reducida</span><span class="gun-row-val accent">12–18 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Máx. compresor</span><span class="gun-row-val accent">25 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Boquilla 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div><div class="gun-config" data-key="pri-aero"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">18–22 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">1 – 1.5 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Primer</span><span class="gun-config-val">Muy reducido</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">5–10 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="tra-gun-14">
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">26–30 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">28–32 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">30–35 PSI</span></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-          <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas ideales · 1.4</span><span class="gun-card-badge">1.4 HVLP</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 – 3 vueltas</span></div></div></div>
-          <div class="gun-config" data-key="tra-14"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">29 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div></div></div>
-        </div>
-        <div class="gun-panel" id="tra-gun-graco"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val accent">26–30 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base solvente</span><span class="gun-row-val accent">22–26 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">24–28 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val accent">28–32 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Graco 1.4</span><span class="gun-card-badge">Graco Stellair ACE</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Transparente</span><span class="gun-row-val">2 – 2.5 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Base</span><span class="gun-row-val">1.5 – 2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">H₂O</span><span class="gun-row-val">2 vueltas</span></div><div class="gun-row"><span class="gun-row-label">Primer</span><span class="gun-row-val">2.5 vueltas</span></div></div></div><div class="gun-config" data-key="tra-graco"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">28 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">2 vueltas</span></div><div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">Abierto casi completo</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">15–20 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-        <div class="gun-panel" id="tra-gun-aero"><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Juemel 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Base solvente reducida</span><span class="gun-row-val accent">12–18 PSI</span></div><div class="gun-row"><span class="gun-row-label">Base H₂O</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Transparente reducido</span><span class="gun-row-val accent">15–20 PSI</span></div><div class="gun-row"><span class="gun-row-label">Primer muy reducido</span><span class="gun-row-val accent">18–22 PSI</span></div><div class="gun-row"><span class="gun-row-label">Máx. compresor</span><span class="gun-row-val accent">25 PSI</span></div></div></div><div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas · Boquilla 0.3mm</span><span class="gun-card-badge">Aerógrafo</span></div><div class="gun-rows"><div class="gun-row"><span class="gun-row-label">Detalle fino</span><span class="gun-row-val">¼ – ½ vuelta</span></div><div class="gun-row"><span class="gun-row-label">Difuminado</span><span class="gun-row-val">½ – 1 vuelta</span></div><div class="gun-row"><span class="gun-row-label">Relleno</span><span class="gun-row-val">1 – 1.5 vueltas</span></div></div></div><div class="gun-config" data-key="tra-aero"><div class="gun-config-title">⭐ Config recomendada</div><div class="gun-config-rows"><div class="gun-config-row"><span class="gun-config-label">PSI</span><span class="gun-config-val">15–18 PSI</span></div><div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">½ – 1 vuelta</span></div><div class="gun-config-row"><span class="gun-config-label">Transparente</span><span class="gun-config-val">Muy reducido</span></div><div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">5–10 cm</span></div></div><button class="edit-config-btn" onclick="toggleEdit(this)">✏️ Editar config</button></div></div>
-      </div>
-      <button class="reset-btn" onclick="resetTab('tra')">↺ Limpiar</button>
-    </div>
-    <div class="footer">ROG PAINT · TRANSPARENTE 4044 · 10:1 + 5% THINNER</div>
-  </div>
-
-</div><!-- /wrap -->
+  <main id="appPanels"></main>
+</div>
 
 <script>
-var tabMeta={
-  ext:{label:'Exterior',cls:'tab-ext'},
-  int:{label:'Interior',cls:'tab-int'},
-  h2o:{label:'H₂O',   cls:'tab-h2o'},
-  pri:{label:'Primer', cls:'tab-pri'},
-  tra:{label:'Transp.',cls:'tab-tra'}
+const MATERIAL_LABELS={solvent:'Base solvente',h2o:'Base H₂O',clear:'Transparente',primer:'Primer'};
+const TABS={
+  ext:{label:'Exterior',cls:'tab-ext',emoji:'🎨',footer:'EXTERIOR · 3:1:1',input:'¿Cuánta pintura tienes?',hint:'Proporción editable · Base solvente',placeholder:300,baseName:'Pintura',baseEmoji:'🎨',basePartName:'Pintura',material:'solvent',params:{minMl:50,paintParts:3,hardenerParts:1,thinnerParts:1},mode:null},
+  int:{label:'Interior',cls:'tab-int',emoji:'🏠',footer:'INTERIOR · 20:1 + THINNER',input:'¿Cuánta pintura tienes?',hint:'Proporción editable · Noche/Día',placeholder:500,baseName:'Pintura',baseEmoji:'🎨',basePartName:'Pintura',material:'solvent',params:{minMl:50,paintParts:20,hardenerParts:1,nightPctMin:5,nightPctMax:6,dayPctMin:7,dayPctMax:10},mode:'night'},
+  h2o:{label:'H₂O',cls:'tab-h2o',emoji:'💧',footer:'H₂O · 6:1 + AGUA',input:'¿Cuánta pintura H₂O tienes?',hint:'Proporción editable · Agua 5–20%',placeholder:400,baseName:'Pintura H₂O',baseEmoji:'💧',basePartName:'Pintura',material:'h2o',params:{minMl:50,paintParts:6,hardenerParts:1,nightPctMin:5,nightPctMax:18,dayPctMin:18,dayPctMax:20},mode:'night'},
+  pri:{label:'Primer',cls:'tab-pri',emoji:'🟢',footer:'PRIMER · 15:1',input:'¿Cuánto primer tienes?',hint:'Proporción editable · Sin thinner',placeholder:300,baseName:'Primer',baseEmoji:'🟢',basePartName:'Primer',material:'primer',params:{minMl:50,paintParts:15,hardenerParts:1},mode:null},
+  tra:{label:'Transp.',cls:'tab-tra',emoji:'✨',footer:'TRANSPARENTE · 10:1 + 5%',input:'¿Cuánto transparente tienes?',hint:'Proporción editable · 10:1 + thinner',placeholder:200,baseName:'Transparente',baseEmoji:'✨',basePartName:'Transp.',material:'clear',params:{minMl:50,paintParts:10,hardenerParts:1,thinnerPct:5},mode:null}
 };
-var currentTab='ext';
-var intMode='night';
-var h2oMode='night';
+const GUN_DEFAULTS={
+  '08':{name:'0.8 mm',icon:'🔧',badge:'Pistola 0.8',maxHvlp:null,note:'Ideal para retoques y piezas pequeñas. Si el material está espeso, reduce o cambia a boquilla mayor.',psi:{solvent:[18,22],h2o:[22,26],clear:[24,28],primer:[24,30]},turns:{solvent:'1.5 – 2 vueltas',h2o:'2 vueltas',clear:'2 vueltas',primer:'2.5 vueltas'},fan:{solvent:'Medio',h2o:'Medio-abierto',clear:'Medio-abierto',primer:'Medio'}},
+  '14':{name:'1.4 HVLP',icon:'🔫',badge:'HVLP 1.4 genérica',maxHvlp:34,note:'Rangos de arranque para HVLP 1.4 genérica. Ajusta con gatillo jalado y prueba patrón antes de la pieza.',psi:{solvent:[24,28],h2o:[26,30],clear:[28,32],primer:[30,34]},turns:{solvent:'1.5 – 2 vueltas',h2o:'2 vueltas',clear:'2 – 2.5 vueltas',primer:'2.5 – 3 vueltas'},fan:{solvent:'Abierto casi completo',h2o:'Abierto casi completo',clear:'Abierto casi completo',primer:'Abierto completo'}},
+  graco:{name:'Graco',icon:'🏆',badge:'Stellair ACE 1.4 HVLP',maxHvlp:34,note:'La Graco de las fotos trabaja como HVLP 1.4. Arranque recomendado: 34 PSI con gatillo jalado; baja sólo si atomiza bien. Para mantener HVLP, no rebases 34 PSI en esa tapa.',psi:{solvent:[30,34],h2o:[32,34],clear:[32,34],primer:[34,34]},turns:{solvent:'1.5 – 2 vueltas',h2o:'2 vueltas',clear:'2 – 2.5 vueltas',primer:'2.5 – 3 vueltas'},fan:{solvent:'Abierto casi completo',h2o:'Abierto casi completo',clear:'Abierto casi completo',primer:'Abierto completo'}}
+};
+const CLIMATES={normal:{label:'Normal',offset:0,note:'Sin ajuste automático.'},night:{label:'Noche / humedad alta',offset:1,note:'Sube un poco la atomización y usa capas ligeras con más tiempo de oreo.'},hot:{label:'Calor / seco',offset:-1,note:'Baja un poco la presión para reducir overspray y seca demasiado rápido.'},custom:{label:'Personalizado',offset:null,note:'Usa el ajuste PSI que tú escribas.'}};
+let state={tab:'ext',mode:{int:'night',h2o:'night'},params:{},guns:{},climate:{},gunSelected:{ext:'08',int:'08',h2o:'08',pri:'08',tra:'08'}};
 
-function switchTab(t){
-  // hide panels
-  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.nav-btn').forEach(function(b,i){
-    b.classList.toggle('active',['ext','int','h2o','pri','tra'][i]===t);
-  });
-  document.getElementById('panel-'+t).classList.add('active');
-  // swap body class
-  var b=document.body;
-  Object.values(tabMeta).forEach(function(m){b.classList.remove(m.cls);});
-  b.classList.add(tabMeta[t].cls);
-  document.getElementById('topBadge').textContent=tabMeta[t].label;
-  currentTab=t;
-}
-
+function clone(o){return JSON.parse(JSON.stringify(o));}
 function q(id){return document.getElementById(id);}
-function rng(a,b){return a.toFixed(1)+' – '+b.toFixed(1);}
-
-function showHide(id,show){q(id).classList.toggle('hidden',!show);}
-
-/* ── EXTERIOR ── */
-function calcExt(){
-  var v=parseFloat(q('ext-in').value);
-  if(!v||v<=0){showHide('ext-out',false);showHide('ext-warn',false);return;}
-  if(v<50){showHide('ext-out',false);showHide('ext-warn',true);return;}
-  showHide('ext-warn',false);
-  var h=v/3,t=v/3,tot=v+h+t;
-  q('ext-vp').textContent=v.toFixed(1);
-  q('ext-vh').textContent=h.toFixed(1);
-  q('ext-vt').textContent=t.toFixed(1);
-  q('ext-tot').textContent=tot.toFixed(1)+' ML';
-  showHide('ext-out',true);
+function num(v,def=0){const n=parseFloat(v);return Number.isFinite(n)?n:def;}
+function fmt(n){return Number(n).toFixed(1);}
+function rangeText(a,b){return Math.abs(a-b)<0.001?fmt(a):fmt(a)+' – '+fmt(b);}
+function save(){localStorage.setItem('rogPaintProV1',JSON.stringify(state));}
+function load(){
+  Object.keys(TABS).forEach(t=>state.params[t]=clone(TABS[t].params));
+  state.guns=clone(GUN_DEFAULTS);
+  Object.keys(TABS).forEach(t=>state.climate[t]={type:'normal',offset:0});
+  try{const raw=localStorage.getItem('rogPaintProV1');if(raw){const old=JSON.parse(raw);state={...state,...old};}}
+  catch(e){}
+  Object.keys(TABS).forEach(t=>{state.params[t]={...clone(TABS[t].params),...(state.params[t]||{})};state.climate[t]={type:'normal',offset:0,...(state.climate[t]||{})};});
+  state.guns={...clone(GUN_DEFAULTS),...(state.guns||{})};
 }
-
-/* ── INTERIOR ── */
-function setIntMode(m){
-  intMode=m;
-  ['night','day','both'].forEach(function(k){
-    q('int-btn-'+k).classList.toggle('active',k===m);
+function buildNav(){
+  const nav=q('navInner');nav.innerHTML='';
+  Object.entries(TABS).forEach(([key,t])=>{
+    const b=document.createElement('button');b.className='nav-btn'+(key===state.tab?' active':'');b.textContent=t.emoji+' '+t.label;b.onclick=()=>switchTab(key);nav.appendChild(b);
   });
-  calcInt();
 }
-function calcInt(){
-  var v=parseFloat(q('int-in').value);
-  if(!v||v<=0){showHide('int-out',false);showHide('int-warn',false);return;}
-  if(v<50){showHide('int-out',false);showHide('int-warn',true);return;}
-  showHide('int-warn',false);
-  var h=v/20,base=v+h;
-  var wn1=base*0.05,wn2=base*0.06,wd1=base*0.07,wd2=base*0.10;
-  q('int-vp').textContent=v.toFixed(1);
-  q('int-vh').textContent=h.toFixed(1);
-  var cn=q('int-card-night'),cd=q('int-card-day');
-  if(intMode==='night'){
-    cd.classList.add('hidden');cn.classList.remove('hidden');
-    q('int-lbl-n').textContent='Thinner · Noche';q('int-pct-n').textContent='5–6%';
-    q('int-vn').textContent=rng(wn1,wn2);
-    q('int-tot').textContent=(v+h+(wn1+wn2)/2).toFixed(1)+' ML (aprox)';
-  } else if(intMode==='day'){
-    cd.classList.add('hidden');cn.classList.remove('hidden');
-    q('int-lbl-n').textContent='Thinner · Día';q('int-pct-n').textContent='7–10%';
-    q('int-vn').textContent=rng(wd1,wd2);
-    q('int-tot').textContent=(v+h+(wd1+wd2)/2).toFixed(1)+' ML (aprox)';
-  } else {
-    cn.classList.remove('hidden');cd.classList.remove('hidden');
-    q('int-lbl-n').textContent='Thinner · Noche';q('int-pct-n').textContent='5–6%';
-    q('int-vn').textContent=rng(wn1,wn2);q('int-vd').textContent=rng(wd1,wd2);
-    q('int-tot').textContent=(v+h+(wn1+wn2+wd1+wd2)/4).toFixed(1)+' ML (aprox)';
+function buildPanels(){
+  const app=q('appPanels');app.innerHTML='';
+  Object.entries(TABS).forEach(([key,t])=>{
+    const p=document.createElement('section');p.className='tab-panel'+(key===state.tab?' active':'');p.id='panel-'+key;
+    p.innerHTML=panelHtml(key,t);app.appendChild(p);renderGun(key);
+  });
+}
+function pillsHtml(key){
+  const p=state.params[key];
+  if(key==='ext')return `<div class="ratio-pills"><div class="rp"><span class="rp-top">×${p.paintParts}</span>Pintura</div><div class="rp"><span class="rp-top">×${p.hardenerParts}</span>Hardener</div><div class="rp"><span class="rp-top">×${p.thinnerParts}</span>Thinner</div></div>`;
+  if(key==='pri')return `<div class="ratio-pills"><div class="rp"><span class="rp-top">×${p.paintParts}</span>Primer</div><div class="rp"><span class="rp-top">×${p.hardenerParts}</span>Hardener</div></div>`;
+  if(key==='tra')return `<div class="ratio-pills"><div class="rp"><span class="rp-top">×${p.paintParts}</span>Transp.</div><div class="rp"><span class="rp-top">×${p.hardenerParts}</span>Hardener</div><div class="rp"><span class="rp-top">${p.thinnerPct}%</span>Thinner</div></div>`;
+  return '';
+}
+function modeHtml(key){
+  if(!TABS[key].mode)return '';
+  const noun=key==='h2o'?'Agua':'Thinner';
+  const p=state.params[key], m=state.mode[key];
+  return `<div class="mode-row">
+    <button class="mode-btn ${m==='night'?'active':''}" onclick="setMode('${key}','night')"><span class="mode-top">🌙 ${p.nightPctMin}–${p.nightPctMax}%</span><span class="mode-sub">NOCHE</span></button>
+    <button class="mode-btn ${m==='day'?'active':''}" onclick="setMode('${key}','day')"><span class="mode-top">☀️ ${p.dayPctMin}–${p.dayPctMax}%</span><span class="mode-sub">DÍA</span></button>
+    <button class="mode-btn ${m==='both'?'active':''}" onclick="setMode('${key}','both')"><span class="mode-top">⚡ AMBOS</span><span class="mode-sub">${noun}</span></button>
+  </div>`;
+}
+function paramHtml(key){
+  const p=state.params[key];
+  let fields=`
+    <div class="p-field"><label>Mínimo ML</label><input type="number" step="1" value="${p.minMl}" onchange="setParam('${key}','minMl',this.value)"></div>
+    <div class="p-field"><label>Partes base</label><input type="number" step="0.1" value="${p.paintParts}" onchange="setParam('${key}','paintParts',this.value)"></div>
+    <div class="p-field"><label>Partes hardener</label><input type="number" step="0.1" value="${p.hardenerParts}" onchange="setParam('${key}','hardenerParts',this.value)"></div>`;
+  if(key==='ext')fields+=`<div class="p-field"><label>Partes thinner</label><input type="number" step="0.1" value="${p.thinnerParts}" onchange="setParam('${key}','thinnerParts',this.value)"></div>`;
+  if(key==='tra')fields+=`<div class="p-field"><label>% thinner</label><input type="number" step="0.1" value="${p.thinnerPct}" onchange="setParam('${key}','thinnerPct',this.value)"></div>`;
+  if(key==='int'||key==='h2o')fields+=`
+    <div class="p-field"><label>% noche mínimo</label><input type="number" step="0.1" value="${p.nightPctMin}" onchange="setParam('${key}','nightPctMin',this.value)"></div>
+    <div class="p-field"><label>% noche máximo</label><input type="number" step="0.1" value="${p.nightPctMax}" onchange="setParam('${key}','nightPctMax',this.value)"></div>
+    <div class="p-field"><label>% día mínimo</label><input type="number" step="0.1" value="${p.dayPctMin}" onchange="setParam('${key}','dayPctMin',this.value)"></div>
+    <div class="p-field"><label>% día máximo</label><input type="number" step="0.1" value="${p.dayPctMax}" onchange="setParam('${key}','dayPctMax',this.value)"></div>`;
+  return `<details class="param-box"><summary>⚙️ Modificar parámetros de mezcla</summary><div class="param-grid">${fields}<div class="p-help">Todo queda guardado en este equipo. Si cambias por marca, clima o viscosidad, la calculadora recalcula con tus nuevos valores.</div></div></details>`;
+}
+function climateHtml(key){
+  const c=state.climate[key];
+  const note=CLIMATES[c.type]?.note||CLIMATES.normal.note;
+  return `<div class="climate-box">
+    <div class="climate-title">🌙 Ajuste rápido por clima / turno</div>
+    <div class="climate-grid">
+      <div class="p-field"><label>Condición</label><select onchange="setClimate('${key}',this.value)">
+        ${Object.entries(CLIMATES).map(([v,o])=>`<option value="${v}" ${c.type===v?'selected':''}>${o.label}</option>`).join('')}
+      </select></div>
+      <div class="p-field"><label>Ajuste PSI</label><input type="number" step="0.5" value="${c.offset}" onchange="setPsiOffset('${key}',this.value)"></div>
+      <div class="climate-note"><strong>Nota:</strong> ${note} La presión mostrada se calcula con el gatillo jalado.</div>
+    </div>
+  </div>`;
+}
+function panelHtml(key,t){
+  return `${pillsHtml(key)}
+  <div class="input-block">
+    <label class="input-lbl" for="${key}-in">${t.emoji} ${t.input}</label>
+    <div class="input-hint" id="${key}-hint">Mínimo ${state.params[key].minMl} ML · ${t.hint}</div>
+    <div class="input-row"><input class="num-input" type="number" id="${key}-in" placeholder="${t.placeholder}" inputmode="decimal" autocomplete="off" oninput="calc('${key}')"><span class="unit-lbl">ML</span></div>
+  </div>
+  ${modeHtml(key)}
+  ${paramHtml(key)}
+  ${climateHtml(key)}
+  <div id="${key}-warn" class="warn-min">⚠️ Ingresa mínimo ${state.params[key].minMl} ML</div>
+  <div id="${key}-out" class="hidden">
+    <div class="results" id="${key}-results"></div>
+    <div class="total-row"><span class="total-lbl">Total mezcla</span><span class="total-val" id="${key}-tot">— ML</span></div>
+    <div class="prop-bar" id="${key}-prop"></div>
+    <div class="psi-box" id="${key}-psi-summary"></div>
+    <div class="gun-schema">
+      <div class="gun-schema-title">🔫 Configuración editable por pistola · sin aerógrafo</div>
+      <div class="gun-tabs" id="${key}-gun-tabs"></div>
+      <div id="${key}-gun-panel"></div>
+    </div>
+    <button class="reset-btn" onclick="resetTab('${key}')">↺ Limpiar</button>
+  </div>
+  <div class="footer">VOLPAINT · ${t.footer}</div>`;
+}
+function switchTab(key){
+  state.tab=key;save();
+  Object.values(TABS).forEach(t=>document.body.classList.remove(t.cls));document.body.classList.add(TABS[key].cls);q('topBadge').textContent=TABS[key].label;
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));q('panel-'+key).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',Object.keys(TABS)[i]===key));
+}
+function setMode(key,mode){state.mode[key]=mode;save();rebuildKeepValues(key);}
+function setParam(key,name,value){state.params[key][name]=num(value,state.params[key][name]);save();rebuildKeepValues(key);}
+function setClimate(key,type){const o=CLIMATES[type]||CLIMATES.normal;state.climate[key].type=type;if(o.offset!==null)state.climate[key].offset=o.offset;save();rebuildKeepValues(key);}
+function setPsiOffset(key,value){state.climate[key].offset=num(value,0);state.climate[key].type='custom';save();rebuildKeepValues(key);}
+function rebuildKeepValues(key){const old=q(key+'-in')?.value||'';q('panel-'+key).innerHTML=panelHtml(key,TABS[key]);q(key+'-in').value=old;renderGun(key);calc(key);}
+function calc(key){
+  const v=num(q(key+'-in').value,0), p=state.params[key], t=TABS[key];
+  const warn=q(key+'-warn'), out=q(key+'-out');
+  warn.textContent=`⚠️ Ingresa mínimo ${p.minMl} ML`;
+  if(!v||v<=0){warn.classList.remove('show');out.classList.add('hidden');return;}
+  if(v<p.minMl){warn.classList.add('show');out.classList.add('hidden');return;}
+  warn.classList.remove('show');out.classList.remove('hidden');
+  const one=v/p.paintParts; const hard=one*p.hardenerParts; let rows=[]; let total=v+hard;
+  rows.push({name:t.baseName,sub:`Base · ×${p.paintParts}`,emoji:t.baseEmoji,val:fmt(v),cls:''});
+  rows.push({name:'Hardener',sub:`Agregar · ×${p.hardenerParts}`,emoji:'⚗️',val:fmt(hard),cls:'c-hard'});
+  if(key==='ext'){
+    const th=one*p.thinnerParts;total+=th;rows.push({name:'Thinner',sub:`Agregar · ×${p.thinnerParts}`,emoji:'🪣',val:fmt(th),cls:'c-thin'});
   }
-  showHide('int-out',true);
-}
-
-/* ── H2O ── */
-function setH2oMode(m){
-  h2oMode=m;
-  ['night','day','both'].forEach(function(k){
-    q('h2o-btn-'+k).classList.toggle('active',k===m);
-  });
-  calcH2o();
-}
-function calcH2o(){
-  var v=parseFloat(q('h2o-in').value);
-  if(!v||v<=0){showHide('h2o-out',false);showHide('h2o-warn',false);return;}
-  if(v<50){showHide('h2o-out',false);showHide('h2o-warn',true);return;}
-  showHide('h2o-warn',false);
-  var h=v/6,base=v+h;
-  var wn1=base*0.05,wn2=base*0.18,wd1=base*0.18,wd2=base*0.20;
-  q('h2o-vp').textContent=v.toFixed(1);
-  q('h2o-vh').textContent=h.toFixed(1);
-  var cn=q('h2o-card-night'),cd=q('h2o-card-day');
-  if(h2oMode==='night'){
-    cd.classList.add('hidden');cn.classList.remove('hidden');
-    q('h2o-lbl-n').textContent='Agua · Noche';q('h2o-pct-n').textContent='5–18%';
-    q('h2o-vn').textContent=rng(wn1,wn2);
-    q('h2o-tot').textContent=(v+h+(wn1+wn2)/2).toFixed(1)+' ML (aprox)';
-  } else if(h2oMode==='day'){
-    cd.classList.add('hidden');cn.classList.remove('hidden');
-    q('h2o-lbl-n').textContent='Agua · Día';q('h2o-pct-n').textContent='18–20%';
-    q('h2o-vn').textContent=rng(wd1,wd2);
-    q('h2o-tot').textContent=(v+h+(wd1+wd2)/2).toFixed(1)+' ML (aprox)';
-  } else {
-    cn.classList.remove('hidden');cd.classList.remove('hidden');
-    q('h2o-lbl-n').textContent='Agua · Noche';q('h2o-pct-n').textContent='5–18%';
-    q('h2o-vn').textContent=rng(wn1,wn2);q('h2o-vd').textContent=rng(wd1,wd2);
-    q('h2o-tot').textContent=(v+h+(wn1+wn2+wd1+wd2)/4).toFixed(1)+' ML (aprox)';
+  if(key==='tra'){
+    const th=(v+hard)*(p.thinnerPct/100);total+=th;rows.push({name:'Thinner',sub:`Agregar · ${p.thinnerPct}%`,emoji:'🪣',val:fmt(th),cls:'c-thin'});
   }
-  showHide('h2o-out',true);
+  if(key==='int'||key==='h2o'){
+    const noun=key==='h2o'?'Agua':'Thinner', emo=key==='h2o'?'💧':'🪣';
+    const base=v+hard;
+    const rn=[base*p.nightPctMin/100,base*p.nightPctMax/100];
+    const rd=[base*p.dayPctMin/100,base*p.dayPctMax/100];
+    if(state.mode[key]==='night'){rows.push({name:noun,sub:`Noche · ${p.nightPctMin}–${p.nightPctMax}%`,emoji:emo,val:rangeText(rn[0],rn[1]),cls:key==='h2o'?'c-water':'c-thin'});total=base+(rn[0]+rn[1])/2;}
+    else if(state.mode[key]==='day'){rows.push({name:noun,sub:`Día · ${p.dayPctMin}–${p.dayPctMax}%`,emoji:emo,val:rangeText(rd[0],rd[1]),cls:key==='h2o'?'c-water':'c-thin'});total=base+(rd[0]+rd[1])/2;}
+    else{rows.push({name:noun+' noche',sub:`${p.nightPctMin}–${p.nightPctMax}%`,emoji:emo,val:rangeText(rn[0],rn[1]),cls:key==='h2o'?'c-water':'c-thin'});rows.push({name:noun+' día',sub:`${p.dayPctMin}–${p.dayPctMax}%`,emoji:emo,val:rangeText(rd[0],rd[1]),cls:key==='h2o'?'c-water':'c-thin'});total=base+(rn[0]+rn[1]+rd[0]+rd[1])/4;}
+  }
+  q(key+'-results').innerHTML=rows.map(r=>`<div class="result-card ${r.cls}"><div class="rc-left"><div class="rc-emoji">${r.emoji}</div><div><div class="rc-name">${r.sub}</div><div class="rc-desc">${r.name}</div></div></div><div class="rc-right"><div class="rc-val">${r.val}</div><div class="rc-unit">ML</div></div></div>`).join('');
+  q(key+'-tot').textContent=fmt(total)+' ML'+((key==='int'||key==='h2o')?' aprox':'');
+  renderProp(key);renderPsiSummary(key);
 }
-
-/* ── PRIMER ── */
-function calcPri(){
-  var v=parseFloat(q('pri-in').value);
-  if(!v||v<=0){showHide('pri-out',false);showHide('pri-warn',false);return;}
-  if(v<50){showHide('pri-out',false);showHide('pri-warn',true);return;}
-  showHide('pri-warn',false);
-  var h=v/15,tot=v+h;
-  q('pri-vp').textContent=v.toFixed(1);
-  q('pri-vh').textContent=h.toFixed(1);
-  q('pri-tot').textContent=tot.toFixed(1)+' ML';
-  showHide('pri-out',true);
+function renderProp(key){
+  const p=state.params[key]; let segments=[],keys=[];
+  if(key==='ext'){segments=[[p.paintParts,'var(--c1)'],[p.hardenerParts,'#3b82f6'],[p.thinnerParts,'#f59e0b']];keys=[`${TABS[key].basePartName} ×${p.paintParts}`,`Hardener ×${p.hardenerParts}`,`Thinner ×${p.thinnerParts}`];}
+  else if(key==='pri'){segments=[[p.paintParts,'var(--c1)'],[p.hardenerParts,'#3b82f6']];keys=[`Primer ×${p.paintParts}`,`Hardener ×${p.hardenerParts}`];}
+  else if(key==='tra'){segments=[[p.paintParts,'var(--c1)'],[p.hardenerParts,'#3b82f6'],[p.thinnerPct/10,'#f59e0b']];keys=[`Transp. ×${p.paintParts}`,`Hardener ×${p.hardenerParts}`,`Thinner ${p.thinnerPct}%`];}
+  else{segments=[[p.paintParts,'var(--c1)'],[p.hardenerParts,'#3b82f6'],[1,'#06b6d4']];keys=[`${TABS[key].basePartName} ×${p.paintParts}`,`Hardener ×${p.hardenerParts}`,key==='h2o'?'Agua %':'Thinner %'];}
+  q(key+'-prop').innerHTML=`<div class="prop-lbl">Proporción visual editable</div><div class="prop-track">${segments.map(s=>`<div class="pf" style="background:${s[1]};flex:${s[0]}"></div>`).join('')}</div><div class="prop-key">${keys.map((k,i)=>`<div class="pk"><div class="pd" style="background:${segments[i][1]}"></div>${k}</div>`).join('')}</div>`;
 }
-
-/* ── TRANSPARENTE ── */
-function calcTra(){
-  var v=parseFloat(q('tra-in').value);
-  if(!v||v<=0){showHide('tra-out',false);showHide('tra-warn',false);return;}
-  if(v<50){showHide('tra-out',false);showHide('tra-warn',true);return;}
-  showHide('tra-warn',false);
-  var h=v/10;           // 10:1 → hardener = v/10
-  var base=v+h;
-  var t=base*0.05;      // 5% del total (transparente+hardener)
-  var tot=base+t;
-  q('tra-vp').textContent=v.toFixed(1);
-  q('tra-vh').textContent=h.toFixed(1);
-  q('tra-vt').textContent=t.toFixed(1);
-  q('tra-tot').textContent=tot.toFixed(1)+' ML';
-  showHide('tra-out',true);
+function effectiveRange(gunKey,mat,key){
+  const base=state.guns[gunKey].psi[mat];let a=num(base[0]),b=num(base[1]);
+  const off=num(state.climate[key].offset,0);a+=off;b+=off;
+  const max=state.guns[gunKey].maxHvlp;
+  if(max){a=Math.min(a,max);b=Math.min(b,max);}return [Math.max(0,a),Math.max(0,b)];
 }
-
-/* ── PISTOLAS ── */
-function switchGun(tab,gun){
-  var order=['08','14','graco','aero'];
-  order.forEach(function(key){
-    var panel=document.getElementById(tab+'-gun-'+key);
-    if(panel){panel.classList.toggle('active',key===gun);}
-  });
-  document.querySelectorAll('#panel-'+tab+' .gun-tab').forEach(function(b){
-    b.classList.toggle('active',b.dataset.gun===gun);
-  });
+function renderPsiSummary(key){
+  const gun=state.gunSelected[key], mat=TABS[key].material, r=effectiveRange(gun,mat,key);
+  q(key+'-psi-summary').innerHTML=`🔫 <strong>${state.guns[gun].badge} · ${MATERIAL_LABELS[mat]}:</strong> ${rangeText(r[0],r[1])} PSI con gatillo jalado`;
 }
-
-/* ── EDITABLE CONFIG ── */
-function toggleEdit(btn){
-  var cfg=btn.closest('.gun-config');
-  var vals=cfg.querySelectorAll('.gun-config-val');
-  var editing=btn.classList.toggle('editing');
-  vals.forEach(function(v){v.contentEditable=editing?'true':'false';});
-  btn.textContent=editing?'✓ Guardar config':'✏️ Editar config';
-  if(!editing){saveConfig(cfg);}
+function renderGun(key){
+  const tabs=q(key+'-gun-tabs'), panel=q(key+'-gun-panel');if(!tabs||!panel)return;
+  tabs.innerHTML=Object.entries(state.guns).map(([g,data])=>`<button class="gun-tab ${state.gunSelected[key]===g?'active':''}" onclick="selectGun('${key}','${g}')"><span class="gun-tab-icon">${data.icon}</span>${data.name}</button>`).join('');
+  const gkey=state.gunSelected[key]; const gun=state.guns[gkey]; const mat=TABS[key].material;
+  const rows=Object.keys(MATERIAL_LABELS).map(m=>{
+    const eff=effectiveRange(gkey,m,key); const raw=gun.psi[m];
+    return `<div class="gun-row ${m===mat?'active-material':''}"><span class="gun-row-label">${MATERIAL_LABELS[m]}</span><span class="gun-row-val accent" data-eff="${gkey}-${m}">${rangeText(eff[0],eff[1])} PSI</span><div class="edit-line"><input class="mini-input" type="number" step="0.5" value="${raw[0]}" onchange="setGunPsi('${key}','${gkey}','${m}',0,this.value)"><input class="mini-input" type="number" step="0.5" value="${raw[1]}" onchange="setGunPsi('${key}','${gkey}','${m}',1,this.value)"></div></div>`;
+  }).join('');
+  const turnRows=Object.keys(MATERIAL_LABELS).map(m=>`<div class="gun-row ${m===mat?'active-material':''}"><span class="gun-row-label">${MATERIAL_LABELS[m]}</span><span class="gun-row-val">Vueltas</span><div class="edit-line"><input class="text-input" type="text" value="${gun.turns[m]}" onchange="setGunText('${key}','${gkey}','turns','${m}',this.value)"></div></div>`).join('');
+  const fanRows=Object.keys(MATERIAL_LABELS).map(m=>`<div class="gun-row ${m===mat?'active-material':''}"><span class="gun-row-label">${MATERIAL_LABELS[m]}</span><span class="gun-row-val">Abanico</span><div class="edit-line"><input class="text-input" type="text" value="${gun.fan[m]}" onchange="setGunText('${key}','${gkey}','fan','${m}',this.value)"></div></div>`).join('');
+  const rec=effectiveRange(gkey,mat,key);
+  panel.innerHTML=`<div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">PSI · Material</span><span class="gun-card-badge">${gun.badge}</span></div><div class="gun-rows">${rows}</div><div class="small-note"><strong>Base:</strong> los cuadros editables son tu rango base. El valor grande suma el ajuste de clima y respeta el máximo HVLP cuando aplica.</div></div>
+  <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Vueltas por material</span><span class="gun-card-badge">Editable</span></div><div class="gun-rows">${turnRows}</div></div>
+  <div class="gun-card"><div class="gun-card-header"><span class="gun-card-title">Abanico por material</span><span class="gun-card-badge">Editable</span></div><div class="gun-rows">${fanRows}</div></div>
+  <div class="gun-config"><div class="gun-config-title">⭐ Config recomendada para esta sección</div>
+    <div class="gun-config-row"><span class="gun-config-label">Material</span><span class="gun-config-val">${MATERIAL_LABELS[mat]}</span></div>
+    <div class="gun-config-row"><span class="gun-config-label">PSI calculado</span><span class="gun-config-val">${rangeText(rec[0],rec[1])} PSI</span></div>
+    <div class="gun-config-row"><span class="gun-config-label">Vueltas</span><span class="gun-config-val">${gun.turns[mat]}</span></div>
+    <div class="gun-config-row"><span class="gun-config-label">Abanico</span><span class="gun-config-val">${gun.fan[mat]}</span></div>
+    <div class="gun-config-row"><span class="gun-config-label">Distancia</span><span class="gun-config-val">15–20 cm</span></div>
+    <div class="small-note"><strong>Nota:</strong> ${gun.note}</div>
+  </div><button class="edit-btn warning" onclick="restoreGun('${key}','${gkey}')">↺ Restaurar esta pistola</button>`;
+  if(q(key+'-out')&&!q(key+'-out').classList.contains('hidden'))renderPsiSummary(key);
 }
-function saveConfig(cfg){
-  var key=cfg.dataset.key;if(!key)return;
-  var data={};
-  cfg.querySelectorAll('.gun-config-row').forEach(function(row){
-    var lbl=row.querySelector('.gun-config-label').textContent;
-    var val=row.querySelector('.gun-config-val').textContent;
-    data[lbl]=val;
-  });
-  try{localStorage.setItem('rogcfg_'+key,JSON.stringify(data));}catch(e){}
-}
-function loadConfigs(){
-  document.querySelectorAll('.gun-config[data-key]').forEach(function(cfg){
-    var key=cfg.dataset.key;
-    try{
-      var raw=localStorage.getItem('rogcfg_'+key);
-      if(!raw)return;
-      var data=JSON.parse(raw);
-      cfg.querySelectorAll('.gun-config-row').forEach(function(row){
-        var lbl=row.querySelector('.gun-config-label').textContent;
-        if(data[lbl])row.querySelector('.gun-config-val').textContent=data[lbl];
-      });
-    }catch(e){}
-  });
-}
-window.addEventListener('load',loadConfigs);
-
-/* ── RESET ── */
-function resetTab(t){
-  var fields={ext:['ext-in'],int:['int-in'],h2o:['h2o-in'],pri:['pri-in'],tra:['tra-in']};
-  fields[t].forEach(function(id){q(id).value='';});
-  showHide(t+'-out',false);showHide(t+'-warn',false);
-  // reset extra cards
-  if(t==='int'){q('int-card-day').classList.add('hidden');}
-  if(t==='h2o'){q('h2o-card-day').classList.add('hidden');}
-}
+function selectGun(key,g){state.gunSelected[key]=g;save();renderGun(key);calc(key);}
+function setGunPsi(key,g,m,i,value){state.guns[g].psi[m][i]=num(value,state.guns[g].psi[m][i]);if(state.guns[g].psi[m][0]>state.guns[g].psi[m][1])state.guns[g].psi[m].sort((a,b)=>a-b);save();renderGun(key);calc(key);}
+function setGunText(key,g,group,m,value){state.guns[g][group][m]=value.trim()||GUN_DEFAULTS[g][group][m];save();renderGun(key);}
+function restoreGun(key,g){state.guns[g]=clone(GUN_DEFAULTS[g]);save();renderGun(key);calc(key);}
+function resetTab(key){q(key+'-in').value='';q(key+'-warn').classList.remove('show');q(key+'-out').classList.add('hidden');}
+function init(){load();buildNav();buildPanels();Object.keys(TABS).forEach(calc);switchTab(state.tab||'ext');}
+window.addEventListener('load',init);
 </script>
 
 <script>
-/* PWA compartida: VolarisOps + Reports + ROG Paint */
 (function(){
-  if (!('serviceWorker' in navigator)) return;
-
-  window.addEventListener('load', function(){
+  if(!('serviceWorker' in navigator))return;
+  window.addEventListener('load',function(){
     navigator.serviceWorker.register('./sw.js').then(function(reg){
-      // Revisa actualizaciones cuando haya internet, sin tocar nada desde iPhone.
-      if (navigator.onLine && reg.update) {
-        reg.update().catch(function(){});
-      }
-
-      // Si llega un SW nuevo, toma control y refresca una sola vez.
-      reg.addEventListener('updatefound', function(){
-        var nw = reg.installing;
-        if (!nw) return;
-        nw.addEventListener('statechange', function(){
-          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-            nw.postMessage({type:'SKIP_WAITING'});
-          }
-        });
-      });
-    }).catch(function(err){
-      console.log('Service Worker no registrado:', err);
-    });
+      if(navigator.onLine&&reg.update){reg.update().catch(function(){});}
+      reg.addEventListener('updatefound',function(){var nw=reg.installing;if(!nw)return;nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller){nw.postMessage({type:'SKIP_WAITING'});}});});
+    }).catch(function(err){console.log('Service Worker no registrado:',err);});
   });
-
-  var refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', function(){
-    if (refreshing) return;
-    refreshing = true;
-    window.location.reload();
-  });
+  var refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(refreshing)return;refreshing=true;window.location.reload();});
 })();
 </script>
-
 </body>
 </html>
