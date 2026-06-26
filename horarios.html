@@ -1558,6 +1558,117 @@ body.admin-mode .admin-only{display:flex !important;}
   }
 }
 
+
+
+/* ═════ AJUSTE DAVID 2.6 — menú móvil más compacto + filtro real de mi horario ═════ */
+@media(max-width:430px){
+  .tabs{
+    gap:4px !important;
+    margin-bottom:6px !important;
+  }
+  .tab{
+    min-height:38px !important;
+    padding:7px 3px !important;
+    border-radius:14px !important;
+    font-size:10px !important;
+  }
+  .tab svg{
+    width:12px !important;
+    height:12px !important;
+  }
+  .controls{
+    grid-template-columns:44px 1fr 44px !important;
+    padding:5px !important;
+    margin:3px 0 7px !important;
+    border-radius:24px !important;
+  }
+  .round{
+    height:42px !important;
+    border-radius:15px !important;
+    font-size:26px !important;
+  }
+  .month-title strong{
+    font-size:17px !important;
+    line-height:1.05 !important;
+  }
+  .month-title span{
+    margin-top:2px !important;
+    font-size:10.5px !important;
+  }
+  .toolbar{
+    padding:10px !important;
+    gap:8px !important;
+    border-radius:24px !important;
+    margin-bottom:8px !important;
+  }
+  .toolbar .field span{
+    font-size:9px !important;
+    letter-spacing:.12em !important;
+    margin-bottom:0 !important;
+  }
+  .toolbar .field input,
+  .toolbar .field select{
+    min-height:42px !important;
+    padding:10px 12px !important;
+    border-radius:14px !important;
+    font-size:14px !important;
+  }
+  .toolbar-meta{
+    gap:8px !important;
+  }
+  .toggle-card{
+    min-height:58px !important;
+    padding:10px 12px !important;
+    border-radius:16px !important;
+    gap:10px !important;
+  }
+  .toggle-label{
+    font-size:13px !important;
+  }
+  .toggle-card small{
+    font-size:10.5px !important;
+    line-height:1.2 !important;
+  }
+  .slider{
+    width:56px !important;
+    height:31px !important;
+  }
+  .slider::before{
+    width:23px !important;
+    height:23px !important;
+  }
+  .switch input:checked + .slider::before{
+    transform:translateX(25px) !important;
+  }
+  #todayBtn{
+    min-height:42px !important;
+    padding:10px 12px !important;
+    border-radius:15px !important;
+  }
+  .calendar-context{
+    margin:4px 0 8px !important;
+    padding:8px 10px !important;
+    border-radius:15px !important;
+    gap:6px !important;
+  }
+  .calendar-context-copy span{
+    font-size:9px !important;
+  }
+  .calendar-context-copy strong{
+    font-size:14px !important;
+  }
+  .calendar-context-selected{
+    padding:6px 8px !important;
+    border-radius:13px !important;
+  }
+  .calendar-context-selected small{
+    font-size:9.5px !important;
+  }
+  .calendar-context-selected strong{
+    font-size:11px !important;
+  }
+}
+
 </style>
 </head>
 <body class="locked">
@@ -2216,6 +2327,7 @@ function selectedUserId() { return $("#userFilter").value; }
 function getUsersForView() {
   const mine = visibleUsers().find(u => u.id === currentProfileId()) || currentProfile;
   if (!isAdmin()) return mine ? [mine] : [];
+  if (isMyScheduleOnly()) return mine ? [mine] : [];
   const selected = selectedUserId();
   if (!selected || selected === "all") return visibleUsers();
   const target = visibleUsers().find(u => u.id === selected);
