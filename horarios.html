@@ -2239,7 +2239,7 @@ body.admin-mode .admin-only{display:flex !important;}
     <div class="auth-signature" aria-label="Firma de la app">
       <div class="signature-inner">
         <span class="signature-by">by laraclv</span>
-        <span class="signature-version">v 2.5.0</span>
+        <span class="signature-version">v 2.9.0</span>
       </div>
     </div>
   </section>
@@ -2317,7 +2317,7 @@ body.admin-mode .admin-only{display:flex !important;}
 
       <section class="dashboard-kpis" aria-label="Resumen del mes">
         <article class="kpi-card glass kpi-work"><div class="kpi-icon">✓</div><strong id="kpiWorked">0</strong><span>Trabajados</span></article>
-        <article class="kpi-card glass kpi-rest"><div class="kpi-icon">★</div><strong id="kpiRest">0</strong><span>Descansos</span></article>
+        <article class="kpi-card glass kpi-rest"><div class="kpi-icon">★</div><strong id="kpiRest">0</strong><span>Descansados</span></article>
         <article class="kpi-card glass kpi-extra"><div class="kpi-icon">◷</div><strong id="kpiExtra">0</strong><span>Extra</span></article>
         <article class="kpi-card glass kpi-vac"><div class="kpi-icon">✈</div><strong id="kpiVacation">0</strong><span>Vacaciones</span></article>
       </section>
@@ -2473,7 +2473,7 @@ body.admin-mode .admin-only{display:flex !important;}
     <footer class="app-signature" aria-label="Firma de la app">
       <div class="signature-inner">
         <span class="signature-by">by laraclv</span>
-        <span class="signature-version">v 2.5.0</span>
+        <span class="signature-version">v 2.9.0</span>
       </div>
     </footer>
   </div>
@@ -3030,10 +3030,27 @@ function vacationBalanceForUser(user, year=current.getFullYear()) {
   const available = Math.max(0, total - used);
   return { total, alreadyTaken, programmedInApp, used, available };
 }
+function countDashboardMonth(user, baseDate=current) {
+  const days = new Date(baseDate.getFullYear(), baseDate.getMonth()+1, 0).getDate();
+  const counts = Object.keys(STATUS).reduce((a,k)=>(a[k]=0,a),{});
+  for (let n=1; n<=days; n++) {
+    const date = ymd(new Date(baseDate.getFullYear(), baseDate.getMonth(), n));
+    const record = dayRecord(user, date);
+    const status = record.status;
+    if (counts[status] === undefined) counts[status] = 0;
+    counts[status]++;
+
+    // Las vacaciones también son días descansados para el KPI superior.
+    // Así, si julio tiene 14 descansos normales y capturas 3 vacaciones,
+    // el cuadro de descansados mostrará 17 y vacaciones seguirá mostrando 3.
+    if (status === "vacation") counts.rest++;
+  }
+  return counts;
+}
 function renderMainDashboard() {
   const user = getDashboardUser();
   if (!user) return;
-  const monthCounts = countUserMonth(user, current);
+  const monthCounts = countDashboardMonth(user, current);
   const balance = vacationBalanceForUser(user, current.getFullYear());
   const percent = balance.total > 0 ? Math.min(100, Math.max(0, (balance.used / balance.total) * 100)) : 0;
   const initials = String(user.name || "U").trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase();
