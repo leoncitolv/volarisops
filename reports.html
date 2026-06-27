@@ -2151,6 +2151,480 @@ body.view-historial .floating-report-actions{display:none}
   }
 }
 
+  
+/* ════════════════════════════════════════════════════════════════
+   PATCH DAVID — iOS MODO DIOS PROPORCIONAL MÓVIL 2026-06-27
+   Objetivo: más área útil, cards compactas, dock inferior limpio,
+   campos proporcionales para reportes en celular.
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  --mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ios-dock-h: 76px;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overscroll-behavior-y: contain;
+}
+
+body {
+  padding-bottom: calc(var(--ios-dock-h) + var(--mobile-safe-bottom));
+}
+
+.container {
+  width: min(100%, 900px) !important;
+}
+
+/* Hero más elegante y menos invasivo */
+.header.report-hero {
+  margin-bottom: 12px !important;
+}
+
+.hero-user-signature {
+  min-width: auto !important;
+}
+
+.hero-chip {
+  min-height: 34px;
+}
+
+/* Tabs superiores compactas tipo segmented control iOS */
+.tabs.tabs-pill {
+  top: max(8px, env(safe-area-inset-top, 0px)) !important;
+  padding: 6px !important;
+  gap: 6px !important;
+  margin-bottom: 12px !important;
+  border-radius: 24px !important;
+  background: rgba(18, 4, 39, .70) !important;
+}
+
+.tabs-pill .tab-btn {
+  min-height: 42px !important;
+  padding: 10px 12px !important;
+  border-radius: 18px !important;
+  font-size: 12px !important;
+  letter-spacing: .10em !important;
+}
+
+/* Tarjetas más proporcionales */
+.form-section,
+.aeronave-card,
+.pendientes-global-section {
+  padding: 16px !important;
+  margin-bottom: 12px !important;
+  border-radius: 22px !important;
+  background:
+    linear-gradient(160deg, rgba(64, 22, 112, .64), rgba(18, 7, 38, .88)) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.065) !important;
+}
+
+.form-section::before,
+.aeronave-card::before,
+.pendientes-global-section::before {
+  top: 18px !important;
+  bottom: 18px !important;
+  width: 3px !important;
+  opacity: .92 !important;
+}
+
+.form-title,
+.aeronave-card-title {
+  font-size: clamp(18px, 5.3vw, 22px) !important;
+  line-height: 1.12 !important;
+  margin-bottom: 14px !important;
+  letter-spacing: -.04em !important;
+}
+
+.form-group {
+  margin-bottom: 12px !important;
+}
+
+.form-label,
+.report-label {
+  font-size: 10.5px !important;
+  letter-spacing: .18em !important;
+  margin-bottom: 7px !important;
+}
+
+.input-wrapper {
+  gap: 9px !important;
+  align-items: stretch !important;
+}
+
+.input-icon,
+.input-wrapper > img[style] {
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  border-radius: 15px !important;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+  min-height: 44px !important;
+  padding: 11px 13px !important;
+  border-radius: 16px !important;
+  font-size: 16px !important;
+  line-height: 1.35 !important;
+}
+
+textarea {
+  min-height: 96px !important;
+}
+
+/* El glosario es donde trabajas: más cómodo para escribir sin crecer demasiado */
+.tech-helper-card {
+  margin: 10px 0 12px !important;
+  padding: 12px !important;
+  border-radius: 20px !important;
+  background:
+    radial-gradient(120% 160% at 0% 0%, rgba(84,213,255,.08), transparent 45%),
+    rgba(255,255,255,.04) !important;
+}
+
+.tech-helper-card textarea {
+  min-height: 112px !important;
+  max-height: 170px !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+}
+
+.tech-helper-actions {
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  margin-top: 9px !important;
+}
+
+.tech-helper-actions .btn {
+  min-height: 42px !important;
+  padding: 10px 12px !important;
+  border-radius: 16px !important;
+  font-size: 11px !important;
+  letter-spacing: .12em !important;
+}
+
+.tech-helper-note {
+  font-size: 10.5px !important;
+  line-height: 1.45 !important;
+  opacity: .82;
+}
+
+/* Botones normales dentro de modales o edición: visibles otra vez */
+.modal .button-group,
+#formEditar .button-group,
+.glossary-editor-card .button-group {
+  display: flex !important;
+}
+
+/* Dock inferior: compacto, flotante y sin tapar tanto contenido */
+.floating-report-actions {
+  position: fixed !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: calc(10px + var(--mobile-safe-bottom)) !important;
+  z-index: 250 !important;
+  display: grid !important;
+  grid-template-columns: .86fr 1.14fr !important;
+  gap: 10px !important;
+  padding: 9px !important;
+  margin: 0 !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(180deg, rgba(44, 10, 72, .86), rgba(12, 4, 29, .88)) !important;
+  border: 1px solid rgba(236, 161, 255, .18) !important;
+  box-shadow: 0 18px 48px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  backdrop-filter: blur(22px) saturate(1.35) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(1.35) !important;
+}
+
+.floating-report-actions .btn {
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 10px 12px !important;
+  border-radius: 18px !important;
+  font-size: 11px !important;
+  letter-spacing: .12em !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+.floating-report-actions .floating-secondary,
+.floating-report-actions .floating-primary {
+  flex: unset !important;
+}
+
+body.view-historial .floating-report-actions {
+  display: none !important;
+}
+
+/* Historial con jerarquía más móvil */
+.history-toolbar {
+  padding: 4px 0 8px !important;
+  margin-bottom: 10px !important;
+}
+
+.history-toolbar-intro h2 {
+  font-size: 24px !important;
+}
+
+.history-toolbar-actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+}
+
+.report-card {
+  border-radius: 22px !important;
+  padding: 15px !important;
+}
+
+.report-title {
+  font-size: 20px !important;
+}
+
+.report-actions {
+  gap: 8px !important;
+}
+
+.report-actions .btn {
+  min-height: 42px !important;
+  padding: 10px 12px !important;
+  font-size: 11px !important;
+}
+
+/* Modal y editor del glosario: caben mejor en celular */
+.modal {
+  padding: 10px !important;
+}
+
+.modal-content {
+  width: min(96vw, 660px) !important;
+  max-height: calc(100dvh - 24px) !important;
+  padding: 18px !important;
+  border-radius: 24px !important;
+}
+
+.modal-header {
+  font-size: 18px !important;
+  padding-right: 42px;
+}
+
+.glossary-editor-title {
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  flex-wrap: wrap;
+}
+
+.glossary-row {
+  grid-template-columns: 1fr !important;
+  gap: 7px !important;
+  padding: 10px !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(205,132,255,.11);
+}
+
+.glossary-row input,
+.glossary-row textarea {
+  font-size: 14px !important;
+  min-height: 42px !important;
+}
+
+.glossary-row textarea {
+  min-height: 72px !important;
+}
+
+/* Ajuste fino para pantallas como iPhone 13/14/15 y Android similares */
+@media (max-width: 560px) {
+  body {
+    padding-bottom: calc(92px + var(--mobile-safe-bottom)) !important;
+  }
+
+  body::after {
+    display: none !important;
+  }
+
+  .container {
+    padding: 8px 10px 18px !important;
+  }
+
+  .header.report-hero {
+    padding: 14px !important;
+    border-radius: 24px !important;
+  }
+
+  .hero-topline {
+    margin-bottom: 8px !important;
+  }
+
+  .signature-name {
+    font-size: clamp(40px, 13vw, 54px) !important;
+    line-height: .88 !important;
+  }
+
+  .signature-id {
+    font-size: 12px !important;
+    margin-left: 8px !important;
+  }
+
+  .hero-chip {
+    padding: 7px 10px !important;
+    font-size: 10px !important;
+  }
+
+  .hero-main {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .hero-brand-wrap {
+    gap: 10px !important;
+  }
+
+  .hero-avatar-ring {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+
+  .hero-plane-mark {
+    display: none !important;
+  }
+
+  .hero-brand {
+    font-size: 9px !important;
+    letter-spacing: .22em !important;
+    margin-bottom: 4px !important;
+  }
+
+  .header.report-hero h1 {
+    font-size: clamp(22px, 7.5vw, 32px) !important;
+    line-height: .98 !important;
+    margin-bottom: 4px !important;
+  }
+
+  .header.report-hero p {
+    font-size: 11px !important;
+    line-height: 1.32 !important;
+  }
+
+  .tabs.tabs-pill {
+    grid-template-columns: 1fr 1fr !important;
+    border-radius: 22px !important;
+  }
+
+  .tabs-pill .tab-btn {
+    min-height: 40px !important;
+    padding: 9px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .form-section,
+  .aeronave-card,
+  .pendientes-global-section {
+    padding: 14px !important;
+    border-radius: 21px !important;
+  }
+
+  .form-title,
+  .aeronave-card-title {
+    font-size: 20px !important;
+  }
+
+  .aeronave-card-header {
+    margin-bottom: 12px !important;
+  }
+
+  .aeronave-num-badge {
+    width: 27px !important;
+    height: 27px !important;
+    font-size: 12px !important;
+  }
+
+  .input-icon,
+  .input-wrapper > img[style] {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  textarea,
+  select {
+    min-height: 42px !important;
+    padding: 10px 12px !important;
+  }
+
+  .foto-upload-area {
+    padding: 13px !important;
+    border-radius: 18px !important;
+  }
+
+  .foto-upload-label span {
+    font-size: 22px !important;
+  }
+
+  .foto-thumb-wrapper,
+  .report-foto-thumb {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 16px !important;
+  }
+
+  .floating-report-actions {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: calc(8px + var(--mobile-safe-bottom)) !important;
+    padding: 8px !important;
+    border-radius: 22px !important;
+  }
+
+  .floating-report-actions .btn {
+    min-height: 46px !important;
+    font-size: 10.5px !important;
+    padding: 9px 8px !important;
+  }
+
+  .btn {
+    min-height: 42px !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .tabs-pill .tab-btn span {
+    font-size: 10px !important;
+  }
+
+  .form-title,
+  .aeronave-card-title {
+    font-size: 18px !important;
+  }
+
+  .floating-report-actions {
+    grid-template-columns: .8fr 1.2fr !important;
+    gap: 7px !important;
+  }
+
+  .floating-report-actions .btn {
+    letter-spacing: .08em !important;
+  }
+}
+
   </style>
 </head>
 <body>
