@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <link rel="manifest" href="./manifest-reports.json">
+  <link rel="manifest" href="./manifest-reports.json?v=20260627-glosario-edit-02">
   <meta name="theme-color" content="#aa22ff">
-  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png?v=20260627-glosario-edit-02">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Reportes">
@@ -2100,6 +2100,51 @@ body.view-historial .floating-report-actions{display:none}
   font-size: 11px;
   line-height: 1.45;
 }
+.glossary-editor-card {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(205,132,255,.18);
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+}
+.glossary-editor-title {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+  font-size:13px;
+  font-weight:900;
+  color:var(--accent-light);
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+.glossary-row {
+  display:grid;
+  grid-template-columns: 1.15fr 1.7fr auto;
+  gap:8px;
+  align-items:start;
+  margin-bottom:8px;
+}
+.glossary-row textarea,
+.glossary-row input {
+  min-height:44px !important;
+  font-size:13px !important;
+}
+.glossary-row textarea {
+  min-height:68px !important;
+}
+.glossary-mini-help {
+  margin:8px 0 12px;
+  color:var(--text-sub);
+  font-size:11px;
+  line-height:1.45;
+}
+@media (max-width: 640px) {
+  .glossary-row {
+    grid-template-columns: 1fr;
+  }
+}
 @media (max-width: 430px) {
   .tech-helper-actions {
     grid-template-columns: 1fr;
@@ -3454,7 +3499,7 @@ function renderAeronavesHistorial(r) {
 }
 
 function cargarReportes() {
-  const reportes = JSON.parse(localStorage.getItem('reportesTurno')) || [];
+  const reportes = (typeof safeReadReportes === 'function') ? safeReadReportes() : (JSON.parse(localStorage.getItem('reportesTurno')) || []);
   const container = document.getElementById('reportsContainer');
   if (!container) return;
   if (reportes.length === 0) {
@@ -3522,60 +3567,60 @@ function cargarReportes() {
 const REPORT_DRAFT_STORAGE_KEY = 'reportesTurno_borrador_v3';
 let reportDraftTimer = null;
 
-const AVIATION_PAINT_GLOSSARY = [
+const DEFAULT_AVIATION_PAINT_GLOSSARY = [
   {
-    term: 'Escape Slide Cover Assy / Tapa de tobogan',
-    paint: 'Paint touch-up performed on Escape Slide Cover Assy / Tapa de tobogan',
+    term: 'Escape Slide Cover Assy',
+    paint: 'Paint touch-up performed on Escape Slide Cover Assy',
     keys: ['tapa de tobogan', 'tapa tobogan', 'tobogan', 'tobogán', 'escape slide cover', 'escape slide cover assy', 'slide cover']
   },
   {
-    term: 'Entrance Door Scuff Plate / dintel',
-    paint: 'Paint touch-up performed on Entrance Door Scuff Plate / dintel',
+    term: 'Entrance Door Scuff Plate',
+    paint: 'Paint touch-up performed on Entrance Door Scuff Plate',
     keys: ['dintel', 'scuff plate', 'entrance door scuff plate', 'door scuff plate']
   },
   {
-    term: 'Toilet Shroud Assembly / poceta',
-    paint: 'Paint touch-up was performed on the Toilet Shroud Assembly / poceta',
+    term: 'Toilet Shroud Assembly',
+    paint: 'Paint touch-up was performed on the Toilet Shroud Assembly',
     keys: ['poceta', 'toilet shroud', 'toilet shroud assembly', 'shroud assembly']
   },
   {
-    term: 'Cabin Attendant Seat / asiento de sobrecargos',
-    paint: 'Paint touch-up performed on Cabin Attendant Seat / asiento de sobrecargos',
+    term: 'Cabin Attendant Seat',
+    paint: 'Paint touch-up performed on Cabin Attendant Seat',
     keys: ['asiento de sobrecargo', 'asiento de sobrecargos', 'sobrecargo', 'sobrecargos', 'cabin attendant seat', 'attendant seat']
   },
   {
-    term: 'Passenger Seat / asiento de pasajeros',
-    paint: 'Paint touch-up performed on Passenger Seat / asiento de pasajeros',
+    term: 'Passenger Seat',
+    paint: 'Paint touch-up performed on Passenger Seat',
     keys: ['asiento de pasajero', 'asiento de pasajeros', 'asientos pasajeros', 'passenger seat', 'passenger seats']
   },
   {
-    term: 'Service Cabinet / compartimiento de sanitas',
-    paint: 'Paint touch-up performed on Service Cabinet / compartimiento de sanitas',
+    term: 'Service Cabinet',
+    paint: 'Paint touch-up performed on Service Cabinet',
     keys: ['service cabinet', 'compartimiento de sanitas', 'sanitas']
   },
   {
-    term: 'Washbasin Door Assy / tapa de lavabo',
-    paint: 'Paint touch-up performed on Washbasin Door Assy / tapa de lavabo',
+    term: 'Washbasin Door Assy',
+    paint: 'Paint touch-up performed on Washbasin Door Assy',
     keys: ['washbasin door', 'washbasin door assy', 'tapa de lavabo', 'lavabo']
   },
   {
-    term: 'Table Assy-Nursing / mesa de pañalera',
-    paint: 'Paint touch-up performed on Table Assy-Nursing / mesa de pañalera',
+    term: 'Table Assy-Nursing',
+    paint: 'Paint touch-up performed on Table Assy-Nursing',
     keys: ['table assy nursing', 'table assy-nursing', 'nursing table', 'mesa de panalera', 'mesa de pañalera', 'panalera', 'pañalera']
   },
   {
-    term: 'Door Assy / puerta de baño',
-    paint: 'Paint touch-up performed on Door Assy / puerta de baño',
+    term: 'Door Assy',
+    paint: 'Paint touch-up performed on Door Assy',
     keys: ['door assy', 'puerta de bano', 'puerta de baño', 'puerta baño', 'puerta del bano', 'puerta del baño', 'lavatory door']
   },
   {
-    term: 'Overhead Bin Door/ bines',
-    paint: 'Paint touch-up performed on Overhead Bin Door/ bines',
+    term: 'Overhead Bin Door',
+    paint: 'Paint touch-up performed on Overhead Bin Door',
     keys: ['overhead bin door', 'overhead bin', 'bin door', 'bines', 'bin', 'bins']
   }
 ];
 
-const AVIATION_PLACARD_GLOSSARY = [
+const DEFAULT_AVIATION_PLACARD_GLOSSARY = [
   {
     text: 'Interphone service & ground electric placard was installed',
     keys: ['interphone service ground electric', 'interphone service and ground electric', 'interphone service ground electrical', 'interphone', 'ground electric', 'ground electrical', 'energia tierra', 'energía tierra']
@@ -3593,6 +3638,205 @@ const AVIATION_PLACARD_GLOSSARY = [
     keys: ['cargo compartment doors', 'cargo doors', 'cargo compartment', 'compuertas de carga', 'puertas de carga', 'carga']
   }
 ];
+
+const GLOSSARY_STORAGE_KEY = 'reportesTurno_glosario_editable_v1';
+
+function cloneGlossaryDefaults() {
+  return {
+    paint: DEFAULT_AVIATION_PAINT_GLOSSARY.map(item => ({
+      term: item.term,
+      paint: item.paint,
+      keys: [...item.keys]
+    })),
+    placards: DEFAULT_AVIATION_PLACARD_GLOSSARY.map(item => ({
+      text: item.text,
+      keys: [...item.keys]
+    }))
+  };
+}
+
+function stripGlossaryExampleSuffix(text='') {
+  return String(text).replace(/\s*\/\s*[^/]*$/g, '').trim();
+}
+
+function sanitizeGlossaryEntry(entry, type) {
+  const keys = Array.isArray(entry.keys)
+    ? entry.keys.map(k => String(k).trim()).filter(Boolean)
+    : String(entry.keys || '').split(',').map(k => k.trim()).filter(Boolean);
+
+  if (type === 'paint') {
+    const term = stripGlossaryExampleSuffix(entry.term || '');
+    const paint = stripGlossaryExampleSuffix(entry.paint || '');
+    if (!term || !paint || !keys.length) return null;
+    return { term, paint, keys };
+  }
+
+  const text = stripGlossaryExampleSuffix(entry.text || '');
+  if (!text || !keys.length) return null;
+  return { text, keys };
+}
+
+function loadEditableGlossary() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GLOSSARY_STORAGE_KEY) || 'null');
+    if (!saved || !Array.isArray(saved.paint) || !Array.isArray(saved.placards)) return cloneGlossaryDefaults();
+    const paint = saved.paint.map(item => sanitizeGlossaryEntry(item, 'paint')).filter(Boolean);
+    const placards = saved.placards.map(item => sanitizeGlossaryEntry(item, 'placard')).filter(Boolean);
+    return { paint, placards };
+  } catch (err) {
+    console.error('Error leyendo glosario:', err);
+    return cloneGlossaryDefaults();
+  }
+}
+
+function saveEditableGlossary(glossary) {
+  const clean = {
+    paint: (glossary.paint || []).map(item => sanitizeGlossaryEntry(item, 'paint')).filter(Boolean),
+    placards: (glossary.placards || []).map(item => sanitizeGlossaryEntry(item, 'placard')).filter(Boolean)
+  };
+  localStorage.setItem(GLOSSARY_STORAGE_KEY, JSON.stringify(clean));
+  return clean;
+}
+
+function getAviationPaintGlossary() {
+  return loadEditableGlossary().paint;
+}
+
+function getAviationPlacardGlossary() {
+  return loadEditableGlossary().placards;
+}
+
+function parseGlossaryKeys(value='') {
+  return String(value).split(',').map(v => v.trim()).filter(Boolean);
+}
+
+function ensureGlossaryModal() {
+  if (document.getElementById('modalGlosario')) return;
+  const modal = document.createElement('div');
+  modal.id = 'modalGlosario';
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width:860px;">
+      <button class="modal-close" onclick="cerrarGlosario()">✕</button>
+      <div class="modal-header">🧠 Editar glosario técnico</div>
+      <div class="glossary-mini-help">
+        En <b>palabras clave</b> escribe las formas en que tú lo dices, separadas por coma. En <b>frase final</b> escribe exactamente lo que quieres que aparezca en el reporte. No uses la parte después de “/”; eso era solo ejemplo.
+      </div>
+      <div class="glossary-editor-card">
+        <div class="glossary-editor-title">
+          <span>🎨 Pintura / retoque</span>
+          <button type="button" class="btn btn-secondary btn-small" onclick="agregarFilaGlosario('paint')">➕ Agregar pintura</button>
+        </div>
+        <div id="glossaryPaintRows"></div>
+      </div>
+      <div class="glossary-editor-card">
+        <div class="glossary-editor-title">
+          <span>🏷️ Instalación de calcomanías / placards</span>
+          <button type="button" class="btn btn-secondary btn-small" onclick="agregarFilaGlosario('placard')">➕ Agregar calcomanía</button>
+        </div>
+        <div id="glossaryPlacardRows"></div>
+      </div>
+      <div class="button-group">
+        <button type="button" class="btn btn-primary" onclick="guardarGlosarioEditable()">💾 Guardar glosario</button>
+        <button type="button" class="btn btn-secondary" onclick="restaurarGlosarioBase()">↩️ Restaurar base</button>
+        <button type="button" class="btn btn-secondary" onclick="cerrarGlosario()">Cancelar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function renderGlossaryRows() {
+  ensureGlossaryModal();
+  const glossary = loadEditableGlossary();
+  const paintContainer = document.getElementById('glossaryPaintRows');
+  const placardContainer = document.getElementById('glossaryPlacardRows');
+
+  paintContainer.innerHTML = glossary.paint.map((item, idx) => `
+    <div class="glossary-row" data-type="paint" data-index="${idx}">
+      <input type="text" class="glossary-keys" value="${escapeTechHtml(item.keys.join(', '))}" placeholder="Ej: tapa de tobogan, tobogan">
+      <textarea class="glossary-output" placeholder="Frase final">${escapeTechHtml(item.paint)}</textarea>
+      <button type="button" class="btn btn-danger btn-small" onclick="eliminarFilaGlosario('paint', ${idx})">Eliminar</button>
+    </div>`).join('');
+
+  placardContainer.innerHTML = glossary.placards.map((item, idx) => `
+    <div class="glossary-row" data-type="placard" data-index="${idx}">
+      <input type="text" class="glossary-keys" value="${escapeTechHtml(item.keys.join(', '))}" placeholder="Ej: apu fuel drain, drenado apu">
+      <textarea class="glossary-output" placeholder="Frase final">${escapeTechHtml(item.text)}</textarea>
+      <button type="button" class="btn btn-danger btn-small" onclick="eliminarFilaGlosario('placard', ${idx})">Eliminar</button>
+    </div>`).join('');
+}
+
+function abrirGlosario() {
+  renderGlossaryRows();
+  document.getElementById('modalGlosario')?.classList.add('active');
+}
+
+function cerrarGlosario() {
+  document.getElementById('modalGlosario')?.classList.remove('active');
+}
+
+function leerGlosarioDesdeModal() {
+  const paint = [...document.querySelectorAll('#glossaryPaintRows .glossary-row')].map(row => {
+    const keys = parseGlossaryKeys(row.querySelector('.glossary-keys')?.value || '');
+    const paint = stripGlossaryExampleSuffix(row.querySelector('.glossary-output')?.value || '');
+    const term = paint
+      .replace(/^Paint touch[- ]?up (was )?performed on( the)?\s*/i, '')
+      .replace(/^Rework was performed on( the)?\s*/i, '')
+      .trim() || paint;
+    return sanitizeGlossaryEntry({ term, paint, keys }, 'paint');
+  }).filter(Boolean);
+
+  const placards = [...document.querySelectorAll('#glossaryPlacardRows .glossary-row')].map(row => {
+    const keys = parseGlossaryKeys(row.querySelector('.glossary-keys')?.value || '');
+    const text = stripGlossaryExampleSuffix(row.querySelector('.glossary-output')?.value || '');
+    return sanitizeGlossaryEntry({ text, keys }, 'placard');
+  }).filter(Boolean);
+
+  return { paint, placards };
+}
+
+function guardarGlosarioEditable() {
+  const glossary = leerGlosarioDesdeModal();
+  if (!glossary.paint.length && !glossary.placards.length) {
+    mostrarToast('⚠️ Deja al menos una frase en el glosario', 'error');
+    return;
+  }
+  saveEditableGlossary(glossary);
+  renderGlossaryRows();
+  mostrarToast('✅ Glosario actualizado', 'success');
+}
+
+function agregarFilaGlosario(type) {
+  const glossary = leerGlosarioDesdeModal();
+  if (type === 'paint') {
+    glossary.paint.push({
+      term: 'Nuevo apartado',
+      paint: 'Paint touch-up performed on New Area',
+      keys: ['nuevo apartado']
+    });
+  } else {
+    glossary.placards.push({
+      text: 'New placard was installed',
+      keys: ['new placard']
+    });
+  }
+  saveEditableGlossary(glossary);
+  renderGlossaryRows();
+}
+
+function eliminarFilaGlosario(type, index) {
+  const glossary = leerGlosarioDesdeModal();
+  if (type === 'paint') glossary.paint.splice(index, 1);
+  else glossary.placards.splice(index, 1);
+  saveEditableGlossary(glossary);
+  renderGlossaryRows();
+}
+
+function restaurarGlosarioBase() {
+  localStorage.removeItem(GLOSSARY_STORAGE_KEY);
+  renderGlossaryRows();
+  mostrarToast('↩️ Glosario base restaurado', 'success');
+}
 
 function escapeTechHtml(value='') {
   return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
@@ -3632,14 +3876,14 @@ function uniqueByText(items, field='text') {
 
 function detectPaintItems(normalizedText) {
   return uniqueByText(
-    AVIATION_PAINT_GLOSSARY.filter(item => item.keys.some(key => normalizedText.includes(techNormalize(key)))),
+    getAviationPaintGlossary().filter(item => item.keys.some(key => normalizedText.includes(techNormalize(key)))),
     'paint'
   );
 }
 
 function detectPlacards(normalizedText) {
   return uniqueByText(
-    AVIATION_PLACARD_GLOSSARY.filter(item => item.keys.some(key => normalizedText.includes(techNormalize(key)))),
+    getAviationPlacardGlossary().filter(item => item.keys.some(key => normalizedText.includes(techNormalize(key)))),
     'text'
   );
 }
@@ -3650,7 +3894,7 @@ function improveTechnicalLine(line='') {
 
   const n = techNormalize(original);
   if (/^paint touch[- ]?up/i.test(original) || /placard was installed\.?$/i.test(original)) {
-    return original.replace(/\.$/, '');
+    return stripGlossaryExampleSuffix(original.replace(/\.$/, ''));
   }
 
   const placards = detectPlacards(n);
@@ -3682,7 +3926,7 @@ function improveTechnicalLine(line='') {
 function mejorarTextoTecnico(texto='') {
   const improvedLines = splitTechnicalInput(texto)
     .flatMap(line => improveTechnicalLine(line).split('\n'))
-    .map(line => cleanActivityLine(line))
+    .map(line => stripGlossaryExampleSuffix(cleanActivityLine(line)))
     .filter(Boolean);
   return improvedLines.map(line => `🔹 ${line}`).join('\n');
 }
@@ -3774,7 +4018,8 @@ function renderTechHelperBlock(id, editMode=false) {
         <button type="button" class="btn btn-secondary btn-small" onclick="${rewriteFn}">Reescribir actividades</button>
       </div>
       <button type="button" class="btn btn-secondary btn-small" style="width:100%; justify-content:center; margin-top:8px;" onclick="${exampleFn}">Cargar ejemplo</button>
-      <div class="tech-helper-note">Ejemplo: “se pinto tapa de tobogan” → “Paint touch-up performed on Escape Slide Cover Assy / Tapa de tobogan”.</div>
+      <button type="button" class="btn btn-secondary btn-small" style="width:100%; justify-content:center; margin-top:8px;" onclick="abrirGlosario()">🧠 Editar glosario</button>
+      <div class="tech-helper-note">Ejemplo: “se pinto tapa de tobogan” → “Paint touch-up performed on Escape Slide Cover Assy”. Usa “Editar glosario” para agregar o corregir frases.</div>
     </div>`;
 }
 
@@ -4183,7 +4428,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let reloadedByUpdate = false;
 
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js").then(function (registration) {
+    navigator.serviceWorker.register("./sw.js?v=20260627-glosario-edit-02").then(function (registration) {
       if (registration.waiting) {
         registration.waiting.postMessage({ type: "SKIP_WAITING" });
       }

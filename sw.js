@@ -1,6 +1,6 @@
 // Service Worker actualizado para Reportes
 // Cambia esta versión cada vez que subas cambios importantes.
-const CACHE_NAME = 'reportes-v2026-06-27-glosario-fix-01';
+const CACHE_NAME = 'reportes-v2026-06-27-glosario-edit-02';
 const APP_SHELL = [
   './',
   './reports.html',
