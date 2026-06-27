@@ -2166,6 +2166,36 @@ body.admin-mode .admin-only{display:flex !important;}
   }
 }
 
+
+/* ═════ AJUSTE DAVID 2.8 — vacaciones reales + colores KPI ═════
+   Trabajo se muestra en rojo y descanso en verde, igual que la tabla.
+   El saldo de vacaciones permite capturar total y días ya tomados. */
+.kpi-work strong,
+.kpi-work .kpi-icon{
+  color:var(--status-work) !important;
+}
+.kpi-rest strong,
+.kpi-rest .kpi-icon{
+  color:var(--status-rest) !important;
+}
+.vacation-settings{
+  grid-template-columns:repeat(2,minmax(0,1fr)) auto !important;
+}
+@media(max-width:560px){
+  .vacation-settings{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  .vacation-settings button{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+  }
+}
+@media(max-width:360px){
+  .vacation-settings{
+    grid-template-columns:1fr !important;
+  }
+}
+
 </style>
 </head>
 <body class="locked">
@@ -2266,7 +2296,7 @@ body.admin-mode .admin-only{display:flex !important;}
         <div class="vacation-title">
           <div>
             <h2>Vacaciones disponibles</h2>
-            <p>Progreso anual calculado para tu usuario autenticado.</p>
+            <p>Progreso anual calculado con tu saldo actual y vacaciones programadas.</p>
           </div>
           <div class="vacation-available"><strong id="vacationAvailable">0</strong>días restantes</div>
         </div>
@@ -2278,8 +2308,9 @@ body.admin-mode .admin-only{display:flex !important;}
           <div class="vacation-metric"><span>Usados</span><strong id="vacationUsed">0</strong></div>
           <div class="vacation-metric"><span>Este mes</span><strong id="vacationMonth">0</strong></div>
         </div>
-        <form id="vacationDaysForm" class="vacation-settings" aria-label="Configurar días de vacaciones">
-          <label class="field"><span>Días totales de vacaciones</span><input id="vacationDaysInput" type="number" min="0" max="365" step="1" inputmode="numeric" /></label>
+        <form id="vacationDaysForm" class="vacation-settings" aria-label="Configurar saldo de vacaciones">
+          <label class="field"><span>Días totales</span><input id="vacationDaysInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 25" /></label>
+          <label class="field"><span>Días ya tomados</span><input id="vacationUsedInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 13" /></label>
           <button class="soft" type="submit">Guardar</button>
         </form>
       </article>
@@ -2411,6 +2442,7 @@ body.admin-mode .admin-only{display:flex !important;}
             <label class="field"><span>Color</span><input id="userColor" type="color" value="#8b2fc9" /></label>
             <label class="field"><span>Rol</span><select id="accessRole"><option value="user">Embajador</option><option value="admin">Supervisor</option></select></label>
             <label class="field"><span>Días vacaciones</span><input id="userVacationDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="15" required /></label>
+            <label class="field"><span>Días ya tomados</span><input id="userVacationUsedDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="0" required /></label>
             <label class="field"><span>PIN inicial</span><input id="userPin" type="password" minlength="4" inputmode="numeric" placeholder="Mín. 4" required /></label>
             <button class="primary" type="submit">Agregar</button>
           </form>
@@ -2977,33 +3009,58 @@ function countUserYearVacation(user, year=current.getFullYear()) {
   }
   return used;
 }
+function safeDays(value, fallback=0) {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;
+}
+function clampDays(value, min=0, max=365) {
+  return Math.max(min, Math.min(max, safeDays(value, min)));
+}
+function vacationTotalForUser(user) {
+  return clampDays(user?.vacationTotalDays ?? user?.vacationTotal ?? 15, 0, 365);
+}
+function vacationTakenForUser(user) {
+  return clampDays(user?.vacationUsedDays ?? user?.vacationTakenDays ?? user?.vacationUsedPrevious ?? 0, 0, 365);
+}
+function vacationBalanceForUser(user, year=current.getFullYear()) {
+  const total = vacationTotalForUser(user);
+  const alreadyTaken = Math.min(total, vacationTakenForUser(user));
+  const programmedInApp = countUserYearVacation(user, year);
+  const used = Math.min(total, alreadyTaken + programmedInApp);
+  const available = Math.max(0, total - used);
+  return { total, alreadyTaken, programmedInApp, used, available };
+}
 function renderMainDashboard() {
   const user = getDashboardUser();
   if (!user) return;
   const monthCounts = countUserMonth(user, current);
-  const total = Number(user.vacationTotalDays ?? user.vacationTotal ?? 15) || 15;
-  const usedYear = Math.min(total, countUserYearVacation(user, current.getFullYear()));
-  const available = Math.max(0, total - usedYear);
-  const percent = total > 0 ? Math.min(100, Math.max(0, (usedYear / total) * 100)) : 0;
+  const balance = vacationBalanceForUser(user, current.getFullYear());
+  const percent = balance.total > 0 ? Math.min(100, Math.max(0, (balance.used / balance.total) * 100)) : 0;
   const initials = String(user.name || "U").trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase();
   const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
   setText("dashboardName", user.name || "Usuario");
   setText("dashboardEmployee", user.employeeId || "—");
   setText("dashboardRole", roleLabel(user.accessRole));
   setText("dashboardAvatar", initials || "✈");
-  setText("vacationAvailable", available);
-  setText("vacationTotal", total);
-  setText("vacationUsed", usedYear);
+  setText("vacationAvailable", balance.available);
+  setText("vacationTotal", balance.total);
+  setText("vacationUsed", balance.used);
   setText("vacationMonth", monthCounts.vacation || 0);
   setText("kpiWorked", monthCounts.work || 0);
   setText("kpiRest", monthCounts.rest || 0);
   setText("kpiExtra", monthCounts.overtime || 0);
   setText("kpiVacation", monthCounts.vacation || 0);
-  const input = document.getElementById("vacationDaysInput");
+  const totalInput = document.getElementById("vacationDaysInput");
+  const usedInput = document.getElementById("vacationUsedInput");
   const form = document.getElementById("vacationDaysForm");
-  if (input) {
-    input.value = total;
-    input.disabled = !canEditUser(user.id);
+  if (totalInput) {
+    totalInput.value = balance.total;
+    totalInput.disabled = !canEditUser(user.id);
+  }
+  if (usedInput) {
+    usedInput.value = balance.alreadyTaken;
+    usedInput.disabled = !canEditUser(user.id);
+    usedInput.max = String(balance.total);
   }
   if (form) form.dataset.userId = user.id;
   const fill = document.getElementById("vacationProgressFill");
@@ -3104,7 +3161,7 @@ function renderUsers() {
           <div class="avatar" style="background:${u.color || "#8b2fc9"}">${escapeHtml((u.name||"U")[0])}</div>
           <div>
             <h3>${escapeHtml(u.name)} <span class="role-pill">${roleLabel(u.accessRole)}</span></h3>
-            <p>No. ${escapeHtml(u.employeeId || "—")} · ${escapeHtml(u.area || "Sin área")} · Base ${u.baseDate || "—"} · Vacaciones ${Number(u.vacationTotalDays ?? 15)}</p>
+            <p>No. ${escapeHtml(u.employeeId || "—")} · ${escapeHtml(u.area || "Sin área")} · Base ${u.baseDate || "—"} · Vacaciones ${vacationTotalForUser(u)} · Tomados ${vacationTakenForUser(u)}</p>
           </div>
         </div>
       </div>
@@ -3145,13 +3202,14 @@ async function employeeExists(employeeId) {
   // ya no deben impedir volver a crear el mismo número de empleado.
   return profiles.some(p => p.active !== false);
 }
-async function createStaff({ employeeId, name, area, baseDate, color, accessRole, pin, vacationTotalDays=15 }) {
+async function createStaff({ employeeId, name, area, baseDate, color, accessRole, pin, vacationTotalDays=15, vacationUsedDays=0 }) {
   if (!canManageUsers()) throw new Error("Solo supervisores pueden agregar personal.");
   const clean = normalizeEmployee(employeeId);
   if (!clean || !name || !pin) throw new Error("Completa número de empleado, nombre y PIN.");
   if (pin.length < 4) throw new Error("El PIN debe tener mínimo 4 caracteres.");
   if (clean === normalizeEmployee(APP_CONFIG.OWNER_EMPLOYEE_ID) && !isOwner()) throw new Error("Solo el propietario puede administrar su propio número.");
-  const vacationDays = Math.max(0, Number(vacationTotalDays) || 0);
+  const vacationDays = clampDays(vacationTotalDays, 0, 365);
+  const vacationUsed = Math.min(vacationDays, clampDays(vacationUsedDays, 0, 365));
 
   const previousProfiles = await findEmployeeProfiles(clean);
   if (previousProfiles.some(p => p.active !== false)) throw new Error("Ese número de empleado ya existe activo.");
@@ -3184,6 +3242,7 @@ async function createStaff({ employeeId, name, area, baseDate, color, accessRole
       color,
       accessRole: accessRole === "admin" ? "admin" : "user",
       vacationTotalDays: vacationDays,
+      vacationUsedDays: vacationUsed,
       active: true,
       protected: false,
       createdBy: currentUser.uid,
@@ -3235,7 +3294,11 @@ async function editUserProfile(userId) {
 
   const vacationTotalDays = prompt("Días totales de vacaciones:", String(target.vacationTotalDays ?? 15));
   if (vacationTotalDays === null) return;
-  const cleanVacationTotalDays = Math.max(0, Number(vacationTotalDays) || 0);
+  const cleanVacationTotalDays = clampDays(vacationTotalDays, 0, 365);
+
+  const vacationUsedDays = prompt("Días ya tomados / usados antes de cargarlos en la app:", String(target.vacationUsedDays ?? 0));
+  if (vacationUsedDays === null) return;
+  const cleanVacationUsedDays = Math.min(cleanVacationTotalDays, clampDays(vacationUsedDays, 0, 365));
 
   const updates = {
     name: cleanName,
@@ -3243,6 +3306,7 @@ async function editUserProfile(userId) {
     baseDate: cleanBaseDate,
     color: cleanColor,
     vacationTotalDays: cleanVacationTotalDays,
+    vacationUsedDays: cleanVacationUsedDays,
     updatedAt: serverTimestamp(),
     updatedBy: currentUser.uid
   };
@@ -3382,8 +3446,14 @@ $("#vacationDaysForm")?.addEventListener("submit", async e=>{
   e.preventDefault();
   const userId = e.currentTarget.dataset.userId || currentProfileId();
   if (!canEditUser(userId)) { alert("No tienes permiso para modificar esos días de vacaciones."); return; }
-  const value = Math.max(0, Number($("#vacationDaysInput").value) || 0);
-  await updateDoc(doc(db,"profiles",userId), { vacationTotalDays:value, updatedAt: serverTimestamp(), updatedBy: currentUser.uid });
+  const totalValue = clampDays($("#vacationDaysInput").value, 0, 365);
+  const usedValue = Math.min(totalValue, clampDays($("#vacationUsedInput").value, 0, 365));
+  await updateDoc(doc(db,"profiles",userId), {
+    vacationTotalDays: totalValue,
+    vacationUsedDays: usedValue,
+    updatedAt: serverTimestamp(),
+    updatedBy: currentUser.uid
+  });
 });
 
 $("#userForm").addEventListener("submit",async e=>{
@@ -3399,9 +3469,10 @@ $("#userForm").addEventListener("submit",async e=>{
       color: $("#userColor").value,
       accessRole: $("#accessRole").value,
       pin: $("#userPin").value,
-      vacationTotalDays: Number($("#userVacationDays").value || 15)
+      vacationTotalDays: Number($("#userVacationDays").value || 15),
+      vacationUsedDays: Number($("#userVacationUsedDays").value || 0)
     });
-    e.target.reset(); $("#baseDate").value=ymd(new Date()); $("#userColor").value="#8b2fc9"; $("#userVacationDays").value="15";
+    e.target.reset(); $("#baseDate").value=ymd(new Date()); $("#userColor").value="#8b2fc9"; $("#userVacationDays").value="15"; $("#userVacationUsedDays").value="0";
   } catch(err) { alert(err.message || "No se pudo agregar el usuario."); console.warn(err); }
   finally { setBusy(btn,false); }
 });
