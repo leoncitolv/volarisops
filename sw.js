@@ -1,6 +1,6 @@
 // Service Worker actualizado para Reportes
 // Cambia esta versión cada vez que subas cambios importantes.
-const CACHE_NAME = 'reportes-v2026-06-27-ios-god-mobile-01';
+const CACHE_NAME = 'reportes-v2026-06-27-actividad-mobile-01';
 const APP_SHELL = [
   './',
   './reports.html',

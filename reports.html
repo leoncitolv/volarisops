@@ -2625,6 +2625,184 @@ body.view-historial .floating-report-actions {
   }
 }
 
+
+/* ════════════════════════════════════════════════════════════════
+   PATCH DAVID — ACTIVIDADES REALIZADAS PRO MOBILE 2026-06-27
+   Área principal del reporte: más legible, cómoda y sin cortes.
+   ════════════════════════════════════════════════════════════════ */
+.activity-main-textarea,
+textarea[id^="act-"],
+textarea[id^="edit-act-"] {
+  width: 100% !important;
+  min-height: 188px !important;
+  max-height: 42dvh !important;
+  resize: vertical !important;
+  overflow-y: auto !important;
+  display: block !important;
+  padding: 18px 17px 18px 18px !important;
+  border-radius: 22px !important;
+  border: 1.8px solid rgba(104, 219, 255, .34) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035)),
+    radial-gradient(115% 95% at 0% 0%, rgba(84,213,255,.11), transparent 48%),
+    rgba(18, 7, 36, .92) !important;
+  color: #fffaff !important;
+  -webkit-text-fill-color: #fffaff !important;
+  caret-color: #6ef7ff !important;
+  font-size: 17px !important;
+  line-height: 1.62 !important;
+  font-weight: 850 !important;
+  letter-spacing: .006em !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.035) inset,
+    0 12px 30px rgba(0,0,0,.24),
+    0 0 26px rgba(84,213,255,.08) !important;
+  white-space: pre-wrap !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: manipulation !important;
+}
+
+.activity-main-textarea::placeholder,
+textarea[id^="act-"]::placeholder,
+textarea[id^="edit-act-"]::placeholder {
+  color: rgba(238, 225, 255, .52) !important;
+  -webkit-text-fill-color: rgba(238, 225, 255, .52) !important;
+  font-weight: 800 !important;
+  line-height: 1.55 !important;
+}
+
+.activity-main-textarea:focus,
+textarea[id^="act-"]:focus,
+textarea[id^="edit-act-"]:focus {
+  min-height: 215px !important;
+  border-color: rgba(110, 247, 255, .72) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.095), rgba(255,255,255,.05)),
+    radial-gradient(110% 90% at 0% 0%, rgba(84,213,255,.17), transparent 50%),
+    rgba(16, 6, 34, .96) !important;
+  box-shadow:
+    0 0 0 4px rgba(84,213,255,.13),
+    0 0 0 1px rgba(255,255,255,.06) inset,
+    0 18px 42px rgba(0,0,0,.32),
+    0 0 34px rgba(84,213,255,.16) !important;
+}
+
+.aeronave-card .form-group:has(.activity-main-textarea),
+.aeronave-card .form-group:has(textarea[id^="act-"]),
+.aeronave-card .form-group:has(textarea[id^="edit-act-"]) {
+  margin-top: 16px !important;
+  padding: 13px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(104, 219, 255, .15) !important;
+  background: rgba(84, 213, 255, .035) !important;
+}
+
+.aeronave-card .form-group:has(.activity-main-textarea) .form-label,
+.aeronave-card .form-group:has(textarea[id^="act-"]) .form-label,
+.aeronave-card .form-group:has(textarea[id^="edit-act-"]) .form-label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  color: rgba(235, 247, 255, .88) !important;
+  font-size: 11px !important;
+  letter-spacing: .16em !important;
+}
+
+.aeronave-card .form-group:has(.activity-main-textarea) .form-label::after,
+.aeronave-card .form-group:has(textarea[id^="act-"]) .form-label::after,
+.aeronave-card .form-group:has(textarea[id^="edit-act-"]) .form-label::after {
+  content: 'SE GUARDA EN EL REPORTE';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(72, 240, 182, .13);
+  border: 1px solid rgba(72, 240, 182, .22);
+  color: #6ef7ad;
+  font-size: 8.5px;
+  line-height: 1;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+.activity-main-textarea::-webkit-scrollbar,
+textarea[id^="act-"]::-webkit-scrollbar,
+textarea[id^="edit-act-"]::-webkit-scrollbar {
+  width: 7px;
+}
+
+.activity-main-textarea::-webkit-scrollbar-track,
+textarea[id^="act-"]::-webkit-scrollbar-track,
+textarea[id^="edit-act-"]::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.035);
+  border-radius: 999px;
+}
+
+.activity-main-textarea::-webkit-scrollbar-thumb,
+textarea[id^="act-"]::-webkit-scrollbar-thumb,
+textarea[id^="edit-act-"]::-webkit-scrollbar-thumb {
+  background: rgba(110,247,255,.38);
+  border-radius: 999px;
+}
+
+@media (max-width: 560px) {
+  .aeronave-card .form-group:has(.activity-main-textarea),
+  .aeronave-card .form-group:has(textarea[id^="act-"]),
+  .aeronave-card .form-group:has(textarea[id^="edit-act-"]) {
+    margin-left: -2px !important;
+    margin-right: -2px !important;
+    padding: 11px !important;
+    border-radius: 22px !important;
+  }
+
+  .activity-main-textarea,
+  textarea[id^="act-"],
+  textarea[id^="edit-act-"] {
+    min-height: 205px !important;
+    max-height: 46dvh !important;
+    padding: 17px 15px !important;
+    border-radius: 21px !important;
+    font-size: 17px !important;
+    line-height: 1.68 !important;
+    letter-spacing: .002em !important;
+  }
+
+  .activity-main-textarea:focus,
+  textarea[id^="act-"]:focus,
+  textarea[id^="edit-act-"]:focus {
+    min-height: 245px !important;
+  }
+
+  .aeronave-card .form-group:has(.activity-main-textarea) .form-label,
+  .aeronave-card .form-group:has(textarea[id^="act-"]) .form-label,
+  .aeronave-card .form-group:has(textarea[id^="edit-act-"]) .form-label {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    line-height: 1.35 !important;
+  }
+
+  .aeronave-card .form-group:has(.activity-main-textarea) .form-label::after,
+  .aeronave-card .form-group:has(textarea[id^="act-"]) .form-label::after,
+  .aeronave-card .form-group:has(textarea[id^="edit-act-"]) .form-label::after {
+    font-size: 8px !important;
+    margin-top: 2px;
+  }
+}
+
+@media (max-width: 390px) {
+  .activity-main-textarea,
+  textarea[id^="act-"],
+  textarea[id^="edit-act-"] {
+    min-height: 215px !important;
+    font-size: 16.5px !important;
+    line-height: 1.66 !important;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -2949,7 +3127,7 @@ body.view-historial .floating-report-actions {
         </div>
         <div class="form-group">
           <label class="form-label">✨ Actividades Realizadas</label>
-          <textarea id="act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
+          <textarea class="activity-main-textarea" id="act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
             oninput="syncAeronaveField(${id},'actividades',this.value)" required>${datos?.actividades || ''}</textarea>
         </div>
         <div class="form-group">
@@ -3581,7 +3759,7 @@ Esta acción eliminará la nota guardada en este celular y no se puede deshacer.
         </div>
         <div class="form-group">
           <label class="form-label">✨ Actividades Realizadas</label>
-          <textarea id="edit-act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
+          <textarea class="activity-main-textarea" id="edit-act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
             oninput="editSyncField(${id},'actividades',this.value)">${obj.actividades}</textarea>
         </div>
         <div class="form-group">
@@ -4509,6 +4687,34 @@ function handleActivityEnter(textarea, afterChange) {
   });
 }
 
+function ajustarAreaActividades(textarea) {
+  if (!textarea) return;
+  textarea.classList.add('activity-main-textarea');
+  const viewportH = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+  const isMobile = window.matchMedia('(max-width: 560px)').matches;
+  const minH = isMobile ? 205 : 188;
+  const maxH = Math.max(isMobile ? 260 : 240, Math.floor(viewportH * (isMobile ? 0.46 : 0.42)));
+  textarea.style.height = 'auto';
+  const nextH = Math.min(Math.max(textarea.scrollHeight + 4, minH), maxH);
+  textarea.style.height = nextH + 'px';
+  textarea.style.overflowY = textarea.scrollHeight > maxH ? 'auto' : 'hidden';
+}
+
+function prepararAreaActividades(textarea) {
+  if (!textarea || textarea.dataset.activityReady === '1') return;
+  textarea.dataset.activityReady = '1';
+  ajustarAreaActividades(textarea);
+  textarea.addEventListener('input', () => ajustarAreaActividades(textarea));
+  textarea.addEventListener('focus', () => {
+    ajustarAreaActividades(textarea);
+    setTimeout(() => {
+      textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 260);
+  });
+  window.addEventListener('resize', () => ajustarAreaActividades(textarea), { passive: true });
+}
+
+
 function syncAeronaveField(id, field, value) {
   const obj = aeronavesData.find(a => a.id === id);
   if (obj) obj[field] = value;
@@ -4545,7 +4751,7 @@ function agregarAeronave(datos = null) {
     ${renderTechHelperBlock(id, false)}
     <div class="form-group">
       <label class="form-label">✨ Actividades Realizadas <span style="opacity:.65;text-transform:none;letter-spacing:0;">(opcional si solo es pendiente/nota)</span></label>
-      <textarea id="act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
+      <textarea class="activity-main-textarea" id="act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
         oninput="syncAeronaveField(${id},'actividades',this.value)">${escapeTechHtml(obj.actividades)}</textarea>
     </div>
     <div class="form-group">
@@ -4560,6 +4766,7 @@ function agregarAeronave(datos = null) {
 
   const ta = document.getElementById(`act-${id}`);
   handleActivityEnter(ta, (value) => syncAeronaveField(id, 'actividades', value));
+  prepararAreaActividades(ta);
 
   if (obj.fotos?.length) {
     const preview = document.getElementById(`preview-${id}`);
@@ -4700,7 +4907,7 @@ function editAgregarAeronave(datos = null) {
     ${renderTechHelperBlock(id, true)}
     <div class="form-group">
       <label class="form-label">✨ Actividades Realizadas <span style="opacity:.65;text-transform:none;letter-spacing:0;">(opcional)</span></label>
-      <textarea id="edit-act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹" oninput="editSyncField(${id},'actividades',this.value)">${escapeTechHtml(obj.actividades)}</textarea>
+      <textarea class="activity-main-textarea" id="edit-act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹" oninput="editSyncField(${id},'actividades',this.value)">${escapeTechHtml(obj.actividades)}</textarea>
     </div>
     <div class="form-group">
       <label class="form-label">📷 Fotos de Actividades</label>
@@ -4721,6 +4928,7 @@ function editAgregarAeronave(datos = null) {
 
   const ta = document.getElementById(`edit-act-${id}`);
   handleActivityEnter(ta, (value) => editSyncField(id, 'actividades', value));
+  prepararAreaActividades(ta);
   editActualizarNumeralesYBotones();
 }
 
@@ -4902,7 +5110,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let reloadedByUpdate = false;
 
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js?v=20260627-glosario-edit-02").then(function (registration) {
+    navigator.serviceWorker.register("./sw.js?v=20260627-actividad-mobile-01").then(function (registration) {
       if (registration.waiting) {
         registration.waiting.postMessage({ type: "SKIP_WAITING" });
       }
