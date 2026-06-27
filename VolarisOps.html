@@ -217,16 +217,22 @@ html,body{background:var(--bg-body);color:var(--text-main);transition:background
 .notas-vacio{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;padding:2.5rem 2rem;text-align:center;}
 .notas-vacio .vacio-icon{font-size:2.5rem;opacity:.3;}
 .notas-vacio p{color:#9977cc;font-weight:700;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;opacity:.4;}
-.btn-admin-act{padding:.24rem .5rem;border:none;border-radius:99px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.63rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;transition:transform .1s;}
-.btn-admin-act:active{transform:scale(.91);}
-.btn-admin-act.undo{background:rgba(80,180,80,.15);color:#88ee88;border:1px solid rgba(80,180,80,.22);}
-.btn-admin-act.del{background:rgba(200,34,68,.18);color:#ff7799;border:1px solid rgba(200,34,68,.25);}
-.btn-historial{display:flex;align-items:center;gap:.3rem;padding:.22rem .55rem;border:none;border-radius:99px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.6rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:rgba(100,60,200,.12);color:rgba(180,130,255,.6);border:1px solid rgba(180,100,255,.15);transition:background .15s;}
-.btn-historial:active{background:rgba(100,60,200,.25);}
-.btn-admin-act.copy{background:rgba(85,200,170,.14);color:#55eecc;border:1px solid rgba(85,200,170,.25);}
-.btn-admin-act.copy:active{background:rgba(85,200,170,.28);}
-.btn-admin-act.report{background:rgba(255,170,60,.14);color:#ffbb55;border:1px solid rgba(255,170,60,.25);}
-.btn-admin-act.report:active{background:rgba(255,170,60,.28);}
+.btn-admin-act,.btn-historial{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:.38rem;min-width:2.5rem;height:2.5rem;padding:0 .78rem;border:none;border-radius:14px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:900;letter-spacing:.03em;color:#f4eeff;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid rgba(220,180,255,.16);box-shadow:0 10px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.10);backdrop-filter:blur(14px) saturate(1.15);-webkit-backdrop-filter:blur(14px) saturate(1.15);transition:transform .16s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, filter .18s ease;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.btn-admin-act::before,.btn-historial::before{content:'';position:absolute;inset:0;background:linear-gradient(140deg,rgba(255,255,255,.14),transparent 45%,transparent 60%,rgba(255,255,255,.05));opacity:.7;pointer-events:none;}
+.btn-admin-act:hover,.btn-historial:hover{transform:translateY(-1px);box-shadow:0 14px 28px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.14);filter:saturate(1.08);}
+.btn-admin-act:active,.btn-historial:active{transform:scale(.93);}
+.btn-admin-act .act-ic,.btn-historial .act-ic{position:relative;z-index:1;width:1.08rem;height:1.08rem;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.btn-admin-act .act-ic svg,.btn-historial .act-ic svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;}
+.btn-admin-act .action-count,.btn-historial .action-count{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;min-width:1.25rem;height:1.25rem;padding:0 .38rem;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);font-size:.68rem;line-height:1;color:inherit;}
+.btn-admin-act.icon-only{width:2.5rem;min-width:2.5rem;padding:0;}
+.btn-admin-act.edit{color:#93d8ff;background:linear-gradient(180deg,rgba(85,170,255,.19),rgba(85,170,255,.08));border-color:rgba(120,195,255,.24);}
+.btn-admin-act.del{color:#ff86ad;background:linear-gradient(180deg,rgba(200,34,68,.24),rgba(200,34,68,.10));border:1px solid rgba(255,130,170,.22);}
+.btn-admin-act.undo{color:#9ef2b0;background:linear-gradient(180deg,rgba(80,180,80,.24),rgba(80,180,80,.10));border:1px solid rgba(80,220,120,.24);}
+.btn-admin-act.copy{color:#72f0d0;background:linear-gradient(180deg,rgba(85,200,170,.22),rgba(85,200,170,.08));border:1px solid rgba(110,230,195,.22);}
+.btn-admin-act.report{color:#ffc57a;background:linear-gradient(180deg,rgba(255,170,60,.25),rgba(255,170,60,.10));border:1px solid rgba(255,190,110,.24);}
+.btn-historial{color:#c7a2ff;background:linear-gradient(180deg,rgba(123,82,255,.24),rgba(123,82,255,.10));border:1px solid rgba(188,145,255,.24);padding:0 .72rem 0 .62rem;}
+.btn-historial .action-count{background:rgba(255,255,255,.12);}
+@media (max-width: 540px){.btn-admin-act,.btn-historial{min-width:2.28rem;height:2.28rem;border-radius:13px;padding:0 .68rem;}.btn-admin-act.icon-only{width:2.28rem;min-width:2.28rem;}.btn-admin-act .act-ic,.btn-historial .act-ic{width:1rem;height:1rem;}.btn-admin-act .action-count,.btn-historial .action-count{min-width:1.15rem;height:1.15rem;font-size:.64rem;}}
 
 /* ─── TOAST ─── */
 #appToast{
@@ -2508,6 +2514,23 @@ async function fbUpdateEntry(mat,entryId,fields){ await update(ref(db,'volaris_n
 async function fbUpdateMat(mat,fields){ await update(ref(db,'volaris_notas/'+matKey(mat)),fields); }
 function getEntries(md){ const e=md.entries||{}; if(Array.isArray(e)){const o={};e.forEach(en=>{if(en?.id)o[en.id]=en;});return o;} return e; }
 function findMatKey(nombre){ return Object.keys(globalData).find(k=>globalData[k]?.nombre===nombre||k===matKey(nombre))||matKey(nombre); }
+function getMatMeta(nombre){
+  if(!nombre)return null;
+  const k=findMatKey(nombre.trim().toUpperCase());
+  const md=globalData[k];
+  return md&&!md.deleted?{key:k,modelo:md.modelo||'',variante:md.variante||'',nombre:md.nombre||nombre.trim().toUpperCase()}:null;
+}
+function syncModelVariantForMatModal(force=false){
+  const mi=document.getElementById('inputMatricula');
+  const selMod=document.getElementById('selectModelo');
+  const selVar=document.getElementById('selectVariante');
+  if(!mi||!selMod||!selVar)return;
+  const meta=getMatMeta(mi.value);
+  if(meta){
+    if(force||!selMod.value)selMod.value=meta.modelo||'';
+    if(force||!selVar.value)selVar.value=meta.variante||'';
+  }
+}
 
 function pluralTxt(n,singular,plural){ return n+' '+(n===1?singular:plural); }
 function computeFleetStats(){
@@ -2670,6 +2693,12 @@ function initItemsEditor(existingItems=[]){
   else{addItemRow('',false);}
 }
 document.getElementById('btnAddItem').addEventListener('click',()=>addItemRow('',true));
+['input','change','blur'].forEach(ev=>{
+  const mi=document.getElementById('inputMatricula');
+  if(mi)mi.addEventListener(ev,()=>{
+    if(modalMode==='new')syncModelVariantForMatModal(ev!=='input');
+  });
+});
 
 function openModal(mode='new',mat='',entryId='',textoActual=''){
   modalMode=mode;modalMat=mat;modalEditEntryId=entryId;pendingFotos=[];renderFotoPreviews();
@@ -2685,29 +2714,34 @@ function openModal(mode='new',mat='',entryId='',textoActual=''){
   if(mode==='edit'){
     document.getElementById('modalTitleText').textContent='✏️ Editar → '+mat;
     mi.value=mat;mi.disabled=true;
-    // Cargar modelo/variante existentes (no editables en modo editar nota)
     const k=findMatKey(mat);
     selMod.value=globalData[k]?.modelo||'';selVar.value=globalData[k]?.variante||'';
     selMod.disabled=false;selVar.disabled=false;
-    // Mostrar aviso de que también puede editar el modelo
     let mdEditHint=document.getElementById('mdEditHint');
     if(!mdEditHint){mdEditHint=document.createElement('div');mdEditHint.id='mdEditHint';mdEditHint.style.cssText='font-size:.6rem;color:rgba(180,130,255,.5);font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:.18rem;';document.getElementById('modeloWrap').after(mdEditHint);}
-    mdEditHint.textContent='✎ Puedes actualizar el modelo/variante aquí';mdEditHint.style.display='block';
     const existingEntry=globalData[k]?.entries?.[entryId];
-    const items=existingEntry?.items||[{texto:textoActual||'',done:false}];
-    initItemsEditor(items);
+    const allItems=existingEntry?.items||[{texto:textoActual||'',done:false}];
+    const pendingOnly=allItems.filter(it=>!it.done);
+    mdEditHint.textContent=pendingOnly.length===allItems.length?'✎ Puedes actualizar el modelo/variante aquí':'✓ Los ítems ya realizados se conservan y no aparecen en Agregar ítem';
+    mdEditHint.style.display='block';
+    initItemsEditor(pendingOnly);
     document.getElementById('btnGuardar').textContent='Guardar cambios';
   } else {
     document.getElementById('modalTitleText').textContent=mode==='add'?'Agregar nota → '+mat:'Nueva Nota';
     mi.value=mode==='add'?mat:'';mi.disabled=mode==='add';
-    // Cargar modelo/variante existente al agregar nota a mat ya conocida
-    if(mode==='add'){const mk2=findMatKey(mat);selMod.value=globalData[mk2]?.modelo||'';selVar.value=globalData[mk2]?.variante||'';selMod.disabled=false;selVar.disabled=false;}else{selMod.value='';selVar.value='';selMod.disabled=false;selVar.disabled=false;}
+    if(mode==='add'){
+      const meta=getMatMeta(mat);
+      selMod.value=meta?.modelo||'';selVar.value=meta?.variante||'';
+      selMod.disabled=false;selVar.disabled=false;
+    }else{
+      selMod.value='';selVar.value='';selMod.disabled=false;selVar.disabled=false;
+    }
     const mdEditHint2=document.getElementById('mdEditHint');if(mdEditHint2)mdEditHint2.style.display='none';
     initItemsEditor([]);
     document.getElementById('btnGuardar').textContent='Guardar nota';
   }
   document.getElementById('modalNota').classList.add('show');
-  setTimeout(()=>{const first=document.querySelector('.item-editor-input');if(first)first.focus();},400);
+  setTimeout(()=>{syncModelVariantForMatModal(true);const first=document.querySelector('.item-editor-input');if(first)first.focus();},120);
   setTimeout(()=>window.initMicButton(),100);
 }
 window.openModal=openModal;
@@ -2834,25 +2868,31 @@ document.getElementById('btnUrgente').addEventListener('click',()=>{
 function closeModal(){ document.getElementById('modalNota').classList.remove('show');document.getElementById('inputMatricula').disabled=false;modalEditEntryId='';pendingFotos=[];renderFotoPreviews(); }
 document.getElementById('btnModalCancel').addEventListener('click',closeModal);
 document.getElementById('btnGuardar').addEventListener('click',async()=>{
-  const mat=modalMode==='add'||modalMode==='edit'?modalMat:document.getElementById('inputMatricula').value.trim().toUpperCase();
+  const mat=(modalMode==='add'||modalMode==='edit'?modalMat:document.getElementById('inputMatricula').value).trim().toUpperCase();
+  syncModelVariantForMatModal(false);
   const itemTexts=getModalItemTexts();
-  if(!mat||!itemTexts.length)return;
+  if(!mat){showToast('⚠️ Captura la matrícula');return;}
+  if(!itemTexts.length){showToast('⚠️ Agrega al menos un ítem');return;}
   const isUrgent=modalUrgencyPressed;
   const btn=document.getElementById('btnGuardar');btn.disabled=true;btn.textContent='Guardando...';
   const perfil=loadPerfil();
   try{
     if(modalMode==='edit'){
-      // Edición: actualizar ítems preservando done state de los existentes
+      // Edición: mostrar/guardar solo ítems pendientes, conservando los ya realizados.
       const k=findMatKey(mat);
       const existingEntry=globalData[k]?.entries?.[modalEditEntryId];
       const prevItems=existingEntry?.items||[];
-      const mergedItems=itemTexts.map((t,i)=>({
+      const doneItems=prevItems.filter(it=>it.done);
+      const pendingItems=prevItems.filter(it=>!it.done);
+      const mergedPending=itemTexts.map((t,i)=>({
+        ...(pendingItems[i]||{}),
         texto:t,
-        done: prevItems[i]?.done||false
+        done:false
       }));
-      const texto=itemTexts.join(' · ');
-      const fields={texto, items:mergedItems};
-      // Actualizar modelo/variante si el usuario los cambió
+      const mergedItems=[...mergedPending,...doneItems];
+      const texto=mergedItems.map(it=>it.texto).join(' · ');
+      const allDone=mergedItems.length>0&&mergedItems.every(it=>it.done);
+      const fields={texto, items:mergedItems, done:allDone};
       const _eMod=document.getElementById('selectModelo');
       const _eVar=document.getElementById('selectVariante');
       await fbUpdateMat(mat,{modelo:_eMod?_eMod.value:'',variante:_eVar?_eVar.value:''});
@@ -2873,12 +2913,11 @@ document.getElementById('btnGuardar').addEventListener('click',async()=>{
       }
       const exH=(existingEntry?.history)||[];
       fields.history=[...exH,{ts:Date.now(),action:'edita',userName:perfil.nombre||DEVICE_NAME,userNum:perfil.numero||''}];
-      await fbUpdateEntry(mat,modalEditEntryId,fields);closeModal();return;
+      await fbUpdateEntry(mat,modalEditEntryId,fields);closeModal();showToast('✅ Cambios guardados');return;
     }
     const ts=Date.now();
     const items=itemTexts.map(t=>({texto:t,done:false}));
     const texto=(isUrgent?'⚠️ ':'')+itemTexts.join(' · ');
-    // Subir fotos a Cloudinary (gratis) y guardar URLs en Firebase
     let fotoUrls=[];
     if(pendingFotos.length>0){
       document.getElementById('fotoUploading').style.display='block';
@@ -2887,27 +2926,33 @@ document.getElementById('btnGuardar').addEventListener('click',async()=>{
         fotoUrls=await Promise.all(pendingFotos.map(f=>subirFotoCloudinary(f.dataUrl)));
       }catch(err){
         console.error('Error subiendo fotos:',err);
-        fotoUrls=pendingFotos.map(f=>f.dataUrl); // fallback a base64 si falla
+        fotoUrls=pendingFotos.map(f=>f.dataUrl);
       }
       document.getElementById('fotoUploading').style.display='none';
       document.getElementById('fotoUploading').textContent='⏳ Procesando foto...';
     }
     const entry={id:'e_'+ts+'_'+Math.random().toString(36).slice(2,5),texto,items,device:DEVICE_ID,deviceName:DEVICE_NAME,ts,done:false,deleted:false,fotos:fotoUrls,createdByName:perfil.nombre||DEVICE_NAME,createdByNum:perfil.numero||'',history:[{ts,action:'crea',userName:perfil.nombre||DEVICE_NAME,userNum:perfil.numero||''}]};
-    // Leer modelo y variante del modal antes de guardar
     const _selMod=document.getElementById('selectModelo');
     const _selVar=document.getElementById('selectVariante');
-    const _modelo=_selMod?_selMod.value:'';
-    const _variante=_selVar?_selVar.value:'';
+    const meta=getMatMeta(mat);
+    const _modelo=(_selMod&&_selMod.value)||meta?.modelo||'';
+    const _variante=(_selVar&&_selVar.value)||meta?.variante||'';
     await fbSetEntry(mat,entry,_modelo,_variante);
-    // — Notificación Telegram —
     const quien2=(perfil.nombre||DEVICE_NAME)+(perfil.numero?' #'+perfil.numero:'');
     const hora2=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
     const fecha2=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short'});
     const esUrgente2=isUrgent;
     const emojiNueva=esUrgente2?'🚨':'🆕';
     const urgMark2=esUrgente2?' ⚠️ URGENTE':'';
-    tgNotify(`${emojiNueva} <b>Nueva tarea creada${urgMark2}</b>\n✈️ Matrícula: <b>${mat}</b>\n📝 ${itemTexts.map(t=>'• '+t).join('\n')}\n👤 Por: ${quien2}\n🕐 ${fecha2} · ${hora2}`);
-    closeModal();
+    tgNotify(`${emojiNueva} <b>Nueva tarea creada${urgMark2}</b>
+✈️ Matrícula: <b>${mat}</b>
+📝 ${itemTexts.map(t=>'• '+t).join('\n')}
+👤 Por: ${quien2}
+🕐 ${fecha2} · ${hora2}`);
+    closeModal();showToast('✅ Nota guardada');
+  }catch(err){
+    console.error(err);
+    showToast('⚠️ No se pudo guardar');
   }finally{btn.disabled=false;btn.textContent=modalMode==='edit'?'Guardar cambios':'Guardar nota';}
 });
 
@@ -2926,16 +2971,27 @@ window.toggleSubItem=async(nombre,entryId,itemIdx)=>{
   const k=findMatKey(nombre);
   const entry=globalData[k]?.entries?.[entryId];
   if(!entry)return;
-  const items=[...(entry.items||[])];
+  let items=(entry.items&&entry.items.length)?entry.items.map(it=>({...it})):[{texto:entry.texto||'',done:!!entry.done}];
   if(!items[itemIdx])return;
-  items[itemIdx]={...items[itemIdx],done:!items[itemIdx].done};
-  const allDone=items.every(it=>it.done);
+  const newDone=!items[itemIdx].done;
+  items[itemIdx]={...items[itemIdx],done:newDone};
+  const allDone=items.length>0&&items.every(it=>it.done);
   const perfil=loadPerfil();
-  const hi={ts:Date.now(),action:allDone?'cierra':'reabre',userName:perfil.nombre||DEVICE_NAME,userNum:perfil.numero||''};
+  const hi={ts:Date.now(),action:newDone?'cierra':'reabre',userName:perfil.nombre||DEVICE_NAME,userNum:perfil.numero||''};
   const exH=entry.history||[];
   const fields={items,done:allDone,history:[...exH,hi]};
   if(allDone){fields.closedByName=perfil.nombre||DEVICE_NAME;fields.closedByNum=perfil.numero||'';fields.closedTs=Date.now();}
+  else{fields.closedByName=null;fields.closedByNum=null;fields.closedTs=null;}
+  // Actualización local inmediata para que el usuario pueda volver a tocarlo sin esperar Firebase.
+  if(globalData[k]?.entries?.[entryId]){
+    globalData[k].entries[entryId]={...entry,...fields};
+    renderFolderScreen(k);
+    renderFolders(document.getElementById('searchNotas')?.value||'');
+    renderGlobal();
+    updateHomeQuickStats();
+  }
   await fbUpdateEntry(nombre,entryId,fields);
+  showToast(newDone?'✅ Ítem realizado':'↩ Ítem reabierto');
 };
 
 /* ══════════════════════════
@@ -2979,10 +3035,30 @@ async function copyEntryTasks(entry){
 /* ══════════════════════════
    ACCESO DIRECTO A REPORTES
 ══════════════════════════ */
+function getEntryReportPayload(entry){
+  const clean=t=>(t||'').toString().trim();
+  const fmt=arr=>arr.map(t=>'🔹 '+clean(t)).filter(Boolean).join('\n');
+  if(entry.items&&entry.items.length){
+    const hechos=entry.items.filter(it=>it.done&&clean(it.texto)).map(it=>it.texto);
+    const pendientes=entry.items.filter(it=>!it.done&&clean(it.texto)).map(it=>it.texto);
+    return{actividades:fmt(hechos),pendientes:fmt(pendientes)};
+  }
+  const texto=clean(entry.texto);
+  if(!texto)return{actividades:'',pendientes:''};
+  return entry.done?{actividades:fmt([texto]),pendientes:''}:{actividades:'',pendientes:fmt([texto])};
+}
 function openReportsWithTasks(nombre,entry){
-  const texto=getEntryTasksText(entry);
-  const url='reports.html?matricula='+encodeURIComponent(nombre)+'&pendientes='+encodeURIComponent(texto);
-  window.open(url,'_blank');
+  const payload=getEntryReportPayload(entry);
+  if(!payload.actividades&&!payload.pendientes){
+    showToast('⚠️ No hay ítems para enviar');
+    return;
+  }
+  const params=new URLSearchParams();
+  params.set('from','volarisops');
+  params.set('matricula',nombre);
+  if(payload.actividades)params.set('actividades',payload.actividades);
+  if(payload.pendientes)params.set('pendientes',payload.pendientes);
+  window.open('reports.html?'+params.toString(),'_blank');
 }
 
 function buildSubItemsNode(entry,nombre){
@@ -2992,13 +3068,34 @@ function buildSubItemsNode(entry,nombre){
   items.forEach((item,idx)=>{
     const row=document.createElement('div');row.className='nota-subitem-row';
     const diamond=document.createElement('span');diamond.className='nota-subitem-diamond'+(item.done?' done':'');diamond.textContent=item.done?'✓':'♦';
-    diamond.title=item.done?'Marcar pendiente':'Marcar efectuado';
-    diamond.onclick=(()=>{const _n=nombre,_id=entry.id,_i=idx;return()=>toggleSubItem(_n,_id,_i);})();
-    const txt=document.createElement('span');txt.className='nota-subitem-text'+(item.done?' done':'');txt.textContent=item.texto;
+    diamond.title=item.done?'Regresar a pendiente':'Marcar como realizado';
+    const toggleFn=(()=>{const _n=nombre,_id=entry.id,_i=idx;return()=>toggleSubItem(_n,_id,_i);})();
+    diamond.onclick=toggleFn;
+    const txt=document.createElement('span');txt.className='nota-subitem-text'+(item.done?' done':'');txt.textContent=item.texto;txt.title=diamond.title;txt.style.cursor='pointer';txt.onclick=toggleFn;
     row.appendChild(diamond);row.appendChild(txt);
     wrap.appendChild(row);
   });
   return wrap;
+}
+
+function actionIconSVG(type){
+  const icons={
+    edit:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>`,
+    del:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>`,
+    copy:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+    report:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7Z"/></svg>`,
+    history:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 6.3L3 8"/><path d="M12 7v5l3 2"/></svg>`,
+    undo:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M20 20a8 8 0 0 0-8-8H4"/></svg>`
+  };
+  return `<span class="act-ic">${icons[type]||icons.copy}</span>`;
+}
+function applyActionIcon(btn,type,count=null){
+  btn.classList.add('icon-only');
+  btn.innerHTML=actionIconSVG(type);
+  if(count!==null&&count!==undefined){
+    btn.classList.remove('icon-only');
+    btn.innerHTML=actionIconSVG(type)+`<span class="action-count">${count}</span>`;
+  }
 }
 
 function buildNotaPersonalNode(k,nombre,entry){
@@ -3024,12 +3121,12 @@ function buildNotaPersonalNode(k,nombre,entry){
   who.innerHTML=`<span class="nota-who-badge badge-crea">✏ ${cp}${cn?' #'+cn:''}</span>`;
   if(entry.done){const lc=log.filter(l=>l.action==='cierra').pop();if(lc)who.innerHTML+=`<span class="nota-who-badge badge-cierra">✓ ${lc.userName}${lc.userNum?' #'+lc.userNum:''}</span>`;}
   const fs2=document.createElement('span');fs2.className='nota-personal-date';fs2.textContent=fmtTs(entry.ts);who.appendChild(fs2);div.appendChild(who);
-  const act=document.createElement('div');act.style.cssText='display:flex;align-items:center;gap:.42rem;flex-wrap:wrap;';
-  if(puedeEditar()){const eb=document.createElement('button');eb.className='btn-admin-act';eb.style.cssText='background:rgba(85,170,255,.12);color:#88ccff;border:1px solid rgba(85,170,255,.22);';eb.textContent='✏️';eb.onclick=(()=>{const _n=nombre,_id=entry.id,_t=entry.texto;return()=>openModal('edit',_n,_id,_t);})();act.appendChild(eb);}
-  if(puedeBorrar()){const db2=document.createElement('button');db2.className='btn-admin-act del';db2.textContent='🗑';db2.onclick=(()=>{const _n=nombre,_id=entry.id;return()=>confirmDeleteEntry(_n,_id);})();act.appendChild(db2);}
-  const cpBtn=document.createElement('button');cpBtn.className='btn-admin-act copy';cpBtn.title='Copiar tareas';cpBtn.textContent='📋';cpBtn.onclick=(()=>{const _e=entry;return()=>copyEntryTasks(_e);})();act.appendChild(cpBtn);
-  const rpBtn=document.createElement('button');rpBtn.className='btn-admin-act report';rpBtn.title='Enviar a Reporte de Turno';rpBtn.textContent='📤';rpBtn.onclick=(()=>{const _n=nombre,_e=entry;return()=>openReportsWithTasks(_n,_e);})();act.appendChild(rpBtn);
-  const hb=document.createElement('button');hb.className='btn-historial';hb.textContent='📜 ('+log.length+')';hb.onclick=()=>{if(expandedHistorial.has(histKey))expandedHistorial.delete(histKey);else expandedHistorial.add(histKey);renderFolderScreen(fsCurrentKey);};act.appendChild(hb);
+  const act=document.createElement('div');act.style.cssText='display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;';
+  if(puedeEditar()){const eb=document.createElement('button');eb.className='btn-admin-act edit';eb.title='Editar nota';eb.setAttribute('aria-label','Editar nota');applyActionIcon(eb,'edit');eb.onclick=(()=>{const _n=nombre,_id=entry.id,_t=entry.texto;return()=>openModal('edit',_n,_id,_t);})();act.appendChild(eb);}
+  if(puedeBorrar()){const db2=document.createElement('button');db2.className='btn-admin-act del';db2.title='Eliminar nota';db2.setAttribute('aria-label','Eliminar nota');applyActionIcon(db2,'del');db2.onclick=(()=>{const _n=nombre,_id=entry.id;return()=>confirmDeleteEntry(_n,_id);})();act.appendChild(db2);}
+  const cpBtn=document.createElement('button');cpBtn.className='btn-admin-act copy';cpBtn.title='Copiar tareas';cpBtn.setAttribute('aria-label','Copiar tareas');applyActionIcon(cpBtn,'copy');cpBtn.onclick=(()=>{const _e=entry;return()=>copyEntryTasks(_e);})();act.appendChild(cpBtn);
+  const rpBtn=document.createElement('button');rpBtn.className='btn-admin-act report';rpBtn.title='Enviar a Reporte de Turno';rpBtn.setAttribute('aria-label','Enviar a Reporte de Turno');applyActionIcon(rpBtn,'report');rpBtn.onclick=(()=>{const _n=nombre,_e=entry;return()=>openReportsWithTasks(_n,_e);})();act.appendChild(rpBtn);
+  const hb=document.createElement('button');hb.className='btn-historial';hb.title='Ver historial';hb.setAttribute('aria-label','Ver historial');applyActionIcon(hb,'history',log.length);hb.onclick=()=>{if(expandedHistorial.has(histKey))expandedHistorial.delete(histKey);else expandedHistorial.add(histKey);renderFolderScreen(fsCurrentKey);};act.appendChild(hb);
   div.appendChild(act);
   if(isHistOpen&&log.length){const hw=document.createElement('div');hw.className='historial-wrap';log.forEach(item=>{const {dot,text}=actionLabel(item.action);const r=document.createElement('div');r.className='historial-row';r.innerHTML=`<span class="historial-dot ${dot}"></span><span class="historial-text"><strong>${item.userName}${item.userNum?' <span style="opacity:.5">#'+item.userNum+'</span>':''}</strong> — ${text}</span><span class="historial-time">${fmtTs(item.ts)}</span>`;hw.appendChild(r);});div.appendChild(hw);}
   return div;
@@ -3234,12 +3331,12 @@ function renderGlobal(){
         } else {td2.textContent=entry.texto||'';entEl.appendChild(td2);}
         if(!entry.deleted){buildFotoThumbs(entry.fotos).then(ft2=>{if(ft2)entEl.appendChild(ft2);});}
         if(entry.done&&!entry.deleted){const lc=log.filter(l=>l.action==='cierra').pop();if(lc){const ce=document.createElement('div');ce.style.cssText='font-size:.58rem;font-weight:800;color:rgba(85,238,136,.6);letter-spacing:.06em;';ce.textContent=`✓ ${lc.userName}${lc.userNum?' #'+lc.userNum:''} · ${fmtTs(lc.ts)}`;entEl.appendChild(ce);}}
-        const ar=document.createElement('div');ar.style.cssText='display:flex;gap:.42rem;align-items:center;flex-wrap:wrap;';
+        const ar=document.createElement('div');ar.style.cssText='display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;';
         if(!entry.deleted&&!isDel){
-          if(puedeEditar()){const eb=document.createElement('button');eb.className='btn-admin-act';eb.style.cssText='background:rgba(85,170,255,.12);color:#88ccff;border:1px solid rgba(85,170,255,.22);';eb.textContent='✏️';eb.onclick=(()=>{const _n=nombre,_id=entry.id,_t=entry.texto;return()=>openModal('edit',_n,_id,_t);})();ar.appendChild(eb);}
+          if(puedeEditar()){const eb=document.createElement('button');eb.className='btn-admin-act edit';eb.title='Editar nota';eb.setAttribute('aria-label','Editar nota');applyActionIcon(eb,'edit');eb.onclick=(()=>{const _n=nombre,_id=entry.id,_t=entry.texto;return()=>openModal('edit',_n,_id,_t);})();ar.appendChild(eb);}
         }
-        if(isAdmin){const ab2=document.createElement('button');if(entry.deleted){ab2.className='btn-admin-act undo';ab2.textContent='↩';ab2.onclick=(()=>{const _n=nombre,_id=entry.id;return()=>undoEntry(_n,_id);})();}else{ab2.className='btn-admin-act del';ab2.textContent='🗑';ab2.onclick=(()=>{const _n=nombre,_id=entry.id;return()=>confirmDeleteEntry(_n,_id);})();}ar.appendChild(ab2);}
-        if(log.length){const hb=document.createElement('button');hb.className='btn-historial';hb.textContent='📜 ('+log.length+')';hb.onclick=()=>{if(expandedHistorial.has(histKeyG))expandedHistorial.delete(histKeyG);else expandedHistorial.add(histKeyG);renderGlobal();};ar.appendChild(hb);}
+        if(isAdmin){const ab2=document.createElement('button');if(entry.deleted){ab2.className='btn-admin-act undo';ab2.title='Restaurar nota';ab2.setAttribute('aria-label','Restaurar nota');applyActionIcon(ab2,'undo');ab2.onclick=(()=>{const _n=nombre,_id=entry.id;return()=>undoEntry(_n,_id);})();}else{ab2.className='btn-admin-act del';ab2.title='Eliminar nota';ab2.setAttribute('aria-label','Eliminar nota');applyActionIcon(ab2,'del');ab2.onclick=(()=>{const _n=nombre,_id=entry.id;return()=>confirmDeleteEntry(_n,_id);})();}ar.appendChild(ab2);}
+        if(log.length){const hb=document.createElement('button');hb.className='btn-historial';hb.title='Ver historial';hb.setAttribute('aria-label','Ver historial');applyActionIcon(hb,'history',log.length);hb.onclick=()=>{if(expandedHistorial.has(histKeyG))expandedHistorial.delete(histKeyG);else expandedHistorial.add(histKeyG);renderGlobal();};ar.appendChild(hb);}
         entEl.appendChild(ar);
         if(isHistOpenG&&log.length){const hw=document.createElement('div');hw.className='historial-wrap';log.forEach(item=>{const {dot,text}=actionLabel(item.action);const r=document.createElement('div');r.className='historial-row';r.innerHTML=`<span class="historial-dot ${dot}"></span><span class="historial-text"><strong>${item.userName}${item.userNum?' <span style="opacity:.5">#'+item.userNum+'</span>':''}</strong> — ${text}</span><span class="historial-time">${fmtTs(item.ts)}</span>`;hw.appendChild(r);});entEl.appendChild(hw);}
         row.appendChild(entEl);nw.appendChild(row);

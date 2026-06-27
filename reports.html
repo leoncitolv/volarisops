@@ -5085,10 +5085,63 @@ function resetearFormularioReporte(){
   mostrarToast('🧹 Formulario limpiado', 'success');
 }
 
+
+/* PATCH VolarisOps → Reports: recibe ítems realizados como actividades y pendientes por separado. */
+function precargarDesdeURL() {
+  const params = new URLSearchParams(window.location.search);
+  const matricula = params.get('matricula') || params.get('mat') || '';
+  const actividades = params.get('actividades') || params.get('actividad') || params.get('realizados') || '';
+  const pendientes = params.get('pendientes') || '';
+  const hayDatos = !!(matricula || actividades || pendientes);
+  if (!hayDatos) return;
+
+  window.__VOL_REPORT_PRELOAD_FROM_URL__ = true;
+  try { limpiarBorradorReporte(); } catch (err) { console.warn('No se pudo limpiar borrador previo:', err); }
+
+  // Mantener al usuario en el formulario nuevo y asegurar una aeronave disponible.
+  document.querySelector('[onclick*="\'nuevo\'"]')?.click();
+  if (!Array.isArray(aeronavesData) || aeronavesData.length === 0) {
+    if (typeof inicializarAeronaves === 'function') inicializarAeronaves();
+    else if (typeof agregarAeronave === 'function') agregarAeronave();
+  }
+
+  const firstId = (Array.isArray(aeronavesData) && aeronavesData.length) ? aeronavesData[0].id : 0;
+  const matInput = document.getElementById(`mat-${firstId}`) || document.getElementById('mat-0');
+  const actInput = document.getElementById(`act-${firstId}`) || document.getElementById('act-0');
+
+  if (matricula && matInput) {
+    matInput.value = matricula;
+    syncAeronaveField(firstId, 'matricula', matricula);
+  }
+
+  if (actividades && actInput) {
+    const actual = actInput.value.trim();
+    actInput.value = actual ? `${actual}\n${actividades}` : actividades;
+    syncAeronaveField(firstId, 'actividades', actInput.value);
+    if (typeof ajustarAreaActividades === 'function') ajustarAreaActividades(actInput);
+  }
+
+  if (pendientes) {
+    const campoPendientes = document.getElementById('reportPendientes');
+    if (campoPendientes) {
+      const actual = campoPendientes.value.trim();
+      campoPendientes.value = actual ? `${actual}\n${pendientes}` : pendientes;
+    }
+  }
+
+  if (typeof guardarBorradorReporte === 'function') guardarBorradorReporte();
+  if (typeof mostrarToast === 'function') {
+    if (actividades && pendientes) mostrarToast('📤 Actividades y pendientes importados desde Volaris Ops', 'success');
+    else if (actividades) mostrarToast('📤 Actividades realizadas importadas desde Volaris Ops', 'success');
+    else mostrarToast('📤 Pendientes importados desde Volaris Ops', 'success');
+  }
+  history.replaceState(null, '', window.location.pathname);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   activarAutosaveReporte();
   setTimeout(() => {
-    restaurarBorradorReporte();
+    if (!window.__VOL_REPORT_PRELOAD_FROM_URL__) restaurarBorradorReporte();
     activarAutosaveReporte();
   }, 0);
 });
