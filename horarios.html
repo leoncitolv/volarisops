@@ -2167,9 +2167,10 @@ body.admin-mode .admin-only{display:flex !important;}
 }
 
 
-/* ═════ AJUSTE DAVID 2.8 — vacaciones reales + colores KPI ═════
+/* ═════ AJUSTE DAVID 2.9 — vacaciones por fecha de ingreso ═════
    Trabajo se muestra en rojo y descanso en verde, igual que la tabla.
-   El saldo de vacaciones permite capturar total y días ya tomados. */
+   El saldo de vacaciones permite capturar total, días ya tomados,
+   fecha de ingreso y los días que se suman en cada aniversario. */
 .kpi-work strong,
 .kpi-work .kpi-icon{
   color:var(--status-work) !important;
@@ -2179,7 +2180,7 @@ body.admin-mode .admin-only{display:flex !important;}
   color:var(--status-rest) !important;
 }
 .vacation-settings{
-  grid-template-columns:repeat(2,minmax(0,1fr)) auto !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) auto !important;
 }
 @media(max-width:560px){
   .vacation-settings{
@@ -2311,6 +2312,8 @@ body.admin-mode .admin-only{display:flex !important;}
         <form id="vacationDaysForm" class="vacation-settings" aria-label="Configurar saldo de vacaciones">
           <label class="field"><span>Días totales</span><input id="vacationDaysInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 25" /></label>
           <label class="field"><span>Días ya tomados</span><input id="vacationUsedInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 13" /></label>
+          <label class="field"><span>Fecha de ingreso</span><input id="hireDateInput" type="date" /></label>
+          <label class="field"><span>Suma anual</span><input id="vacationAnnualAddInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 25" /></label>
           <button class="soft" type="submit">Guardar</button>
         </form>
       </article>
@@ -2443,6 +2446,8 @@ body.admin-mode .admin-only{display:flex !important;}
             <label class="field"><span>Rol</span><select id="accessRole"><option value="user">Embajador</option><option value="admin">Supervisor</option></select></label>
             <label class="field"><span>Días vacaciones</span><input id="userVacationDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="15" required /></label>
             <label class="field"><span>Días ya tomados</span><input id="userVacationUsedDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="0" required /></label>
+            <label class="field"><span>Fecha ingreso</span><input id="userHireDate" type="date" /></label>
+            <label class="field"><span>Suma anual</span><input id="userVacationAnnualAddDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="15" /></label>
             <label class="field"><span>PIN inicial</span><input id="userPin" type="password" minlength="4" inputmode="numeric" placeholder="Mín. 4" required /></label>
             <button class="primary" type="submit">Agregar</button>
           </form>
@@ -2668,6 +2673,7 @@ let deferredPrompt = null;
 let isBootstrappingOwner = false;
 let state = { users: [], overrides: {} };
 let authPersistenceReady = Promise.resolve();
+const VACATION_ACCRUAL_PENDING = new Set();
 
 const HORARIOS_CACHE_KEY = 'horarios_offline_cache_v1';
 
@@ -2800,6 +2806,10 @@ async function setupOwner(employeeId, pin) {
       color: "#8b2fc9",
       accessRole: "owner",
       vacationTotalDays: 15,
+      vacationUsedDays: 0,
+      hireDate: ymd(new Date()),
+      vacationAnnualAddDays: 15,
+      vacationLastAccrualYear: new Date().getFullYear(),
       active: true,
       protected: true,
       createdAt: serverTimestamp(),
@@ -2953,6 +2963,7 @@ function dayRecord(user,date) {
 function render() {
   if (!currentProfile) return;
   updateRoleUI();
+  checkVacationAnniversaries();
   renderMonthHeader(); renderUserFilter(); renderMainDashboard(); renderCalendar(); renderCalendarDetail(); renderAgenda(); renderSummary(); renderUsers(); renderStatusColorPanel();
 }
 function renderMonthHeader() {
@@ -3022,6 +3033,77 @@ function vacationTotalForUser(user) {
 function vacationTakenForUser(user) {
   return clampDays(user?.vacationUsedDays ?? user?.vacationTakenDays ?? user?.vacationUsedPrevious ?? 0, 0, 365);
 }
+function isValidYMD(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return false;
+  const d = parseYMD(value);
+  return ymd(d) === value;
+}
+function vacationHireDateForUser(user) {
+  const value = user?.hireDate || user?.fechaIngreso || "";
+  return isValidYMD(value) ? value : "";
+}
+function vacationAnnualAddForUser(user) {
+  return clampDays(user?.vacationAnnualAddDays ?? user?.vacationAnnualDays ?? vacationTotalForUser(user), 0, 365);
+}
+function anniversaryDateForYear(hireDate, year) {
+  if (!isValidYMD(hireDate)) return null;
+  const hire = parseYMD(hireDate);
+  let anniversary = new Date(year, hire.getMonth(), hire.getDate());
+  // Si la fecha de ingreso fue 29/feb y el año no es bisiesto, usa el último día de febrero.
+  if (anniversary.getMonth() !== hire.getMonth()) {
+    anniversary = new Date(year, hire.getMonth() + 1, 0);
+  }
+  return anniversary;
+}
+function defaultVacationLastAccrualYear(hireDate, refDate=new Date()) {
+  const year = refDate.getFullYear();
+  const anniversary = anniversaryDateForYear(hireDate, year);
+  if (!anniversary) return 0;
+  return parseYMD(ymd(refDate)) >= anniversary ? year : year - 1;
+}
+async function applyVacationAnniversaryIfNeeded(user) {
+  if (!firebaseReady || !currentUser || !user?.id || !canEditUser(user.id)) return;
+  const hireDate = vacationHireDateForUser(user);
+  if (!hireDate) return;
+  const today = new Date();
+  const year = today.getFullYear();
+  const anniversary = anniversaryDateForYear(hireDate, year);
+  if (!anniversary || parseYMD(ymd(today)) < anniversary) return;
+
+  // Para no duplicar saldos de usuarios existentes, solo suma cuando el perfil ya tiene
+  // marcado el último año de aniversario aplicado. Al guardar fecha de ingreso se inicializa.
+  const rawLast = Number(user.vacationLastAccrualYear ?? user.vacationLastAddedYear ?? 0);
+  if (!Number.isFinite(rawLast) || rawLast <= 0 || rawLast >= year) return;
+
+  const addDays = vacationAnnualAddForUser(user);
+  if (addDays <= 0) return;
+  const key = `${user.id}|${year}`;
+  if (VACATION_ACCRUAL_PENDING.has(key)) return;
+  VACATION_ACCRUAL_PENDING.add(key);
+  const newTotal = Math.min(365, vacationTotalForUser(user) + addDays);
+  try {
+    const updates = {
+      vacationTotalDays: newTotal,
+      vacationLastAccrualYear: year,
+      vacationLastAccrualAt: serverTimestamp(),
+      vacationLastAccrualDays: addDays,
+      updatedAt: serverTimestamp(),
+      updatedBy: currentUser.uid
+    };
+    await updateDoc(doc(db, "profiles", user.id), updates);
+    if (currentProfile?.id === user.id || currentProfile?.uid === user.id) {
+      currentProfile = { ...currentProfile, ...updates, updatedAt: new Date() };
+    }
+  } catch (err) {
+    console.warn("No se pudo sumar aniversario de vacaciones", err);
+    VACATION_ACCRUAL_PENDING.delete(key);
+  }
+}
+function checkVacationAnniversaries() {
+  visibleUsers().forEach(u => {
+    if (canEditUser(u.id)) applyVacationAnniversaryIfNeeded(u);
+  });
+}
 function vacationBalanceForUser(user, year=current.getFullYear()) {
   const total = vacationTotalForUser(user);
   const alreadyTaken = Math.min(total, vacationTakenForUser(user));
@@ -3069,6 +3151,8 @@ function renderMainDashboard() {
   setText("kpiVacation", monthCounts.vacation || 0);
   const totalInput = document.getElementById("vacationDaysInput");
   const usedInput = document.getElementById("vacationUsedInput");
+  const hireInput = document.getElementById("hireDateInput");
+  const annualInput = document.getElementById("vacationAnnualAddInput");
   const form = document.getElementById("vacationDaysForm");
   if (totalInput) {
     totalInput.value = balance.total;
@@ -3078,6 +3162,14 @@ function renderMainDashboard() {
     usedInput.value = balance.alreadyTaken;
     usedInput.disabled = !canEditUser(user.id);
     usedInput.max = String(balance.total);
+  }
+  if (hireInput) {
+    hireInput.value = vacationHireDateForUser(user);
+    hireInput.disabled = !canEditUser(user.id);
+  }
+  if (annualInput) {
+    annualInput.value = vacationAnnualAddForUser(user);
+    annualInput.disabled = !canEditUser(user.id);
   }
   if (form) form.dataset.userId = user.id;
   const fill = document.getElementById("vacationProgressFill");
@@ -3178,7 +3270,7 @@ function renderUsers() {
           <div class="avatar" style="background:${u.color || "#8b2fc9"}">${escapeHtml((u.name||"U")[0])}</div>
           <div>
             <h3>${escapeHtml(u.name)} <span class="role-pill">${roleLabel(u.accessRole)}</span></h3>
-            <p>No. ${escapeHtml(u.employeeId || "—")} · ${escapeHtml(u.area || "Sin área")} · Base ${u.baseDate || "—"} · Vacaciones ${vacationTotalForUser(u)} · Tomados ${vacationTakenForUser(u)}</p>
+            <p>No. ${escapeHtml(u.employeeId || "—")} · ${escapeHtml(u.area || "Sin área")} · Base ${u.baseDate || "—"} · Ingreso ${vacationHireDateForUser(u) || "—"} · Vacaciones ${vacationTotalForUser(u)} · Tomados ${vacationTakenForUser(u)} · Suma anual ${vacationAnnualAddForUser(u)}</p>
           </div>
         </div>
       </div>
@@ -3219,7 +3311,7 @@ async function employeeExists(employeeId) {
   // ya no deben impedir volver a crear el mismo número de empleado.
   return profiles.some(p => p.active !== false);
 }
-async function createStaff({ employeeId, name, area, baseDate, color, accessRole, pin, vacationTotalDays=15, vacationUsedDays=0 }) {
+async function createStaff({ employeeId, name, area, baseDate, color, accessRole, pin, vacationTotalDays=15, vacationUsedDays=0, hireDate="", vacationAnnualAddDays=15 }) {
   if (!canManageUsers()) throw new Error("Solo supervisores pueden agregar personal.");
   const clean = normalizeEmployee(employeeId);
   if (!clean || !name || !pin) throw new Error("Completa número de empleado, nombre y PIN.");
@@ -3227,6 +3319,10 @@ async function createStaff({ employeeId, name, area, baseDate, color, accessRole
   if (clean === normalizeEmployee(APP_CONFIG.OWNER_EMPLOYEE_ID) && !isOwner()) throw new Error("Solo el propietario puede administrar su propio número.");
   const vacationDays = clampDays(vacationTotalDays, 0, 365);
   const vacationUsed = Math.min(vacationDays, clampDays(vacationUsedDays, 0, 365));
+  const cleanHireDate = String(hireDate || "").trim();
+  if (cleanHireDate && !isValidYMD(cleanHireDate)) throw new Error("La fecha de ingreso debe tener formato válido AAAA-MM-DD.");
+  const annualAddDays = clampDays(vacationAnnualAddDays || vacationDays, 0, 365);
+  const lastAccrualYear = cleanHireDate ? defaultVacationLastAccrualYear(cleanHireDate) : 0;
 
   const previousProfiles = await findEmployeeProfiles(clean);
   if (previousProfiles.some(p => p.active !== false)) throw new Error("Ese número de empleado ya existe activo.");
@@ -3260,6 +3356,9 @@ async function createStaff({ employeeId, name, area, baseDate, color, accessRole
       accessRole: accessRole === "admin" ? "admin" : "user",
       vacationTotalDays: vacationDays,
       vacationUsedDays: vacationUsed,
+      hireDate: cleanHireDate,
+      vacationAnnualAddDays: annualAddDays,
+      vacationLastAccrualYear: lastAccrualYear,
       active: true,
       protected: false,
       createdBy: currentUser.uid,
@@ -3317,6 +3416,18 @@ async function editUserProfile(userId) {
   if (vacationUsedDays === null) return;
   const cleanVacationUsedDays = Math.min(cleanVacationTotalDays, clampDays(vacationUsedDays, 0, 365));
 
+  const hireDate = prompt("Fecha de ingreso del usuario (AAAA-MM-DD). Déjalo vacío si no aplica:", vacationHireDateForUser(target));
+  if (hireDate === null) return;
+  const cleanHireDate = hireDate.trim();
+  if (cleanHireDate && !isValidYMD(cleanHireDate)) {
+    alert("La fecha de ingreso debe tener formato AAAA-MM-DD, por ejemplo 2020-07-15.");
+    return;
+  }
+
+  const vacationAnnualAddDays = prompt("Días que se suman cada aniversario de ingreso:", String(target.vacationAnnualAddDays ?? cleanVacationTotalDays));
+  if (vacationAnnualAddDays === null) return;
+  const cleanAnnualAddDays = clampDays(vacationAnnualAddDays || cleanVacationTotalDays, 0, 365);
+
   const updates = {
     name: cleanName,
     area: area.trim(),
@@ -3324,9 +3435,15 @@ async function editUserProfile(userId) {
     color: cleanColor,
     vacationTotalDays: cleanVacationTotalDays,
     vacationUsedDays: cleanVacationUsedDays,
+    hireDate: cleanHireDate,
+    vacationAnnualAddDays: cleanAnnualAddDays,
     updatedAt: serverTimestamp(),
     updatedBy: currentUser.uid
   };
+  if (cleanHireDate && (!target.vacationLastAccrualYear || cleanHireDate !== vacationHireDateForUser(target))) {
+    updates.vacationLastAccrualYear = defaultVacationLastAccrualYear(cleanHireDate);
+  }
+  if (!cleanHireDate) updates.vacationLastAccrualYear = 0;
 
   await updateDoc(doc(db,"profiles",userId), updates);
   if (currentUser?.uid === userId && currentProfile) {
@@ -3465,12 +3582,23 @@ $("#vacationDaysForm")?.addEventListener("submit", async e=>{
   if (!canEditUser(userId)) { alert("No tienes permiso para modificar esos días de vacaciones."); return; }
   const totalValue = clampDays($("#vacationDaysInput").value, 0, 365);
   const usedValue = Math.min(totalValue, clampDays($("#vacationUsedInput").value, 0, 365));
-  await updateDoc(doc(db,"profiles",userId), {
+  const hireDateValue = String($("#hireDateInput")?.value || "").trim();
+  if (hireDateValue && !isValidYMD(hireDateValue)) { alert("La fecha de ingreso no es válida."); return; }
+  const annualAddValue = clampDays($("#vacationAnnualAddInput")?.value || totalValue, 0, 365);
+  const target = state.users.find(u=>u.id===userId) || currentProfile;
+  const updates = {
     vacationTotalDays: totalValue,
     vacationUsedDays: usedValue,
+    hireDate: hireDateValue,
+    vacationAnnualAddDays: annualAddValue,
     updatedAt: serverTimestamp(),
     updatedBy: currentUser.uid
-  });
+  };
+  if (hireDateValue && (!target?.vacationLastAccrualYear || hireDateValue !== vacationHireDateForUser(target))) {
+    updates.vacationLastAccrualYear = defaultVacationLastAccrualYear(hireDateValue);
+  }
+  if (!hireDateValue) updates.vacationLastAccrualYear = 0;
+  await updateDoc(doc(db,"profiles",userId), updates);
 });
 
 $("#userForm").addEventListener("submit",async e=>{
@@ -3487,13 +3615,19 @@ $("#userForm").addEventListener("submit",async e=>{
       accessRole: $("#accessRole").value,
       pin: $("#userPin").value,
       vacationTotalDays: Number($("#userVacationDays").value || 15),
-      vacationUsedDays: Number($("#userVacationUsedDays").value || 0)
+      vacationUsedDays: Number($("#userVacationUsedDays").value || 0),
+      hireDate: $("#userHireDate").value,
+      vacationAnnualAddDays: Number($("#userVacationAnnualAddDays").value || $("#userVacationDays").value || 15)
     });
-    e.target.reset(); $("#baseDate").value=ymd(new Date()); $("#userColor").value="#8b2fc9"; $("#userVacationDays").value="15"; $("#userVacationUsedDays").value="0";
+    e.target.reset(); $("#baseDate").value=ymd(new Date()); $("#userColor").value="#8b2fc9"; $("#userVacationDays").value="15"; $("#userVacationUsedDays").value="0"; $("#userHireDate").value=""; $("#userVacationAnnualAddDays").value="15";
   } catch(err) { alert(err.message || "No se pudo agregar el usuario."); console.warn(err); }
   finally { setBusy(btn,false); }
 });
 
+$("#userVacationDays")?.addEventListener("input",()=>{
+  const annual = $("#userVacationAnnualAddDays");
+  if (annual && (!annual.value || annual.value === "15")) annual.value = $("#userVacationDays").value || "15";
+});
 $("#dialogUser").addEventListener("change",loadDialogUser);
 $("#dialogStatus").addEventListener("change",()=>toggleRangeSection($("#dialogStatus").value));
 $("#rangeFrom").addEventListener("change",updateRangeInfo);
