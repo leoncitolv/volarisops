@@ -2069,6 +2069,177 @@ body.view-historial .floating-report-actions{display:none}
       }
     }
 
+
+/* ════════════════════════════════════════
+   REDACTOR TÉCNICO DE AVIACIÓN — OFFLINE
+   Mejora frases simples a inglés técnico sin usar internet
+   ════════════════════════════════════════ */
+.technical-writer-panel{
+  margin-top:14px;
+  padding:14px;
+  border:1px solid rgba(84,213,255,.22);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(84,213,255,.13), transparent 45%),
+    linear-gradient(135deg, rgba(170,34,255,.12), rgba(255,255,255,.04));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 12px 26px rgba(0,0,0,.14);
+}
+.technical-writer-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+  color:#fff;
+  font-weight:900;
+  letter-spacing:-.02em;
+}
+.technical-writer-title small{
+  color:var(--success);
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.technical-writer-help{
+  color:var(--text-sub);
+  font-size:12.5px;
+  line-height:1.45;
+  margin:0 0 10px;
+}
+.technical-writer-panel textarea{
+  min-height:76px !important;
+  margin-bottom:10px;
+}
+.tech-actions{
+  display:grid;
+  grid-template-columns:1.4fr 1fr 0.85fr;
+  gap:8px;
+}
+.tech-actions .btn{
+  min-height:38px;
+  padding:9px 10px;
+  font-size:11px;
+}
+.tech-glossary{
+  margin-top:10px;
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:9px;
+  color:var(--text-sub);
+  font-size:12px;
+}
+.tech-glossary summary{
+  cursor:pointer;
+  font-weight:900;
+  color:var(--accent-light);
+  margin-bottom:6px;
+}
+.tech-glossary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:6px;
+}
+.tech-glossary-grid span{
+  display:block;
+  padding:7px 9px;
+  border-radius:12px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.06);
+  line-height:1.25;
+}
+.tech-glossary-grid b{
+  color:#fff;
+}
+
+.tech-glossary-manager{
+  margin-top:10px;
+  padding:10px;
+  border-radius:16px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+}
+.tech-glossary-manager-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+  font-size:12px;
+  font-weight:900;
+  color:#fff;
+}
+.tech-glossary-form{
+  display:grid;
+  grid-template-columns:1.2fr 1.2fr .85fr auto;
+  gap:7px;
+  align-items:end;
+}
+.tech-glossary-form input,
+.tech-glossary-form select{
+  min-height:38px !important;
+  border-radius:12px !important;
+  padding:8px 10px !important;
+  font-size:13px !important;
+}
+.tech-glossary-form .btn{
+  min-height:38px;
+  padding:8px 10px;
+  font-size:10px;
+}
+.custom-glossary-list{
+  display:grid;
+  gap:6px;
+  margin-top:9px;
+}
+.custom-glossary-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border-radius:12px;
+  background:rgba(170,34,255,.08);
+  border:1px solid rgba(170,34,255,.14);
+  color:var(--text-main);
+  font-size:12px;
+  line-height:1.3;
+}
+.custom-glossary-item small{
+  display:block;
+  margin-top:2px;
+  color:var(--text-sub);
+  font-size:10.5px;
+  font-weight:800;
+}
+.custom-glossary-delete{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:1px solid rgba(255,95,126,.32);
+  background:rgba(255,95,126,.12);
+  color:var(--error);
+  font-weight:900;
+  cursor:pointer;
+}
+.tech-glossary-note{
+  margin-top:7px;
+  color:var(--text-sub);
+  font-size:11.5px;
+  line-height:1.35;
+}
+@media(max-width:760px){
+  .tech-glossary-form{grid-template-columns:1fr;}
+}
+.btn-ai{
+  background:linear-gradient(135deg,#00c2ff,#b629ff) !important;
+  color:white !important;
+  box-shadow:0 12px 24px rgba(84,213,255,.18), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+@media(max-width:640px){
+  .tech-actions{grid-template-columns:1fr;}
+  .technical-writer-title{align-items:flex-start;flex-direction:column;gap:2px;}
+}
+
   </style>
 </head>
 <body>
@@ -2168,6 +2339,7 @@ body.view-historial .floating-report-actions{display:none}
           </div>
           
           <div class="button-group">
+            <button type="button" class="btn btn-ai" onclick="mejorarTodoTecnico()">🧠 Mejorar todo</button>
             <button type="submit" class="btn btn-primary">💾 Guardar Reporte</button>
             <button type="reset" class="btn btn-secondary">🔄 Limpiar</button>
           </div>
@@ -2395,6 +2567,42 @@ body.view-historial .floating-report-actions{display:none}
           <label class="form-label">✨ Actividades Realizadas</label>
           <textarea id="act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
             oninput="syncAeronaveField(${id},'actividades',this.value)" required>${datos?.actividades || ''}</textarea>
+
+          <div class="technical-writer-panel">
+            <div class="technical-writer-title">🧠 Redactor técnico de aviación <small>Offline</small></div>
+            <p class="technical-writer-help">Escribe en español simple o mezclado. Ejemplo: <b>pinte baños F y G</b>, <b>puse placard de APU fuel drain</b>, <b>retoque dintel L2&R2</b>.</p>
+            <textarea id="tech-${id}" placeholder="Ej: pinté baños F y G; puse placard de hydraulic system; retoqué poceta"></textarea>
+            <div class="tech-actions">
+              <button type="button" class="btn btn-ai" onclick="mejorarActividadesAeronave(${id})">✈️ Mejorar y agregar</button>
+              <button type="button" class="btn btn-secondary" onclick="normalizarActividadesAeronave(${id})">⚙️ Reescribir actual</button>
+              <button type="button" class="btn btn-secondary" onclick="cargarEjemploTecnico(${id})">💡 Ejemplo</button>
+            </div>
+            <details class="tech-glossary">
+              <summary>Ver / editar glosario técnico</summary>
+              <div class="tech-glossary-grid">
+                <span><b>baños</b> → Lavatories</span>
+                <span><b>poceta</b> → Toilet Shroud Assembly</span>
+                <span><b>dintel</b> → Entrance Door Scuff Plate</span>
+                <span><b>bines</b> → Overhead Bin Door</span>
+                <span><b>pañalera</b> → Nursing Table Assembly</span>
+                <span><b>calca/etiqueta</b> → Placard</span>
+              </div>
+              <div class="tech-glossary-manager">
+                <div class="tech-glossary-manager-title">➕ Agregar término propio <small>Se guarda en este equipo</small></div>
+                <form class="tech-glossary-form" onsubmit="agregarGlosarioPersonalizado(event)">
+                  <input name="keys" type="text" placeholder="Cómo lo escribes: mampara, panel baño" required>
+                  <input name="term" type="text" placeholder="Inglés técnico: Lavatory Partition Panel" required>
+                  <select name="type" aria-label="Tipo de término">
+                    <option value="component">Componente</option>
+                    <option value="placard">Placard</option>
+                  </select>
+                  <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+                <p class="tech-glossary-note">Tip: separa sinónimos con coma. Ejemplo: <b>mampara, división baño</b> → <b>Lavatory Partition Panel</b>.</p>
+                <div class="custom-glossary-list"></div>
+              </div>
+            </details>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">📷 Fotos de Actividades</label>
@@ -2409,6 +2617,7 @@ body.view-historial .floating-report-actions{display:none}
         </div>
       `;
       container.appendChild(card);
+      renderCustomGlossaryViews();
 
       // Auto-emoji en Enter
       const ta = document.getElementById(`act-${id}`);
@@ -3027,6 +3236,42 @@ Esta acción eliminará la nota guardada en este celular y no se puede deshacer.
           <label class="form-label">✨ Actividades Realizadas</label>
           <textarea id="edit-act-${id}" placeholder="Presiona Enter para agregar viñetas automáticas 🔹"
             oninput="editSyncField(${id},'actividades',this.value)">${obj.actividades}</textarea>
+
+          <div class="technical-writer-panel">
+            <div class="technical-writer-title">🧠 Redactor técnico de aviación <small>Offline</small></div>
+            <p class="technical-writer-help">Escribe una nota rápida y la app la convierte a inglés técnico.</p>
+            <textarea id="edit-tech-${id}" placeholder="Ej: pinté baños F y G; instalé placard de APU fuel drain"></textarea>
+            <div class="tech-actions">
+              <button type="button" class="btn btn-ai" onclick="editMejorarActividadesAeronave(${id})">✈️ Mejorar y agregar</button>
+              <button type="button" class="btn btn-secondary" onclick="editNormalizarActividadesAeronave(${id})">⚙️ Reescribir actual</button>
+              <button type="button" class="btn btn-secondary" onclick="editCargarEjemploTecnico(${id})">💡 Ejemplo</button>
+            </div>
+            <details class="tech-glossary">
+              <summary>Ver / editar glosario técnico</summary>
+              <div class="tech-glossary-grid">
+                <span><b>baños</b> → Lavatories</span>
+                <span><b>poceta</b> → Toilet Shroud Assembly</span>
+                <span><b>dintel</b> → Entrance Door Scuff Plate</span>
+                <span><b>bines</b> → Overhead Bin Door</span>
+                <span><b>pañalera</b> → Nursing Table Assembly</span>
+                <span><b>calca/etiqueta</b> → Placard</span>
+              </div>
+              <div class="tech-glossary-manager">
+                <div class="tech-glossary-manager-title">➕ Agregar término propio <small>Se guarda en este equipo</small></div>
+                <form class="tech-glossary-form" onsubmit="agregarGlosarioPersonalizado(event)">
+                  <input name="keys" type="text" placeholder="Cómo lo escribes: mampara, panel baño" required>
+                  <input name="term" type="text" placeholder="Inglés técnico: Lavatory Partition Panel" required>
+                  <select name="type" aria-label="Tipo de término">
+                    <option value="component">Componente</option>
+                    <option value="placard">Placard</option>
+                  </select>
+                  <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+                <p class="tech-glossary-note">Tip: separa sinónimos con coma. Ejemplo: <b>mampara, división baño</b> → <b>Lavatory Partition Panel</b>.</p>
+                <div class="custom-glossary-list"></div>
+              </div>
+            </details>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">📷 Fotos de Actividades</label>
@@ -3039,6 +3284,7 @@ Esta acción eliminará la nota guardada en este celular y no se puede deshacer.
         </div>
       `;
       container.appendChild(card);
+      renderCustomGlossaryViews();
 
       // Renderizar fotos existentes
       if (obj.fotos.length) {
@@ -3355,6 +3601,366 @@ Esta acción eliminará la nota guardada en este celular y no se puede deshacer.
       }, 3000);
     }
   
+
+/* ════════════════════════════════════════
+   MOTOR DE REDACCIÓN TÉCNICA AERONÁUTICA
+   Convierte notas simples a inglés técnico sin internet.
+   No inventa trabajos ni referencias: solo normaliza lo escrito.
+   ════════════════════════════════════════ */
+const AVIATION_COMPONENTS = [
+  { term:'Escape Slide Cover Assembly', keys:['escape slide cover', 'escape slide cover assy', 'tapa de tobogan', 'tapa de tobogán', 'cover assy tobogan'] },
+  { term:'Entrance Door Scuff Plate', keys:['entrance door scuff plate', 'scuff plate', 'dintel'] },
+  { term:'Toilet Shroud Assembly', keys:['toilet shroud', 'toilet shroud assembly', 'poceta', 'taza', 'sanitario'] },
+  { term:'Cabin Attendant Seat', keys:['cabin attendant seat', 'asiento de sobrecargo', 'asiento de sobrecargos', 'jumpseat', 'jump seat'] },
+  { term:'Passenger Seat', keys:['passenger seat', 'asiento de pasajero', 'asiento de pasajeros', 'asientos pasajeros'] },
+  { term:'Service Cabinet', keys:['service cabinet', 'compartimiento de sanitas', 'sanitas'] },
+  { term:'Washbasin Door Assembly', keys:['washbasin door', 'washbasin door assy', 'tapa de lavabo', 'lavabo'] },
+  { term:'Nursing Table Assembly', keys:['nursing table', 'table assy nursing', 'mesa de panalera', 'mesa de pañalera', 'panalera', 'pañalera'] },
+  { term:'Lavatory Door Assembly', keys:['lavatory door', 'door assy lavatory', 'puerta de bano', 'puerta de baño', 'puerta baño', 'puerta del bano', 'puerta del baño'] },
+  { term:'Door Assembly', keys:['door assy', 'door assembly'] },
+  { term:'Overhead Bin Door', keys:['overhead bin door', 'overhead bin', 'bin door', 'bines', 'bin'] },
+  { term:'Galley Service Panel', keys:['galley service panel', 'service panel', 'panel de galley'] }
+];
+
+const AVIATION_PLACARDS = [
+  { term:'Interphone Service and Ground Electrical Power', keys:['interphone service ground electric', 'interphone service ground electrical', 'interphone y energia tierra', 'interphone y energía tierra', 'ground electric', 'ground electrical power'] },
+  { term:'APU Fuel Drain', keys:['apu fuel drain', 'apu drain', 'fuel drain apu', 'drenado apu'] },
+  { term:'Hydraulic System', keys:['hydraulic system', 'sistema hidraulico', 'sistema hidráulico', 'hydraulic'] },
+  { term:'Cargo Compartment Doors', keys:['cargo compartment doors', 'cargo doors', 'compuertas de carga', 'puertas de carga', 'cargo compartment'] },
+  { term:'Interphone Service', keys:['interphone service', 'interphone'] },
+  { term:'Ground Electrical Power', keys:['ground electrical power', 'ground electric power', 'energia tierra', 'energía tierra'] }
+];
+
+const CUSTOM_GLOSSARY_STORAGE_KEY = 'aviation_custom_glossary_v2';
+
+function getCustomGlossary() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(CUSTOM_GLOSSARY_STORAGE_KEY) || '[]');
+    return Array.isArray(raw) ? raw.filter(x => x && x.term && Array.isArray(x.keys)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomGlossary(items) {
+  localStorage.setItem(CUSTOM_GLOSSARY_STORAGE_KEY, JSON.stringify(items || []));
+}
+
+function getAviationComponents() {
+  return [
+    ...AVIATION_COMPONENTS,
+    ...getCustomGlossary().filter(x => x.type !== 'placard').map(x => ({ term: x.term, keys: x.keys }))
+  ];
+}
+
+function getAviationPlacards() {
+  return [
+    ...AVIATION_PLACARDS,
+    ...getCustomGlossary().filter(x => x.type === 'placard').map(x => ({ term: x.term, keys: x.keys }))
+  ];
+}
+
+function escapeTechHtml(value='') {
+  return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+
+function renderCustomGlossaryViews() {
+  const items = getCustomGlossary();
+  document.querySelectorAll('.custom-glossary-list').forEach(list => {
+    if (!items.length) {
+      list.innerHTML = '<div class="tech-glossary-note">Aún no tienes términos propios guardados.</div>';
+      return;
+    }
+    list.innerHTML = items.map((item, index) => `
+      <div class="custom-glossary-item">
+        <div>
+          <b>${escapeTechHtml(item.term)}</b>
+          <small>${item.type === 'placard' ? 'Placard' : 'Componente'} · ${escapeTechHtml(item.keys.join(', '))}</small>
+        </div>
+        <button type="button" class="custom-glossary-delete" onclick="eliminarGlosarioPersonalizado(${index})" aria-label="Eliminar término">×</button>
+      </div>
+    `).join('');
+  });
+}
+
+function agregarGlosarioPersonalizado(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const term = form.term.value.trim();
+  const keys = form.keys.value.split(',').map(x => x.trim()).filter(Boolean);
+  const type = form.type.value === 'placard' ? 'placard' : 'component';
+  if (!term || !keys.length) return mostrarToast('⚠️ Captura el término y al menos una palabra clave', 'error');
+  const items = getCustomGlossary();
+  const normalizedTerm = techNormalize(term);
+  const existingIndex = items.findIndex(x => techNormalize(x.term) === normalizedTerm && x.type === type);
+  const entry = { term, keys, type };
+  if (existingIndex >= 0) items[existingIndex] = entry;
+  else items.push(entry);
+  saveCustomGlossary(items);
+  form.reset();
+  renderCustomGlossaryViews();
+  mostrarToast('✅ Término agregado al glosario técnico', 'success');
+}
+
+function eliminarGlosarioPersonalizado(index) {
+  const items = getCustomGlossary();
+  if (index < 0 || index >= items.length) return;
+  items.splice(index, 1);
+  saveCustomGlossary(items);
+  renderCustomGlossaryViews();
+  mostrarToast('🗑️ Término eliminado del glosario', 'success');
+}
+
+function techNormalize(text='') {
+  return String(text)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[\/_,.;:()\[\]{}]+/g, ' ')
+    .replace(/&/g, ' and ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function cleanActivityLine(line='') {
+  return String(line).replace(/^[\u{1F000}-\u{1FFFF}🔹🔸▪️•\-*\s]+/u, '').trim();
+}
+
+function splitTechnicalInput(text='') {
+  return String(text)
+    .split(/\n|;/)
+    .map(cleanActivityLine)
+    .filter(Boolean);
+}
+
+function ensurePeriod(sentence='') {
+  const out = String(sentence).replace(/\s+/g, ' ').trim();
+  if (!out) return '';
+  return /[.!?]$/.test(out) ? out : out + '.';
+}
+
+function joinWithAnd(items=[]) {
+  const unique = [...new Set(items.filter(Boolean))];
+  if (unique.length <= 1) return unique[0] || '';
+  if (unique.length === 2) return `${unique[0]} and ${unique[1]}`;
+  return `${unique.slice(0, -1).join(', ')}, and ${unique.at(-1)}`;
+}
+
+function findByDictionary(line, dictionary) {
+  const n = techNormalize(line);
+  return dictionary.filter(item => item.keys.some(k => n.includes(techNormalize(k))));
+}
+
+function detectPositionSuffix(line='') {
+  const upper = String(line).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+  let m = upper.match(/\b([LR]\d)\s*(?:&|AND|Y|\/|,)\s*([LR]\d)\b/);
+  if (m) return ` ${m[1]} and ${m[2]}`;
+  m = upper.match(/\b([LR]\d)\b/);
+  if (m) return ` ${m[1]}`;
+  if (/\b(FWD|FORWARD|DELANTERO)\b/.test(upper)) return ' FWD';
+  if (/\b(AFT|TRASERO|POSTERIOR)\b/.test(upper)) return ' AFT';
+  return '';
+}
+
+function detectLavatoryPhrase(line='') {
+  const upper = String(line).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+  let m = upper.match(/\b(?:BANOS?|LAVATOR(?:Y|IES))\s+([A-Z])\s*(?:&|AND|Y|\/|,)\s*([A-Z])\b/);
+  if (m && m[1] !== 'Y' && m[2] !== 'Y') return `lavatories ${m[1]} and ${m[2]}`;
+  m = upper.match(/\b(?:BANO|BANOS|LAVATORY)\s+([A-Z])\b/);
+  if (m && m[1] !== 'Y') return `lavatory ${m[1]}`;
+  return /BANOS|LAVATORIES/.test(upper) ? 'lavatories' : 'lavatory';
+}
+
+function hasAnyVerb(line, words=[]) {
+  const n = techNormalize(line);
+  return words.some(w => n.includes(techNormalize(w)));
+}
+
+function technicalFallback(line='') {
+  let out = cleanActivityLine(line);
+  const replacements = [
+    ['poceta', 'Toilet Shroud Assembly'],
+    ['tapa de tobogan', 'Escape Slide Cover Assembly'],
+    ['tapa de tobogán', 'Escape Slide Cover Assembly'],
+    ['dintel', 'Entrance Door Scuff Plate'],
+    ['asiento de sobrecargos', 'Cabin Attendant Seat'],
+    ['asiento de sobrecargo', 'Cabin Attendant Seat'],
+    ['asiento de pasajeros', 'Passenger Seat'],
+    ['compartimiento de sanitas', 'Service Cabinet'],
+    ['tapa de lavabo', 'Washbasin Door Assembly'],
+    ['mesa de pañalera', 'Nursing Table Assembly'],
+    ['mesa de panalera', 'Nursing Table Assembly'],
+    ['puerta de baño', 'Lavatory Door Assembly'],
+    ['puerta de bano', 'Lavatory Door Assembly'],
+    ['bines', 'Overhead Bin Door'],
+    ['baños', 'lavatories'],
+    ['banos', 'lavatories'],
+    ['baño', 'lavatory'],
+    ['bano', 'lavatory'],
+    ['calca', 'placard'],
+    ['etiqueta', 'placard']
+  ];
+  replacements.sort((a,b) => b[0].length - a[0].length).forEach(([from, to]) => {
+    out = out.replace(new RegExp(from, 'ig'), to);
+  });
+  out = out.replace(/\bse\s+pinto\b|\bse\s+pintó\b|\bse\s+retoco\b|\bse\s+retocó\b|\bpinte\b|\bpinté\b|\bretoque\b|\bretoqué\b|\bse\s+aplico\s+pintura\b|\bse\s+aplicó\s+pintura\b/ig, 'Paint Touch-Up was performed on');
+  out = out.replace(/\bpuse\b|\bcoloque\b|\bcoloqué\b|\binstale\b|\binstalé\b/ig, 'installed');
+  return ensurePeriod(out.charAt(0).toUpperCase() + out.slice(1));
+}
+
+function improveTechnicalLine(line='') {
+  const original = cleanActivityLine(line);
+  if (!original) return '';
+  const n = techNormalize(original);
+  const pos = detectPositionSuffix(original);
+  const components = findByDictionary(original, getAviationComponents()).map(x => x.term);
+  const placards = findByDictionary(original, getAviationPlacards()).map(x => x.term);
+
+  if (n.includes('51 75 12') || n.includes('srm') || (n.includes('exterior') && (n.includes('pint') || n.includes('paint')))) {
+    return 'Exterior paint coating repair was performed in accordance with SRM 51-75-12-911-001 Repair of Paint Coatings.';
+  }
+
+  const isPlacard = n.includes('placard') || n.includes('calca') || n.includes('etiqueta') || n.includes('letrero');
+  const installed = hasAnyVerb(original, ['instale','instalé','instalo','instaló','puse','coloque','coloqué','installed','installation']);
+  if ((isPlacard || installed) && placards.length) {
+    const subject = joinWithAnd(placards);
+    const plural = subject.includes(' and ') || subject.endsWith('Doors');
+    return `${subject} placard${plural ? 's were' : ' was'} installed.`;
+  }
+
+  const hasPaint = hasAnyVerb(original, ['pinte','pinté','pinto','pintó','se pinto','se pintó','se pinto','se retoco','se retocó','se realizo pintura','se realizó pintura','se aplico pintura','se aplicó pintura','pintura','retoque','retoqué','retoco','retocó','retocar','se retoco','touch up','touch-up','paint','painted','minor damage','daño menor','dano menor']);
+  const mentionsLavatory = n.includes('bano') || n.includes('lavatory') || n.includes('lavatories');
+  if (hasPaint) {
+    if (mentionsLavatory && components.length === 0) {
+      return `Performed surface preparation and Paint Touch-Up in ${detectLavatoryPhrase(original)}.`;
+    }
+    if (components.length) {
+      const componentText = joinWithAnd(components.map((c, i) => i === components.length - 1 ? c + pos : c));
+      return `Paint Touch-Up was performed on the ${componentText}.`;
+    }
+    return 'Paint Touch-Up was performed on the affected area.';
+  }
+
+  const hasClean = hasAnyVerb(original, ['limpie','limpié','limpieza','clean','cleaned']);
+  if (hasClean) {
+    if (mentionsLavatory && components.length === 0) return `Cleaning was performed in ${detectLavatoryPhrase(original)}.`;
+    if (components.length) return `Cleaning was performed on the ${joinWithAnd(components.map((c, i) => i === components.length - 1 ? c + pos : c))}.`;
+    return 'Cleaning was performed on the affected area.';
+  }
+
+  const hasInspect = hasAnyVerb(original, ['inspeccione','inspeccioné','inspeccion','inspección','check','checked','inspection','visual']);
+  if (hasInspect) {
+    if (components.length) return `Visual inspection was performed on the ${joinWithAnd(components.map((c, i) => i === components.length - 1 ? c + pos : c))}.`;
+    if (mentionsLavatory) return `Visual inspection was performed in ${detectLavatoryPhrase(original)}.`;
+    return 'Visual inspection was performed on the affected area.';
+  }
+
+  const hasRepair = hasAnyVerb(original, ['repare','reparé','reparacion','reparación','repair','rework','retrabajo','ajuste','adjustment']);
+  if (hasRepair) {
+    if (components.length) return `Rework was performed on the ${joinWithAnd(components.map((c, i) => i === components.length - 1 ? c + pos : c))}.`;
+    return 'Rework was performed on the affected area.';
+  }
+
+  const hasReplace = hasAnyVerb(original, ['cambie','cambié','reemplaze','reemplacé','replace','replaced','remove and replace']);
+  if (hasReplace) {
+    if (components.length) return `The ${joinWithAnd(components.map((c, i) => i === components.length - 1 ? c + pos : c))} was removed and replaced.`;
+    return 'The affected component was removed and replaced.';
+  }
+
+  if (isPlacard) return placards.length ? `${joinWithAnd(placards)} placard was installed.` : 'Placard was installed.';
+  if (components.length) return ensurePeriod(`${joinWithAnd(components.map((c, i) => i === components.length - 1 ? c + pos : c))} work was performed`);
+  return technicalFallback(original);
+}
+
+function mejorarTextoTecnico(texto='') {
+  const lines = splitTechnicalInput(texto).map(improveTechnicalLine).filter(Boolean);
+  return lines.map(l => `🔹 ${l}`).join('\n');
+}
+
+function appendImprovedToTextarea(textarea, improved) {
+  if (!textarea || !improved) return;
+  textarea.value = textarea.value.trim()
+    ? `${textarea.value.trim()}\n${improved}`
+    : improved;
+}
+
+function mejorarActividadesAeronave(id) {
+  const raw = document.getElementById(`tech-${id}`);
+  const act = document.getElementById(`act-${id}`);
+  const source = raw?.value?.trim() || act?.value?.trim();
+  if (!source) return mostrarToast('⚠️ Escribe una nota para mejorar', 'error');
+  const improved = mejorarTextoTecnico(source);
+  if (raw?.value?.trim()) {
+    appendImprovedToTextarea(act, improved);
+    raw.value = '';
+  } else {
+    act.value = improved;
+  }
+  syncAeronaveField(id, 'actividades', act.value);
+  mostrarToast('✈️ Redacción técnica agregada', 'success');
+}
+
+function normalizarActividadesAeronave(id) {
+  const act = document.getElementById(`act-${id}`);
+  if (!act?.value?.trim()) return mostrarToast('⚠️ No hay actividades para reescribir', 'error');
+  act.value = mejorarTextoTecnico(act.value);
+  syncAeronaveField(id, 'actividades', act.value);
+  mostrarToast('⚙️ Actividades reescritas en inglés técnico', 'success');
+}
+
+function cargarEjemploTecnico(id) {
+  const raw = document.getElementById(`tech-${id}`);
+  if (!raw) return;
+  raw.value = 'se pintó baños F y G; se retocó poceta; puse placard de APU fuel drain; se retocó dintel L2&R2';
+  raw.focus();
+}
+
+function mejorarTodoTecnico() {
+  let count = 0;
+  aeronavesData.forEach(a => {
+    const act = document.getElementById(`act-${a.id}`);
+    if (act?.value?.trim()) {
+      act.value = mejorarTextoTecnico(act.value);
+      syncAeronaveField(a.id, 'actividades', act.value);
+      count++;
+    }
+  });
+  if (!count) return mostrarToast('⚠️ No hay actividades para mejorar', 'error');
+  mostrarToast(`🧠 Redacción mejorada en ${count} aeronave(s)`, 'success');
+}
+
+function editMejorarActividadesAeronave(id) {
+  const raw = document.getElementById(`edit-tech-${id}`);
+  const act = document.getElementById(`edit-act-${id}`);
+  const source = raw?.value?.trim() || act?.value?.trim();
+  if (!source) return mostrarToast('⚠️ Escribe una nota para mejorar', 'error');
+  const improved = mejorarTextoTecnico(source);
+  if (raw?.value?.trim()) {
+    appendImprovedToTextarea(act, improved);
+    raw.value = '';
+  } else {
+    act.value = improved;
+  }
+  editSyncField(id, 'actividades', act.value);
+  mostrarToast('✈️ Redacción técnica agregada', 'success');
+}
+
+function editNormalizarActividadesAeronave(id) {
+  const act = document.getElementById(`edit-act-${id}`);
+  if (!act?.value?.trim()) return mostrarToast('⚠️ No hay actividades para reescribir', 'error');
+  act.value = mejorarTextoTecnico(act.value);
+  editSyncField(id, 'actividades', act.value);
+  mostrarToast('⚙️ Actividades reescritas en inglés técnico', 'success');
+}
+
+function editCargarEjemploTecnico(id) {
+  const raw = document.getElementById(`edit-tech-${id}`);
+  if (!raw) return;
+  raw.value = 'se pintó baños F y G; instalé placard de hydraulic system; se retocó bines';
+  raw.focus();
+}
+
+
+document.addEventListener('DOMContentLoaded', () => renderCustomGlossaryViews());
 
 // ===== REPORTES V2 VISUAL PATCH =====
 function resetearFormularioReporte(){
