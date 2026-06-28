@@ -1603,26 +1603,136 @@ function renderGlobal(){
 }
 
 /* ══════════════════════════
-   TELEGRAM BOT
+   TELEGRAM BOT SEGURO VIA GITHUB ACTIONS
 ══════════════════════════ */
-// Telegram seguro: NO coloques aquí el token del bot.
-// Para activar notificaciones, crea una Cloud Function/endpoint propio y pega su URL pública aquí.
-// Ejemplo: const TELEGRAM_WEBHOOK_URL = 'https://tu-region-tu-proyecto.cloudfunctions.net/sendTelegram';
+// Seguridad: aquí NO se coloca token de Telegram ni chat_id.
+// El HTML solo puede disparar el workflow de GitHub Actions.
+// GitHub Actions usa TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID desde Secrets del repo.
 const TELEGRAM_WEBHOOK_URL = '';
+const OPS_GITHUB_TRIGGER_KEY = 'vops_github_actions_trigger_v1';
+
+function loadOpsGithubTrigger(){
+  try{return JSON.parse(localStorage.getItem(OPS_GITHUB_TRIGGER_KEY)||'{}')||{};}
+  catch(e){return {};}
+}
+function saveOpsGithubTrigger(cfg){
+  localStorage.setItem(OPS_GITHUB_TRIGGER_KEY, JSON.stringify(cfg||{}));
+}
+function opsGithubTriggerReady(){
+  const c=loadOpsGithubTrigger();
+  return !!(c.owner&&c.repo&&c.branch&&c.workflow&&c.token);
+}
+async function triggerOpsTelegramWorkflow(reason='evento-volaris-ops'){
+  const c=loadOpsGithubTrigger();
+  if(!opsGithubTriggerReady()){
+    console.info('VolarisOps Telegram: falta configurar el disparador GitHub Actions.');
+    return false;
+  }
+  const owner=encodeURIComponent(c.owner.trim());
+  const repo=encodeURIComponent(c.repo.trim());
+  const workflow=encodeURIComponent(c.workflow.trim());
+  const url=`https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflow}/dispatches`;
+  try{
+    const resp=await fetch(url,{
+      method:'POST',
+      headers:{
+        'Accept':'application/vnd.github+json',
+        'Authorization':'Bearer '+c.token.trim(),
+        'X-GitHub-Api-Version':'2022-11-28',
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({ref:c.branch.trim()||'main'})
+    });
+    if(resp.status===204){
+      console.info('VolarisOps Telegram: workflow disparado:', reason);
+      return true;
+    }
+    let detail='';
+    try{detail=await resp.text();}catch(_e){}
+    console.warn('VolarisOps Telegram: no pude disparar workflow', resp.status, detail);
+    showToast('⚠️ Bot no disparó GitHub Actions');
+    return false;
+  }catch(e){
+    console.warn('VolarisOps Telegram: error disparando workflow:', e);
+    showToast('⚠️ Sin conexión para disparar bot');
+    return false;
+  }
+}
 
 async function tgNotify(msg){
-  if(!TELEGRAM_WEBHOOK_URL){
-    console.info('Telegram desactivado: falta configurar TELEGRAM_WEBHOOK_URL.');
-    return;
+  // Compatibilidad con endpoint externo si algún día se configura.
+  if(TELEGRAM_WEBHOOK_URL){
+    try{
+      await fetch(TELEGRAM_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:msg})});
+      return;
+    }catch(e){ console.warn('Telegram webhook no disponible:',e); }
   }
-  try{
-    await fetch(TELEGRAM_WEBHOOK_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({text:msg})
-    });
-  }catch(e){ console.warn('Telegram no disponible:',e); }
+  // Ruta segura actual: dispara GitHub Actions, y el workflow manda Telegram usando Secrets.
+  const ok=await triggerOpsTelegramWorkflow('nota/cierre');
+  if(ok) showToast('⚡ Bot Telegram programado');
 }
+
+function openOpsGithubTriggerConfig(){
+  const cur=loadOpsGithubTrigger();
+  const esc=v=>String(v||'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
+  let ov=document.getElementById('modalGitHubBotOps');
+  if(ov)ov.remove();
+  ov=document.createElement('div');
+  ov.id='modalGitHubBotOps';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(5,0,18,.96);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center;padding:1.2rem;';
+  ov.innerHTML=`
+    <div style="width:min(94vw,420px);border:1px solid rgba(160,100,255,.28);border-radius:28px;background:linear-gradient(180deg,rgba(36,12,62,.96),rgba(12,4,25,.98));box-shadow:0 25px 80px rgba(0,0,0,.55),0 0 40px rgba(140,50,255,.18);padding:1.1rem;color:#eee;font-family:'Nunito',sans-serif;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.8rem;">
+        <div>
+          <div style="font-size:1.05rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#d8b8ff;">⚡ Bot Telegram</div>
+          <div style="font-size:.66rem;color:rgba(220,190,255,.55);font-weight:800;letter-spacing:.08em;text-transform:uppercase;">Dispara GitHub Actions sin exponer el token del bot</div>
+        </div>
+        <button id="ghBotClose" style="border:none;border-radius:999px;background:rgba(255,80,120,.16);color:#ff88aa;font-weight:900;padding:.45rem .7rem;">✕</button>
+      </div>
+      <div style="display:grid;gap:.65rem;">
+        <label style="font-size:.62rem;font-weight:900;color:#ad8cff;letter-spacing:.1em;text-transform:uppercase;">Usuario GitHub<input id="ghBotOwner" value="${esc(cur.owner||'leoncitolv')}" style="margin-top:.25rem;width:100%;box-sizing:border-box;border:1px solid rgba(170,120,255,.25);background:rgba(255,255,255,.07);color:#fff;border-radius:14px;padding:.72rem .85rem;font-weight:800;outline:none;"></label>
+        <label style="font-size:.62rem;font-weight:900;color:#ad8cff;letter-spacing:.1em;text-transform:uppercase;">Repositorio<input id="ghBotRepo" value="${esc(cur.repo||'volarisops')}" style="margin-top:.25rem;width:100%;box-sizing:border-box;border:1px solid rgba(170,120,255,.25);background:rgba(255,255,255,.07);color:#fff;border-radius:14px;padding:.72rem .85rem;font-weight:800;outline:none;"></label>
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:.55rem;">
+          <label style="font-size:.62rem;font-weight:900;color:#ad8cff;letter-spacing:.1em;text-transform:uppercase;">Rama<input id="ghBotBranch" value="${esc(cur.branch||'main')}" style="margin-top:.25rem;width:100%;box-sizing:border-box;border:1px solid rgba(170,120,255,.25);background:rgba(255,255,255,.07);color:#fff;border-radius:14px;padding:.72rem .85rem;font-weight:800;outline:none;"></label>
+          <label style="font-size:.62rem;font-weight:900;color:#ad8cff;letter-spacing:.1em;text-transform:uppercase;">Workflow<input id="ghBotWorkflow" value="${esc(cur.workflow||'volaris-ops-telegram.yml')}" style="margin-top:.25rem;width:100%;box-sizing:border-box;border:1px solid rgba(170,120,255,.25);background:rgba(255,255,255,.07);color:#fff;border-radius:14px;padding:.72rem .85rem;font-weight:800;outline:none;"></label>
+        </div>
+        <label style="font-size:.62rem;font-weight:900;color:#ad8cff;letter-spacing:.1em;text-transform:uppercase;">Token GitHub local<input id="ghBotToken" type="password" value="${esc(cur.token||'')}" placeholder="github_pat_..." style="margin-top:.25rem;width:100%;box-sizing:border-box;border:1px solid rgba(170,120,255,.25);background:rgba(255,255,255,.07);color:#fff;border-radius:14px;padding:.72rem .85rem;font-weight:800;outline:none;"></label>
+        <div style="font-size:.66rem;line-height:1.35;color:rgba(230,210,255,.58);font-weight:700;">Este token se guarda solo en este dispositivo. Debe ser fine-grained para el repo <b>volarisops</b> con permiso <b>Actions: Read and write</b>.</div>
+      </div>
+      <div style="display:flex;gap:.6rem;margin-top:1rem;">
+        <button id="ghBotSave" style="flex:1;border:none;border-radius:999px;background:linear-gradient(135deg,#6a22ff,#b144ff);color:white;font-weight:950;padding:.78rem .9rem;">Guardar</button>
+        <button id="ghBotTest" style="flex:1;border:none;border-radius:999px;background:rgba(80,170,255,.16);border:1px solid rgba(80,170,255,.3);color:#9fd3ff;font-weight:950;padding:.78rem .9rem;">Probar</button>
+      </div>
+      <button id="ghBotDelete" style="margin-top:.65rem;width:100%;border:none;border-radius:999px;background:rgba(255,70,100,.12);border:1px solid rgba(255,70,100,.24);color:#ff8aaa;font-weight:900;padding:.68rem .9rem;">Borrar token local</button>
+    </div>`;
+  document.body.appendChild(ov);
+  const readCfg=()=>({
+    owner:document.getElementById('ghBotOwner').value.trim(),
+    repo:document.getElementById('ghBotRepo').value.trim(),
+    branch:document.getElementById('ghBotBranch').value.trim()||'main',
+    workflow:document.getElementById('ghBotWorkflow').value.trim()||'volaris-ops-telegram.yml',
+    token:document.getElementById('ghBotToken').value.trim()
+  });
+  document.getElementById('ghBotClose').onclick=()=>ov.remove();
+  document.getElementById('ghBotSave').onclick=()=>{saveOpsGithubTrigger(readCfg());showToast('✅ Bot configurado');ov.remove();};
+  document.getElementById('ghBotTest').onclick=async()=>{saveOpsGithubTrigger(readCfg());const ok=await triggerOpsTelegramWorkflow('prueba-manual');showToast(ok?'✅ Workflow disparado':'⚠️ No pude disparar workflow');};
+  document.getElementById('ghBotDelete').onclick=()=>{localStorage.removeItem(OPS_GITHUB_TRIGGER_KEY);showToast('🧹 Token local borrado');ov.remove();};
+}
+window.openOpsGithubTriggerConfig=openOpsGithubTriggerConfig;
+
+(function injectOpsBotButton(){
+  const make=()=>{
+    if(document.getElementById('btnOpsBotConfig'))return;
+    const b=document.createElement('button');
+    b.id='btnOpsBotConfig';
+    b.textContent='⚡ Bot';
+    b.title='Configurar disparo seguro de GitHub Actions';
+    b.onclick=openOpsGithubTriggerConfig;
+    b.style.cssText='position:fixed;right:16px;bottom:78px;z-index:450;border:none;border-radius:999px;padding:.72rem .95rem;background:linear-gradient(135deg,rgba(110,40,255,.95),rgba(180,65,255,.95));color:#fff;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:950;letter-spacing:.04em;box-shadow:0 12px 35px rgba(110,40,255,.35);cursor:pointer;';
+    document.body.appendChild(b);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',make);else make();
+})();
 
 function tgMsgToggle(newDone, nombre, textoNota, perfil){
   const quien = (perfil.nombre||DEVICE_NAME) + (perfil.numero?' #'+perfil.numero:'');
