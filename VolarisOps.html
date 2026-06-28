@@ -2273,9 +2273,80 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
 
 <!-- Firebase -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, update, remove, onValue, get, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+let firebaseOnline = true;
+let initializeApp, getDatabase, ref, set, update, remove, onValue, get, push;
+let getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence;
+
+const FIREBASE_URLS = {
+  app: "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js",
+  db: "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js",
+  auth: "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"
+};
+
+function getStoredPerfilForOfflineAuth(){
+  try { return { nombre: localStorage.getItem('vop_nombre')||'', numero: localStorage.getItem('vop_numero')||'' }; }
+  catch(e){ return { nombre:'', numero:'' }; }
+}
+function readOfflineJSONDirect(key, fallback){
+  try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
+  catch(e){ return fallback; }
+}
+function valueAtFirebaseLikePath(rootObj, path){
+  const parts=String(path||'').split('/').filter(Boolean);
+  let cur=rootObj;
+  for(const part of parts){ if(!cur || typeof cur!=='object' || !(part in cur)) return null; cur=cur[part]; }
+  return cur;
+}
+function offlineSnap(value){
+  return { exists:()=>value!==null&&value!==undefined, val:()=>value };
+}
+
+try{
+  const [appMod, dbMod, authMod] = await Promise.all([
+    import(FIREBASE_URLS.app),
+    import(FIREBASE_URLS.db),
+    import(FIREBASE_URLS.auth)
+  ]);
+  ({ initializeApp } = appMod);
+  ({ getDatabase, ref, set, update, remove, onValue, get, push } = dbMod);
+  ({ getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } = authMod);
+}catch(firebaseImportError){
+  firebaseOnline = false;
+  console.warn('Firebase no disponible. Abriendo VolarisOps en modo offline local:', firebaseImportError);
+  initializeApp = () => ({});
+  getDatabase = () => ({});
+  ref = (_db, path='') => ({ path:String(path||'') });
+  get = async (r) => {
+    const path=String(r?.path||'');
+    const root = path.startsWith('volaris_users') ? readOfflineJSONDirect('vop_users_cache_v1', {}) : readOfflineJSONDirect('vop_notas_cache_v1', {});
+    const clean = path.replace(/^volaris_users\/?/,'').replace(/^volaris_notas\/?/,'');
+    return offlineSnap(clean ? valueAtFirebaseLikePath(root, clean) : root);
+  };
+  set = async () => {};
+  update = async () => {};
+  remove = async () => {};
+  push = (r) => ({ ...(r||{}), key:'offline_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6) });
+  onValue = (r, cb, errCb) => {
+    setTimeout(()=>{
+      try{
+        const path=String(r?.path||'');
+        const root = path.startsWith('volaris_users') ? readOfflineJSONDirect('vop_users_cache_v1', {}) : readOfflineJSONDirect('vop_notas_cache_v1', {});
+        const clean = path.replace(/^volaris_users\/?/,'').replace(/^volaris_notas\/?/,'');
+        cb(offlineSnap(clean ? valueAtFirebaseLikePath(root, clean) : root));
+      }catch(e){ errCb?.(e); }
+    },0);
+    return ()=>{};
+  };
+  getAuth = () => {
+    const p=getStoredPerfilForOfflineAuth();
+    return { currentUser: p.numero ? { email:String(p.numero).replace(/\D/g,'')+'@volarisops.local' } : null };
+  };
+  setPersistence = async () => {};
+  browserLocalPersistence = {};
+  onAuthStateChanged = (auth, cb) => { setTimeout(()=>cb(auth.currentUser || null),0); return ()=>{}; };
+  signInWithEmailAndPassword = async (auth, email) => { auth.currentUser={ email }; return { user:auth.currentUser }; };
+  signOut = async (auth) => { if(auth) auth.currentUser=null; };
+}
 
 const firebaseConfig = {
   apiKey: "AIzaSyBgxuSvpkpMJ6nGFdPV8j-Oj5RSHA7_uWM",
@@ -2298,6 +2369,94 @@ function writeJSONCache(key, value) { try { localStorage.setItem(key, JSON.strin
 function loadUsersCache() { return readJSONCache(VOP_USERS_CACHE_KEY, {}); }
 function loadNotasCache() { return readJSONCache(VOP_NOTAS_CACHE_KEY, {}); }
 function offlineAuthMessage(){ return 'Sin conexión. Para entrar por primera vez necesitas internet. Si ya habías iniciado sesión, la app puede abrir con datos guardados.'; }
+
+const VOP_QUEUE_KEY = 'vop_offline_queue_v1';
+function isOfflineMode(){ return !firebaseOnline || !navigator.onLine; }
+function readOfflineQueue(){ return readJSONCache(VOP_QUEUE_KEY, []); }
+function writeOfflineQueue(q){ writeJSONCache(VOP_QUEUE_KEY, q); }
+function queueOfflineOp(type, path, value){
+  const q=readOfflineQueue();
+  q.push({type,path,value,ts:Date.now()});
+  writeOfflineQueue(q.slice(-250));
+}
+function splitPath(path){ return String(path||'').split('/').filter(Boolean); }
+function getLocalRootForPath(path){
+  if(String(path).startsWith('volaris_users')) return {key:VOP_USERS_CACHE_KEY, root:loadUsersCache(), base:'volaris_users'};
+  return {key:VOP_NOTAS_CACHE_KEY, root:loadNotasCache(), base:'volaris_notas'};
+}
+function setDeep(obj, parts, value){
+  let cur=obj;
+  for(let i=0;i<parts.length-1;i++){ const p=parts[i]; if(!cur[p] || typeof cur[p] !== 'object') cur[p]={}; cur=cur[p]; }
+  if(parts.length) cur[parts[parts.length-1]]=value;
+}
+function updateDeep(obj, parts, patch){
+  let cur=obj;
+  for(const p of parts){ if(!cur[p] || typeof cur[p] !== 'object') cur[p]={}; cur=cur[p]; }
+  Object.entries(patch||{}).forEach(([k,v])=>setDeep(cur, splitPath(k), v));
+}
+function removeDeep(obj, parts){
+  let cur=obj;
+  for(let i=0;i<parts.length-1;i++){ cur=cur?.[parts[i]]; if(!cur || typeof cur!=='object') return; }
+  if(parts.length) delete cur[parts[parts.length-1]];
+}
+function applyLocalSet(path, value, shouldQueue=true){
+  const {key,root,base}=getLocalRootForPath(path);
+  const parts=splitPath(path).slice(1);
+  if(!parts.length){ writeJSONCache(key,value||{}); }
+  else { setDeep(root, parts, value); writeJSONCache(key, root); }
+  if(base==='volaris_notas') globalData=loadNotasCache(); else usersData=loadUsersCache();
+  if(shouldQueue) queueOfflineOp('set', path, value);
+}
+function applyLocalUpdate(path, value, shouldQueue=true){
+  const {key,root,base}=getLocalRootForPath(path);
+  const parts=splitPath(path).slice(1);
+  updateDeep(root, parts, value||{});
+  writeJSONCache(key, root);
+  if(base==='volaris_notas') globalData=loadNotasCache(); else usersData=loadUsersCache();
+  if(shouldQueue) queueOfflineOp('update', path, value||{});
+}
+function applyLocalRemove(path, shouldQueue=true){
+  const {key,root,base}=getLocalRootForPath(path);
+  const parts=splitPath(path).slice(1);
+  removeDeep(root, parts);
+  writeJSONCache(key, root);
+  if(base==='volaris_notas') globalData=loadNotasCache(); else usersData=loadUsersCache();
+  if(shouldQueue) queueOfflineOp('remove', path, null);
+}
+function renderFromLocalCache(){
+  try{
+    setSyncOff();
+    renderFolders(document.getElementById('searchNotas')?.value||'');
+    renderGlobal();
+    updateHomeQuickStats();
+  }catch(e){ console.warn('No se pudo renderizar caché local todavía:', e); }
+}
+async function flushOfflineQueue(){
+  if(!firebaseOnline || !navigator.onLine) return;
+  const q=readOfflineQueue();
+  if(!q.length) return;
+  const remaining=[];
+  for(const op of q){
+    try{
+      if(op.type==='localEntry'){
+        const v=op.value||{}, key=matKey(v.mat||'');
+        if(!key || !v.entry) continue;
+        const snap=await get(ref(db,'volaris_notas/'+key));
+        if(!snap.exists()) await set(ref(db,'volaris_notas/'+key),{nombre:v.mat,deviceName:DEVICE_NAME,device:DEVICE_ID,ts:Date.now(),deleted:false,entries:{},modelo:v.modeloVal||'',variante:v.varianteVal||''});
+        else if(v.modeloVal||v.varianteVal){ const upd={}; if(v.modeloVal)upd.modelo=v.modeloVal; if(v.varianteVal)upd.variante=v.varianteVal; await update(ref(db,'volaris_notas/'+key),upd); }
+        await set(ref(db,'volaris_notas/'+key+'/entries/'+v.entry.id),v.entry);
+      }
+      else if(op.type==='set') await set(ref(db, op.path), op.value);
+      else if(op.type==='update') await update(ref(db, op.path), op.value);
+      else if(op.type==='remove') await remove(ref(db, op.path));
+    }catch(e){
+      console.warn('Pendiente offline no sincronizado todavía:', op, e);
+      remaining.push(op);
+    }
+  }
+  writeOfflineQueue(remaining);
+  if(!remaining.length) showToast('✅ Cambios offline sincronizados');
+}
 
 /* ══════════════════════════
    TEMA
@@ -2325,6 +2484,13 @@ let unsubscribeUsers = null;
 
 function startUsersListener(){
   if(unsubscribeUsers) return;
+  if(isOfflineMode()){
+    usersData = loadUsersCache();
+    renderUserList();
+    updateTopUser();
+    syncSupervisorMode(false);
+    if(!firebaseOnline) return;
+  }
   unsubscribeUsers = onValue(usersRef, snap => {
     usersData = snap.val() || {};
     writeJSONCache(VOP_USERS_CACHE_KEY, usersData);
@@ -2372,6 +2538,11 @@ function getUserByNumero(numero){
   return usersData[k] || Object.values(usersData).find(u => String(u.numero).trim() === String(numero).trim()) || null;
 }
 async function getUserByNumeroFresh(numero){
+  if(isOfflineMode()){
+    const cached = loadUsersCache();
+    usersData = Object.keys(usersData || {}).length ? usersData : cached;
+    return cached[userKey(numero)] || Object.values(cached).find(u => String(u.numero).trim() === String(numero).trim()) || null;
+  }
   try {
     const snap = await get(ref(db, 'volaris_users/' + userKey(numero)));
     const value = snap.exists() ? snap.val() : null;
@@ -2470,6 +2641,11 @@ const dbRef = ref(db, 'volaris_notas');
 let unsubscribeNotas = null;
 function startNotasListener(){
   if(unsubscribeNotas) return;
+  if(isOfflineMode()){
+    globalData = loadNotasCache();
+    renderFromLocalCache();
+    if(!firebaseOnline) return;
+  }
   unsubscribeNotas = onValue(dbRef, snap => {
     globalData = snap.val() || {};
     writeJSONCache(VOP_NOTAS_CACHE_KEY, globalData);
@@ -2497,21 +2673,53 @@ function stopRealtimeListeners(){ stopUsersListener(); stopNotasListener(); }
 function matKey(mat){ return mat.replace(/[.#$/\[\] ]/g,'_'); }
 async function fbSetEntry(mat, entry, modeloVal='', varianteVal=''){
   const key=matKey(mat);
-  const snap=await get(ref(db,'volaris_notas/'+key));
-  if(!snap.exists()){
-    // Matrícula nueva: crear con modelo y variante
-    await set(ref(db,'volaris_notas/'+key),{nombre:mat,deviceName:DEVICE_NAME,device:DEVICE_ID,ts:Date.now(),deleted:false,entries:{},modelo:modeloVal,variante:varianteVal});
-  } else if(modeloVal||varianteVal){
-    // Matrícula existente: actualizar modelo/variante solo si se especificaron
-    const upd={};
-    if(modeloVal) upd.modelo=modeloVal;
-    if(varianteVal) upd.variante=varianteVal;
-    await update(ref(db,'volaris_notas/'+key),upd);
+  const localCreateOrUpdate=()=>{
+    const cache=loadNotasCache();
+    if(!cache[key]) cache[key]={nombre:mat,deviceName:DEVICE_NAME,device:DEVICE_ID,ts:Date.now(),deleted:false,entries:{},modelo:modeloVal||'',variante:varianteVal||''};
+    if(modeloVal) cache[key].modelo=modeloVal;
+    if(varianteVal) cache[key].variante=varianteVal;
+    cache[key].entries=cache[key].entries||{};
+    cache[key].entries[entry.id]=entry;
+    writeJSONCache(VOP_NOTAS_CACHE_KEY, cache);
+    globalData=cache;
+    queueOfflineOp('localEntry', 'volaris_notas/'+key, {mat,entry,modeloVal,varianteVal});
+    renderFolders(document.getElementById('searchNotas')?.value||'');renderGlobal();updateHomeQuickStats();setSyncOff();
+  };
+  if(isOfflineMode()){ localCreateOrUpdate(); return; }
+  try{
+    const snap=await get(ref(db,'volaris_notas/'+key));
+    if(!snap.exists()){
+      await set(ref(db,'volaris_notas/'+key),{nombre:mat,deviceName:DEVICE_NAME,device:DEVICE_ID,ts:Date.now(),deleted:false,entries:{},modelo:modeloVal,variante:varianteVal});
+    } else if(modeloVal||varianteVal){
+      const upd={};
+      if(modeloVal) upd.modelo=modeloVal;
+      if(varianteVal) upd.variante=varianteVal;
+      await update(ref(db,'volaris_notas/'+key),upd);
+    }
+    await set(ref(db,'volaris_notas/'+key+'/entries/'+entry.id),entry);
+  }catch(e){
+    console.warn('Guardado online falló; se conserva localmente:', e);
+    localCreateOrUpdate();
   }
-  await set(ref(db,'volaris_notas/'+key+'/entries/'+entry.id),entry);
 }
-async function fbUpdateEntry(mat,entryId,fields){ await update(ref(db,'volaris_notas/'+matKey(mat)+'/entries/'+entryId),fields); }
-async function fbUpdateMat(mat,fields){ await update(ref(db,'volaris_notas/'+matKey(mat)),fields); }
+async function fbUpdateEntry(mat,entryId,fields){
+  const key=matKey(mat), path='volaris_notas/'+key+'/entries/'+entryId;
+  if(isOfflineMode()){ applyLocalUpdate(path, fields); renderFromLocalCache(); return; }
+  try{ await update(ref(db,path),fields); }
+  catch(e){ console.warn('Update online falló; se conserva localmente:', e); applyLocalUpdate(path, fields); renderFromLocalCache(); }
+}
+async function fbUpdateMat(mat,fields){
+  const key=matKey(mat), path='volaris_notas/'+key;
+  if(isOfflineMode()){ applyLocalUpdate(path, fields); renderFromLocalCache(); return; }
+  try{ await update(ref(db,path),fields); }
+  catch(e){ console.warn('Update matrícula online falló; se conserva localmente:', e); applyLocalUpdate(path, fields); renderFromLocalCache(); }
+}
+async function fbUpdateEntriesByKey(k,fields){
+  const path='volaris_notas/'+k+'/entries';
+  if(isOfflineMode()){ applyLocalUpdate(path, fields); renderFromLocalCache(); return; }
+  try{ await update(ref(db,path),fields); }
+  catch(e){ console.warn('Update múltiple online falló; se conserva localmente:', e); applyLocalUpdate(path, fields); renderFromLocalCache(); }
+}
 function getEntries(md){ const e=md.entries||{}; if(Array.isArray(e)){const o={};e.forEach(en=>{if(en?.id)o[en.id]=en;});return o;} return e; }
 function findMatKey(nombre){ return Object.keys(globalData).find(k=>globalData[k]?.nombre===nombre||k===matKey(nombre))||matKey(nombre); }
 function getMatMeta(nombre){
@@ -3442,7 +3650,7 @@ window.openDeleteMatModal=function(nombre){
       if(!puedeBorrar())return;
       const k=findMatKey(nombre);const md=globalData[k];if(!md?.entries)return;
       const u={};Object.keys(getEntries(md)).forEach(eid=>{u[eid+'/deleted']=true;});
-      await update(ref(db,'volaris_notas/'+k+'/entries'),u);
+      await fbUpdateEntriesByKey(k,u);
       closeFolderScreen();showToast('📋 Notas eliminadas');
     });
   };
@@ -3458,7 +3666,7 @@ window.openDeleteMatModal=function(nombre){
 
 window.undoMat=async n=>{if(isAdmin)await fbUpdateMat(n,{deleted:false});};
 window.undoEntry=async(n,id)=>{if(isAdmin)await fbUpdateEntry(n,id,{deleted:false});};
-window.confirmDeleteMat=n=>showConfirm('⚠️ Borrar notas','¿Borrar todas las notas de '+n+'?',async()=>{if(!puedeBorrar())return;const k=findMatKey(n);const md=globalData[k];if(!md?.entries)return;const u={};Object.keys(getEntries(md)).forEach(eid=>{u[eid+'/deleted']=true;});await update(ref(db,'volaris_notas/'+k+'/entries'),u);});
+window.confirmDeleteMat=n=>showConfirm('⚠️ Borrar notas','¿Borrar todas las notas de '+n+'?',async()=>{if(!puedeBorrar())return;const k=findMatKey(n);const md=globalData[k];if(!md?.entries)return;const u={};Object.keys(getEntries(md)).forEach(eid=>{u[eid+'/deleted']=true;});await fbUpdateEntriesByKey(k,u);});
 window.confirmDeleteAll=n=>showConfirm('🗑 Borrar matrícula','Elimina '+n+' y todas sus notas. ¿Continuar?',async()=>{if(puedeBorrar())await fbUpdateMat(n,{deleted:true});});
 window.confirmDeleteEntry=(n,id)=>showConfirm('🗑 Borrar nota','¿Eliminar esta nota?',async()=>{if(puedeBorrar())await fbUpdateEntry(n,id,{deleted:true});});
 
@@ -3696,6 +3904,19 @@ async function continuarDespuesDelSplash(){
   const user = await Promise.race([authReadyPromise, new Promise(res => setTimeout(() => res(null), 2500))]);
   const numeroSesion = perfil.numero || numeroDesdeUsuarioAuth(user);
 
+  if(!navigator.onLine && numeroSesion){
+    try{
+      usersData = loadUsersCache();
+      globalData = loadNotasCache();
+      await entrarAlPortalConNumero(numeroSesion);
+      setSyncOff();
+      showToast('📴 Modo sin conexión: datos guardados');
+      return;
+    }catch(e){
+      console.warn('No se pudo abrir offline con el perfil guardado:', e);
+    }
+  }
+
   if(user && numeroSesion && user.email === authEmailFromNumero(numeroSesion)){
     try{
       await entrarAlPortalConNumero(numeroSesion);
@@ -3844,7 +4065,7 @@ if(SpeechRecognition){
     }
   }
 
-  window.addEventListener('online', () => toast('✅ Conexión recuperada. Revisando cambios...'));
+  window.addEventListener('online', () => { toast('✅ Conexión recuperada. Revisando cambios...'); flushOfflineQueue().catch(console.warn); });
   window.addEventListener('offline', () => toast('📴 Modo sin datos: usando información guardada'));
 
   if ('serviceWorker' in navigator) {

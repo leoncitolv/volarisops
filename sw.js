@@ -2,8 +2,8 @@
    Un solo sw.js para toda la carpeta de GitHub Pages.
    Controla: index + VolarisOps + Reports + Paint + NP + Horarios. */
 const CACHE_PREFIX = 'volaris-suite';
-const APP_CACHE = `${CACHE_PREFIX}-app-v3`;
-const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-v3`;
+const APP_CACHE = `${CACHE_PREFIX}-app-v6`;
+const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-v6`;
 
 const APP_SHELL = [
   './',
@@ -25,7 +25,12 @@ const APP_SHELL = [
   './icon-np-192.png',
   './icon-np-512.png',
   './icon-horarios-192.png',
-  './icon-horarios-512.png'
+  './icon-horarios-512.png',
+  'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js',
+  'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js',
+  'https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap',
+  'https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap'
 ];
 
 const APP_HTML = [
@@ -140,6 +145,7 @@ async function fetchAndUpdate(file, notifyClientId) {
     if (changed && notifyClientId) {
       const client = await self.clients.get(notifyClientId);
       if (client) client.postMessage({ type: 'APP_UPDATED', file: url });
+      client.postMessage({ type: 'VOL_APP_UPDATED', file: url });
     }
     return changed;
   } catch (e) {
