@@ -74,11 +74,78 @@ def save_json(path: Path, data: Any) -> None:
         fh.write("\n")
 
 
+def firebase_auth_token() -> str:
+    """Obtiene un ID token de Firebase Auth si GitHub Secrets trae credenciales.
+
+    Variables soportadas:
+    - OPS_FIREBASE_ID_TOKEN: token ya generado manualmente, si deseas usarlo directo.
+    - OPS_FIREBASE_API_KEY + OPS_FIREBASE_AUTH_EMAIL + OPS_FIREBASE_AUTH_PASSWORD:
+      inicia sesión con Firebase Auth REST y devuelve idToken.
+    """
+    direct_token = os.getenv("OPS_FIREBASE_ID_TOKEN", "").strip()
+    if direct_token:
+        return direct_token
+
+    api_key = os.getenv("OPS_FIREBASE_API_KEY", "").strip()
+    email = os.getenv("OPS_FIREBASE_AUTH_EMAIL", "").strip()
+    password = os.getenv("OPS_FIREBASE_AUTH_PASSWORD", "").strip()
+
+    if not (api_key and email and password):
+        return ""
+
+    url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?" + urllib.parse.urlencode({"key": api_key})
+    payload = json.dumps({
+        "email": email,
+        "password": password,
+        "returnSecureToken": True,
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        method="POST",
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            body = resp.read().decode("utf-8")
+        data = json.loads(body)
+        token = str(data.get("idToken") or "").strip()
+        if not token:
+            raise RuntimeError("Firebase Auth no devolvió idToken.")
+        print("Firebase Auth OK: sesión iniciada para lector Telegram.")
+        return token
+    except Exception as exc:
+        raise RuntimeError(
+            "No pude iniciar sesión en Firebase Auth. Revisa OPS_FIREBASE_API_KEY, "
+            "OPS_FIREBASE_AUTH_EMAIL y OPS_FIREBASE_AUTH_PASSWORD. Error: " + str(exc)
+        ) from exc
+
+
+def with_auth_param(url: str, token: str) -> str:
+    if not token:
+        return url
+    sep = "&" if "?" in url else "?"
+    return url + sep + urllib.parse.urlencode({"auth": token})
+
+
 def fetch_firebase() -> dict[str, Any]:
-    url = os.getenv("OPS_FIREBASE_URL", DEFAULT_FIREBASE_URL).strip() or DEFAULT_FIREBASE_URL
+    base_url = os.getenv("OPS_FIREBASE_URL", DEFAULT_FIREBASE_URL).strip() or DEFAULT_FIREBASE_URL
+    token = firebase_auth_token()
+    url = with_auth_param(base_url, token)
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        raw = resp.read().decode("utf-8")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            raw = resp.read().decode("utf-8")
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else ""
+        if exc.code == 401:
+            raise RuntimeError(
+                "Firebase respondió 401 Unauthorized. La base requiere autenticación. "
+                "Agrega los Secrets OPS_FIREBASE_API_KEY, OPS_FIREBASE_AUTH_EMAIL y "
+                "OPS_FIREBASE_AUTH_PASSWORD en GitHub Actions. Detalle: " + detail
+            ) from exc
+        raise
+
     data = json.loads(raw) if raw else {}
     if data is None:
         return {}
