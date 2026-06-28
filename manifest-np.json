@@ -1,0 +1,25 @@
+{
+  "name": "Números de Parte Volaris",
+  "short_name": "N/P Volaris",
+  "description": "Catálogo aeronáutico de números de parte con modo offline y caché local.",
+  "start_url": "./np.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#05000f",
+  "theme_color": "#7a19ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon-np-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-np-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

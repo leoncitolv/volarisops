@@ -1,0 +1,3784 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Vol turnos" />
+  <meta name="msapplication-TileColor" content="#0a0a1a" />
+  <meta name="msapplication-TileImage" content="./icon-horarios-192.png" />
+
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Horarios" />
+  <title>Portal de Horarios · Volaris</title>
+  <link rel="manifest" href="./manifest-horarios.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-horarios-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="./icon-horarios-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="./icon-horarios-512.png" />
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Allura&display=swap');
+:root{
+  --bg:#06040f;
+  --bg2:#10071d;
+  --panel:rgba(255,255,255,.075);
+  --panel-strong:rgba(255,255,255,.10);
+  --panel-soft:rgba(255,255,255,.05);
+  --line:rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.16);
+  --text:#f7f4ff;
+  --muted:#b1a3d9;
+  --muted-2:#8b7fb9;
+  --soft:#120b22;
+  --purple:#8b2fc9;
+  --purple2:#b05cff;
+  --purple3:#5f2fe8;
+  --purple-dim:rgba(176,92,255,.16);
+  --work:#ef4444;
+  --rest:#22c55e;
+  --vacation:#38bdf8;
+  --course:#facc15;
+  --overtime:#a78bfa;
+  --permission:#94a3b8;
+  --radius-xl:30px;
+  --radius-lg:24px;
+  --radius-md:18px;
+  --radius-sm:14px;
+  --shadow-lg:0 24px 70px rgba(0,0,0,.55);
+  --shadow-md:0 14px 40px rgba(0,0,0,.32);
+  --shadow-soft:0 8px 22px rgba(0,0,0,.22);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+html{background:#05040d}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(139,47,201,.28), transparent 28%),
+    radial-gradient(circle at top right, rgba(93,39,203,.18), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(88,28,135,.16), transparent 32%),
+    linear-gradient(180deg,#130726 0%,#090312 34%,#06040d 100%);
+  background-attachment:fixed;
+}
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  inset:auto;
+  pointer-events:none;
+  z-index:0;
+  filter:blur(30px);
+  opacity:.7;
+}
+body::before{
+  width:220px;height:220px;top:-60px;left:-60px;
+  background:radial-gradient(circle,rgba(176,92,255,.42),transparent 70%);
+}
+body::after{
+  width:240px;height:240px;right:-90px;top:120px;
+  background:radial-gradient(circle,rgba(139,47,201,.25),transparent 70%);
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;color:var(--text)}
+input,select,textarea{appearance:none;-webkit-appearance:none}
+
+.app-shell{
+  position:relative;z-index:1;
+  width:min(1180px,100%);
+  margin:0 auto;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(28px + env(safe-area-inset-bottom));
+}
+.hero{
+  position:sticky;top:0;z-index:20;
+  padding-top:2px;
+  backdrop-filter:blur(18px) saturate(1.18);
+}
+.hero::after{
+  content:"";
+  position:absolute;
+  left:0;right:0;bottom:-10px;height:16px;
+  background:linear-gradient(180deg,rgba(6,4,13,.65),rgba(6,4,13,0));
+  pointer-events:none;
+}
+.hero-top{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  padding:10px 2px 12px;
+}
+.brand{display:flex;flex-direction:column;gap:4px;min-width:0}
+.volaris-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  width:max-content;
+  margin-bottom:2px;
+  padding:4px 0;
+}
+.airline-name{font-size:11px;font-weight:900;letter-spacing:.34em;color:var(--purple2);text-transform:uppercase}
+.user-signature-hero{
+  display:none;
+  position:relative;
+  width:max-content;
+  max-width:min(100%,460px);
+  margin:6px 0 10px;
+  padding:9px 16px 11px;
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(176,92,255,.20),transparent 48%),
+    linear-gradient(135deg,rgba(255,255,255,.105),rgba(255,255,255,.035));
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 18px 42px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(18px) saturate(1.16);
+  overflow:hidden;
+}
+.user-signature-hero.show{display:block}
+.user-signature-hero::before{
+  content:"";
+  position:absolute;
+  inset:-40% -18% auto auto;
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(176,92,255,.22),transparent 67%);
+  pointer-events:none;
+}
+.user-signature-kicker{
+  display:block;
+  margin-bottom:2px;
+  font-size:9.5px;
+  font-weight:900;
+  letter-spacing:.23em;
+  text-transform:uppercase;
+  color:rgba(213,196,255,.58);
+}
+.user-signature-name{
+  position:relative;
+  z-index:1;
+  display:inline-block;
+  padding:0 12px 4px 1px;
+  font-family:'Allura','Segoe Script','Brush Script MT','Lucida Handwriting',cursive;
+  font-size:clamp(43px,8.8vw,72px);
+  font-weight:400;
+  font-style:italic;
+  line-height:.78;
+  color:#fff;
+  letter-spacing:.01em;
+  text-shadow:0 0 16px rgba(255,255,255,.13),0 0 28px rgba(176,92,255,.22);
+}
+.user-signature-name::after{
+  content:"";
+  position:absolute;
+  left:8px;
+  right:-10px;
+  bottom:0;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,rgba(176,92,255,0),rgba(176,92,255,.90) 18%,rgba(255,132,213,.82) 56%,rgba(176,92,255,0));
+  box-shadow:0 0 12px rgba(176,92,255,.32);
+}
+.user-signature-meta{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:2px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.19em;
+  text-transform:uppercase;
+  color:rgba(213,196,255,.68);
+}
+.user-signature-meta .meta-dot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--purple2);
+  box-shadow:0 0 10px rgba(176,92,255,.65);
+}
+.user-signature-role{
+  padding:3px 8px;
+  border-radius:999px;
+  font-size:10px;
+  letter-spacing:.12em;
+  color:#ead7ff;
+  background:rgba(176,92,255,.13);
+  border:1px solid rgba(176,92,255,.22);
+}
+.brand h1{margin:0;font-size:clamp(30px,7vw,54px);font-weight:900;letter-spacing:-.05em;line-height:.97}
+.subtitle{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.5;display:flex;align-items:center;gap:7px;max-width:680px}
+.icon-plane{color:var(--purple2);flex-shrink:0}
+
+.glass{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.045)),
+    linear-gradient(135deg,rgba(136,61,220,.14),rgba(255,255,255,.02) 45%,rgba(176,92,255,.05));
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.07);
+  backdrop-filter:blur(26px) saturate(1.25);
+}
+
+.top-actions{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.top-actions .ghost{white-space:nowrap;text-decoration:none;color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.soft,.ghost,.primary,.danger,.round,.tab,.icon{
+  transition:transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease, color .18s ease;
+}
+.soft:active,.ghost:active,.primary:active,.danger:active,.round:active,.tab:active,.icon:active{transform:scale(.975)}
+.soft,.ghost{
+  border-radius:18px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.08);
+  padding:12px 16px;
+  font-weight:800;
+  box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.soft:hover,.ghost:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.13)}
+.home-link{
+  min-height:54px;
+  padding-inline:18px !important;
+  background:linear-gradient(135deg,rgba(139,47,201,.34),rgba(255,255,255,.08)) !important;
+  border:1px solid rgba(176,92,255,.22) !important;
+  box-shadow:0 16px 34px rgba(34,9,65,.34), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.primary{
+  border-radius:18px;
+  background:linear-gradient(135deg,#9d45ea,#6427ef);
+  padding:13px 18px;
+  font-weight:900;
+  box-shadow:0 14px 30px rgba(118,59,243,.32), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.primary:hover{box-shadow:0 18px 38px rgba(118,59,243,.42)}
+.danger{
+  border-radius:18px;
+  background:rgba(239,68,68,.13);
+  border:1px solid rgba(248,113,113,.18);
+  color:#ffd4d4;
+  padding:12px 14px;
+  font-weight:800;
+}
+.hidden{display:none!important}
+
+.controls{
+  display:grid;grid-template-columns:56px 1fr 56px;align-items:center;
+  border-radius:32px;padding:7px;margin:4px 0 12px;
+}
+.round{
+  height:50px;width:100%;
+  border-radius:18px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.06);
+  font-size:30px;line-height:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.round:hover{background:rgba(255,255,255,.13)}
+.month-title{text-align:center;padding-inline:6px}
+.month-title strong{display:block;font-size:20px;font-weight:900;letter-spacing:-.02em}
+.month-title span{font-size:12px;color:var(--muted);margin-top:4px;display:block}
+
+.tabs{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;
+}
+.tab{
+  min-height:46px;
+  padding:10px 8px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.05);
+  color:var(--muted);
+  font-weight:850;font-size:12px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+}
+.tab.active{
+  background:linear-gradient(135deg,#9d45ea,#6427ef);
+  color:white;border-color:rgba(176,92,255,.3);
+  box-shadow:0 14px 32px rgba(118,59,243,.32), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.tab:hover:not(.active){background:rgba(255,255,255,.09)}
+
+main{display:grid;gap:14px}
+.toolbar{
+  display:grid;grid-template-columns:1fr 1fr auto;
+  gap:10px;align-items:end;border-radius:28px;padding:14px;margin-bottom:2px;
+}
+.field{display:grid;gap:7px}
+.field span{font-size:11px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.15em}
+.field input,.field select,.field textarea{
+  width:100%;border:1px solid rgba(255,255,255,.08);border-radius:18px;
+  background:linear-gradient(180deg,rgba(6,4,18,.92),rgba(8,5,22,.82));
+  color:var(--text);padding:13px 14px;outline:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+}
+.field input::placeholder,.field textarea::placeholder{color:#7f76a8}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(176,92,255,.45);box-shadow:0 0 0 4px rgba(176,92,255,.12)}
+.field textarea{resize:vertical;min-height:94px}
+
+.view{display:none}
+.view.active{display:block}
+.calendar-context{
+  position:sticky;
+  top:12px;
+  z-index:24;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin:6px 0 10px;
+  padding:12px 14px;
+  border-radius:22px;
+  background:linear-gradient(180deg,rgba(18,11,41,.96),rgba(8,6,25,.96));
+  border:1px solid rgba(176,92,255,.16);
+  box-shadow:0 16px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.calendar-context-copy{display:grid;gap:3px;min-width:0}
+.calendar-context-copy span{
+  font-size:10.5px;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  color:var(--purple2);
+  font-weight:900;
+}
+.calendar-context-copy strong{
+  font-size:18px;
+  line-height:1.05;
+  letter-spacing:-.03em;
+}
+.calendar-context-selected{
+  display:grid;
+  justify-items:end;
+  gap:3px;
+  text-align:right;
+  padding:8px 11px;
+  border-radius:16px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.06);
+  min-width:min(52%, 360px);
+}
+.calendar-context-selected small{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+}
+.calendar-context-selected strong{
+  font-size:13.5px;
+  color:#fff;
+  line-height:1.25;
+}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:2px 3px 8px}
+.weekdays span{text-align:center;color:#726493;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{
+  min-height:132px;border-radius:20px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(11,7,27,.95),rgba(10,7,25,.84));
+  border:1px solid rgba(255,255,255,.08);
+  position:relative;padding:9px;display:flex;flex-direction:column;gap:7px;
+  box-shadow:var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.03);
+  transition:transform .16s ease, background .16s ease, border-color .16s ease;
+  cursor:pointer;
+}
+.day::after{
+  content:"";position:absolute;left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
+}
+.day:hover{background:linear-gradient(180deg,rgba(18,12,42,.98),rgba(11,8,28,.92));transform:translateY(-1px);border-color:rgba(176,92,255,.2)}
+.day.other{opacity:.33}
+.day.today{
+  border-color:rgba(176,92,255,.72);
+  box-shadow:0 0 0 2px rgba(176,92,255,.12), 0 18px 36px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.date-number{font-weight:900;font-size:15px;display:flex;justify-content:space-between;align-items:center;letter-spacing:-.02em}
+.mini-count{font-size:10.5px;color:var(--muted-2)}
+.badge{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 9px;border-radius:13px;
+  font-size:11px;font-weight:850;min-width:0;
+  border:1px solid rgba(255,255,255,.05);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.badge .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:rgba(255,255,255,.92)}
+.badge small{display:block;color:rgba(255,255,255,.76);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-work{background:linear-gradient(135deg,rgba(239,68,68,.88),rgba(127,29,29,.68))}
+.status-rest{background:linear-gradient(135deg,rgba(34,197,94,.86),rgba(20,83,45,.68))}
+.status-vacation{background:linear-gradient(135deg,rgba(56,189,248,.82),rgba(14,116,144,.68))}
+.status-course{background:linear-gradient(135deg,rgba(250,204,21,.9),rgba(161,98,7,.72));color:#1f1600}
+.status-course small{color:rgba(31,22,0,.7)}
+.status-overtime{background:linear-gradient(135deg,rgba(167,139,250,.9),rgba(76,29,149,.70))}
+.status-permission{background:linear-gradient(135deg,rgba(148,163,184,.78),rgba(51,65,85,.68))}
+.more{font-size:10.5px;color:var(--muted);padding-left:4px;font-weight:800}
+
+.agenda-list{display:grid;gap:10px}
+.agenda-day{border-radius:24px;padding:15px}
+.agenda-day h3{margin:0 0 10px;font-size:15px}
+.agenda-items{display:grid;gap:8px}
+
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.summary-card,.panel,.empty{border-radius:26px;padding:18px}
+.summary-card h3,.panel h2,.empty h2{margin:0 0 12px;letter-spacing:-.02em}
+.metric{
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid var(--line);padding:10px 0;color:var(--muted);
+}
+.metric strong{color:var(--text);font-size:20px}
+.hint{color:var(--muted);line-height:1.6;font-size:13.5px}
+.user-form{display:grid;grid-template-columns:2fr 1.5fr 1fr 90px auto;gap:10px;align-items:end}
+.users-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:14px}
+.user-card{border-radius:24px;padding:16px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);box-shadow:var(--shadow-soft)}
+.user-card-top{display:flex;justify-content:space-between;gap:10px}
+.avatar{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-weight:950;font-size:18px;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.user-card h3{margin:0;font-size:15px}
+.user-card p{margin:5px 0;color:var(--muted);font-size:12.5px}
+.card-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+.icon{width:42px;height:42px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);font-size:22px;display:grid;place-items:center}
+.icon:hover{background:rgba(255,255,255,.14)}
+.dialog{border:0;background:transparent;color:var(--text);width:min(520px,calc(100% - 22px));padding:0}
+.dialog::backdrop{background:rgba(0,0,0,.7);backdrop-filter:blur(14px)}
+.dialog-card{
+  border-radius:30px;
+  background:linear-gradient(160deg,rgba(18,10,37,.98),rgba(9,5,21,.98));
+  border:1px solid rgba(176,92,255,.22);
+  box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 0 1px rgba(176,92,255,.08), inset 0 1px 0 rgba(255,255,255,.04);
+  padding:18px;display:grid;gap:13px;
+}
+.dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.dialog-head h2{margin:0;letter-spacing:-.03em}
+.dialog-actions{display:flex;justify-content:space-between;gap:10px}
+.empty{text-align:center;margin-top:12px;display:flex;flex-direction:column;align-items:center}
+.empty p{color:var(--muted)}
+.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:10.5px;color:var(--purple2);margin:0 0 6px;font-weight:800}
+.dialog-card .eyebrow::after{content:'';display:block;width:30px;height:2px;background:var(--purple2);border-radius:2px;margin-top:5px}
+
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.03)}
+::-webkit-scrollbar-thumb{background:rgba(176,92,255,.28);border-radius:999px;border:2px solid rgba(0,0,0,0)}
+
+@media(max-width:760px){
+  .app-shell{padding:calc(8px + env(safe-area-inset-top)) 10px calc(24px + env(safe-area-inset-bottom))}
+  .calendar-context{position:relative;top:auto;z-index:1;padding:10px 12px;border-radius:18px;margin:4px 0 10px;}
+  .calendar-context-copy strong{font-size:16px;}
+  .calendar-context-selected{min-width:0;padding:7px 10px;}
+  .calendar-context-selected strong{font-size:12.5px;}
+  .hero-top{padding-top:8px;align-items:flex-start}
+  .toolbar{grid-template-columns:1fr}
+  .tabs{gap:6px}
+  .tab{font-size:11px;padding:10px 4px;min-height:44px}
+  .calendar-grid{gap:5px}
+  .weekdays{gap:5px}
+  .day{min-height:110px;border-radius:18px;padding:8px}
+  .badge{font-size:10px;padding:6px 7px}
+  .badge small{display:none}
+  .user-form{grid-template-columns:1fr}
+  .controls{grid-template-columns:50px 1fr 50px}
+  .round{height:44px;border-radius:16px}
+  .summary-card,.panel,.empty,.agenda-day{border-radius:24px}
+  .dialog-actions{flex-direction:column-reverse}
+  .danger,.primary{width:100%}
+}
+@media(max-width:430px){
+  .user-signature-hero{
+    width:100%;
+    max-width:100%;
+    margin:4px 0 9px;
+    padding:8px 13px 10px;
+    border-radius:21px;
+  }
+  .user-signature-kicker{font-size:8.5px;letter-spacing:.20em}
+  .user-signature-name{
+    font-size:clamp(39px,13vw,55px);
+    line-height:.80;
+  }
+  .user-signature-meta{
+    font-size:10.5px;
+    letter-spacing:.16em;
+    gap:7px;
+  }
+  .user-signature-role{font-size:9px;padding:3px 7px}
+  .hero-top{gap:10px}
+  .calendar-context{position:relative;top:auto;z-index:1;flex-direction:column;align-items:stretch;gap:8px;padding:10px 11px;border-radius:17px;}
+  .calendar-context-copy strong{font-size:15px;}
+  .calendar-context-selected{justify-items:start;text-align:left;}
+  .calendar-context-selected strong{font-size:12px;}
+  .brand h1{font-size:31px}
+  .subtitle{font-size:12px;max-width:230px}
+  .home-link{min-height:50px;padding-inline:15px !important}
+  .month-title strong{font-size:18px}
+  .month-title span{font-size:11.5px}
+  .toolbar{padding:12px}
+  .field input,.field select,.field textarea{padding:13px 12px;border-radius:16px}
+  .tabs{grid-template-columns:repeat(4,1fr)}
+  .tab{border-radius:16px;font-size:10.7px;gap:4px}
+  .weekdays span{font-size:10px}
+  .day{min-height:94px;padding:7px;border-radius:17px}
+  .date-number{font-size:13px}
+  .badge{padding:5px 5px;border-radius:11px}
+  .badge .dot{display:none}
+  .more{display:none}
+}
+
+
+/* ═════ Firma Laraclv ═════ */
+.app-signature,
+.auth-signature{
+  text-align:center;
+  pointer-events:none;
+  user-select:none;
+}
+.app-signature{
+  padding:26px 12px calc(18px + env(safe-area-inset-bottom));
+}
+.auth-signature{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:calc(18px + env(safe-area-inset-bottom));
+  z-index:1;
+}
+.signature-inner{
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.22rem;
+  opacity:.32;
+}
+.signature-by{
+  font-style:italic;
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:.76rem;
+  letter-spacing:.06em;
+  color:var(--text);
+}
+.signature-version{
+  font-size:.52rem;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--text);
+}
+@media(max-width:430px){
+  .auth-signature{bottom:calc(10px + env(safe-area-inset-bottom));}
+  .app-signature{padding-top:20px;}
+}
+
+
+/* ═════ Login central + administración ═════ */
+body.locked .app-shell{filter:blur(18px) saturate(.85);pointer-events:none;user-select:none}
+.auth-screen{
+  position:fixed;inset:0;z-index:9999;
+  display:grid;place-items:center;
+  padding:22px;
+  background:
+    radial-gradient(circle at 30% 12%,rgba(176,92,255,.30),transparent 28%),
+    radial-gradient(circle at 80% 72%,rgba(139,47,201,.22),transparent 28%),
+    linear-gradient(180deg,rgba(7,4,17,.92),rgba(5,3,12,.98));
+  backdrop-filter:blur(26px) saturate(1.2);
+}
+.auth-card{
+  width:min(440px,100%);
+  border-radius:34px;
+  padding:22px;
+  background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 36px 100px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.09);
+}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.auth-mark{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,#9d45ea,#6427ef);box-shadow:0 16px 36px rgba(118,59,243,.34);font-size:24px}
+.auth-card h2{margin:0;font-size:30px;letter-spacing:-.04em;line-height:1}
+.auth-card p{color:var(--muted);line-height:1.5;font-size:13.5px}
+.auth-form{display:grid;gap:12px;margin-top:16px}
+.auth-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:2px}
+.auth-note{font-size:12px;color:var(--muted-2);line-height:1.45;margin-top:12px}
+.auth-error{display:none;margin-top:12px;padding:11px 12px;border-radius:16px;color:#ffd4d4;background:rgba(239,68,68,.13);border:1px solid rgba(248,113,113,.18);font-size:12.5px;line-height:1.4}
+.auth-error.show{display:block}
+.session-badge{border-radius:999px;padding:8px 11px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.09);font-size:11px;color:var(--muted);font-weight:850;white-space:nowrap}
+.role-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;margin-left:6px;background:rgba(176,92,255,.16);border:1px solid rgba(176,92,255,.22);font-size:10px;color:#e9d5ff;text-transform:uppercase;letter-spacing:.08em;font-weight:900}
+.locked-card{opacity:.55;filter:saturate(.7)}
+.admin-tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.admin-tools button{padding:9px 10px;font-size:11.5px;border-radius:13px}
+.user-card.owner-card{border-color:rgba(176,92,255,.34);box-shadow:0 0 0 1px rgba(176,92,255,.12),var(--shadow-soft)}
+.tabs.staff-mode{grid-template-columns:repeat(3,1fr)}
+.config-warning{padding:12px 13px;border-radius:18px;background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.22);color:#fde68a;font-size:12.5px;line-height:1.45;margin-top:12px}
+
+@media(max-width:430px){
+  .auth-screen{padding:14px}.auth-card{padding:18px;border-radius:30px}.auth-card h2{font-size:27px}.session-badge{display:none}
+}
+
+
+
+/* ═════ Splash inicial estilo VolarisOps: Portal de Horarios ═════ */
+#splashHorarios{
+  position:fixed;
+  inset:0;
+  z-index:20000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:2rem 1.5rem;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 52% 22%,rgba(168,85,247,.42),transparent 34%),
+    radial-gradient(circle at 78% 30%,rgba(217,70,239,.20),transparent 32%),
+    linear-gradient(165deg,#05020f 0%,#100025 55%,#030108 100%);
+}
+#splashHorarios::before{
+  content:'✈';
+  position:absolute;
+  top:8%;
+  right:8%;
+  font-size:clamp(6rem,28vw,16rem);
+  opacity:.055;
+  filter:blur(.5px);
+  transform:rotate(-18deg);
+  pointer-events:none;
+}
+#splashHorarios::after{
+  content:'';
+  position:fixed;
+  top:0;
+  left:-200vw;
+  width:55vw;
+  height:100%;
+  background:linear-gradient(105deg,transparent 0%,rgba(255,255,255,.14) 47%,rgba(210,190,255,.28) 50%,rgba(255,255,255,.14) 53%,transparent 100%);
+  pointer-events:none;
+  z-index:2;
+  opacity:0;
+  animation:splashHorariosShine 2.05s cubic-bezier(.35,0,.2,1) .15s both;
+}
+@keyframes splashHorariosShine{
+  0%{left:-200vw;opacity:0}
+  10%{left:-20vw;opacity:1}
+  75%{left:80vw;opacity:1}
+  90%{left:140vw;opacity:.4}
+  100%{left:220vw;opacity:0}
+}
+.splash-horarios-hero{
+  position:relative;
+  z-index:3;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1.2rem;
+  text-align:center;
+}
+.splash-horarios-word{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  row-gap:.12em;
+  line-height:.92;
+  max-width:min(92vw,860px);
+  filter:drop-shadow(0 0 22px rgba(168,85,247,.50));
+}
+.splash-horarios-word span{
+  display:inline-block;
+  font-size:clamp(2.18rem,9.3vw,5.65rem);
+  font-weight:950;
+  letter-spacing:-.045em;
+  opacity:0;
+  background:linear-gradient(135deg,#7c3aed 0%,#c026d3 35%,#f0abfc 50%,#38bdf8 72%,#a855f7 100%);
+  background-size:210%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  transform:translate(calc((var(--i) - 8) * 34px),-260px) rotate(calc((var(--i) - 8) * 5deg)) scale(1.12);
+  animation:splashHorariosLetter .34s cubic-bezier(.2,1.6,.3,1) forwards;
+  animation-delay:calc(var(--i) * .045s);
+}
+.splash-horarios-word span.space{
+  width:.32em;
+  -webkit-text-fill-color:transparent;
+}
+@keyframes splashHorariosLetter{
+  0%{opacity:0}
+  18%{opacity:1}
+  70%{transform:translate(0,8px) rotate(0deg) scale(1)}
+  100%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+}
+.splash-horarios-logo-shine{
+  position:absolute;
+  top:0;
+  left:-200%;
+  width:55%;
+  height:100%;
+  background:linear-gradient(105deg,transparent 0%,rgba(255,255,255,.62) 50%,transparent 100%);
+  pointer-events:none;
+  opacity:0;
+  animation:splashHorariosTextShine 1.15s .82s both;
+}
+@keyframes splashHorariosTextShine{
+  0%{left:-200%;opacity:0}
+  12%{left:-40%;opacity:1}
+  75%{left:90%;opacity:1}
+  100%{left:250%;opacity:0}
+}
+.splash-horarios-divider{
+  width:clamp(130px,42vw,285px);
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent,#9955ff,transparent);
+  opacity:0;
+  transform:scaleX(0);
+  animation:splashHorariosDivider .55s .96s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes splashHorariosDivider{to{opacity:1;transform:scaleX(1)}}
+.splash-horarios-caption{
+  margin:0;
+  font-size:clamp(.68rem,2.7vw,.86rem);
+  color:rgba(244,222,255,.68);
+  font-weight:900;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  opacity:0;
+  animation:splashHorariosFadeUp .55s 1.08s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes splashHorariosFadeUp{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+#splashHorarios.splash-out{
+  opacity:0;
+  transform:scale(1.035);
+  transition:opacity .58s ease,transform .58s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+#splashHorarios.splash-out .splash-horarios-hero{
+  animation:splashHorariosHeroUp .55s cubic-bezier(.6,0,.4,1) forwards;
+}
+@keyframes splashHorariosHeroUp{
+  from{opacity:1;transform:translateY(0)}
+  to{opacity:0;transform:translateY(-74px)}
+}
+@media(max-width:430px){
+  .splash-horarios-word span{font-size:clamp(1.82rem,9.8vw,3.2rem);letter-spacing:-.055em;}
+  .splash-horarios-word{max-width:94vw;}
+}
+@media(prefers-reduced-motion:reduce){
+  #splashHorarios::after,.splash-horarios-word span,.splash-horarios-logo-shine,.splash-horarios-divider,.splash-horarios-caption{animation-duration:.01ms!important;animation-delay:0s!important;}
+}
+
+
+
+/* ═════ Mejoras visuales calendario 2.5 ═════ */
+:root{
+  --lime:#86efac;
+  --cyan:#4de2ff;
+  --cyan-soft:rgba(77,226,255,.18);
+  --rose-soft:rgba(251,113,133,.2);
+  --panel-elevated:rgba(14,9,34,.92);
+}
+body{
+  background-image:
+    linear-gradient(rgba(148,84,255,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,84,255,.055) 1px, transparent 1px),
+    radial-gradient(circle at top left, rgba(139,47,201,.28), transparent 28%),
+    radial-gradient(circle at top right, rgba(93,39,203,.18), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(88,28,135,.16), transparent 32%),
+    linear-gradient(180deg,#130726 0%,#090312 34%,#06040d 100%);
+  background-size: 40px 40px, 40px 40px, auto, auto, auto, auto;
+}
+.hero-top{
+  position:relative;
+}
+.hero-top::after{
+  content:"";
+  position:absolute;
+  right:2%;
+  top:8px;
+  width:min(38vw,280px);
+  height:min(38vw,280px);
+  background:radial-gradient(circle at center, rgba(139,47,201,.24), rgba(76,29,149,.08) 42%, transparent 68%);
+  border-radius:50%;
+  filter:blur(1px);
+  opacity:.9;
+  pointer-events:none;
+}
+.toolbar{
+  grid-template-columns:minmax(230px,1fr) minmax(280px,1.15fr) auto;
+  gap:12px;
+  padding:16px;
+  align-items:stretch;
+}
+.field-wide{grid-column:auto}
+.toolbar-meta{display:grid;gap:12px}
+.toggle-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:74px;
+  padding:14px 16px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(7,4,20,.88),rgba(10,7,26,.82));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.toggle-card > div{display:grid;gap:4px}
+.toggle-label{
+  display:block;
+  color:var(--text);
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.01em;
+}
+.toggle-card small{color:var(--muted);line-height:1.35;font-size:12px}
+.switch{position:relative;display:inline-flex;align-items:center;flex:0 0 auto}
+.switch input{position:absolute;opacity:0;pointer-events:none}
+.slider{
+  width:72px;height:40px;border-radius:999px;position:relative;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 6px rgba(0,0,0,.35);
+  transition:background .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.slider::before{
+  content:"";
+  position:absolute;left:4px;top:4px;
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(180deg,#fff,#ddd6fe);
+  box-shadow:0 6px 14px rgba(0,0,0,.26);
+  transition:transform .18s ease;
+}
+.switch input:checked + .slider{
+  background:linear-gradient(135deg, rgba(34,197,94,.9), rgba(77,226,255,.95));
+  border-color:rgba(134,239,172,.55);
+  box-shadow:0 0 0 4px rgba(77,226,255,.12), inset 0 1px 8px rgba(255,255,255,.18);
+}
+.switch input:checked + .slider::before{transform:translateX(32px)}
+.soft.accent{
+  min-width:110px;
+  background:linear-gradient(135deg,#9d45ea,#c057ff);
+  border-color:rgba(192,87,255,.36);
+  box-shadow:0 16px 34px rgba(134,52,255,.28), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.soft.accent:hover{background:linear-gradient(135deg,#a954f0,#ce6bff)}
+.calendar-grid{gap:8px}
+.weekdays{margin-bottom:10px}
+.weekdays span{font-size:11.5px;color:#9082bc}
+.day{
+  min-height:152px;
+  border-radius:24px;
+  padding:10px;
+  gap:8px;
+  background:
+    linear-gradient(180deg,rgba(20,12,44,.98),rgba(9,6,26,.95)),
+    linear-gradient(135deg,rgba(132,73,246,.12),transparent 55%);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 16px 32px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.day:hover{transform:translateY(-2px);border-color:rgba(176,92,255,.28)}
+.day.other{opacity:.38}
+.day.selected{
+  border-color:rgba(192,87,255,.7);
+  box-shadow:0 0 0 1px rgba(192,87,255,.26), 0 18px 38px rgba(59,18,122,.42), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.day.today{
+  border-color:rgba(168,85,247,.8);
+  box-shadow:0 0 0 1px rgba(192,87,255,.28), 0 0 0 6px rgba(168,85,247,.10), 0 18px 36px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.day-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.date-bubble{
+  min-width:32px;height:32px;padding:0 10px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:950;font-size:15px;letter-spacing:-.03em;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.04);
+}
+.day.today .date-bubble{
+  background:linear-gradient(135deg,#a855f7,#d946ef);
+  box-shadow:0 8px 20px rgba(168,85,247,.32);
+}
+.day.selected .date-bubble{box-shadow:0 0 0 3px rgba(192,87,255,.16)}
+.mini-count{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 8px;border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.06);
+  color:#d5cdf5;font-size:11px;font-weight:850;
+}
+.mini-count svg{width:12px;height:12px;opacity:.85}
+.badge{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:7px;
+  padding:7px 9px;
+  border-radius:999px;
+  font-size:11px;
+  min-width:0;
+}
+.badge-copy{min-width:0;text-align:left}
+.badge-copy strong,.badge-copy small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge-copy strong{font-size:11.3px}
+.badge-copy small{font-size:10px;color:rgba(255,255,255,.78)}
+.badge-icon,.badge-state{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.badge-icon{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(255,255,255,.16);
+  font-size:11px;font-weight:900;
+}
+.badge-state{font-size:12px;opacity:.96}
+.badge.current-user{
+  border:1px solid rgba(77,226,255,.44);
+  box-shadow:0 0 0 1px rgba(77,226,255,.10), 0 8px 18px rgba(18,73,102,.22), inset 0 1px 0 rgba(255,255,255,.14);
+}
+.badge.current-user .badge-copy strong{color:#f4feff}
+.you-chip{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:5px;padding:2px 6px;border-radius:999px;
+  font-size:9px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;
+  color:#05131a;background:rgba(255,255,255,.85);
+}
+.status-work{background:linear-gradient(135deg,rgba(239,68,68,.92),rgba(127,29,29,.74))}
+.status-rest{background:linear-gradient(135deg,rgba(34,197,94,.9),rgba(20,83,45,.74))}
+.status-vacation{background:linear-gradient(135deg,rgba(56,189,248,.9),rgba(14,116,144,.72))}
+.status-course{background:linear-gradient(135deg,rgba(250,204,21,.96),rgba(180,83,9,.84));color:#251902}
+.status-course .badge-copy small{color:rgba(37,25,2,.7)}
+.status-overtime{background:linear-gradient(135deg,rgba(167,139,250,.92),rgba(91,33,182,.76))}
+.status-permission{background:linear-gradient(135deg,rgba(148,163,184,.88),rgba(51,65,85,.76))}
+.badge.current-user.status-work{background:linear-gradient(135deg,rgba(36,204,239,.98),rgba(14,165,233,.84))}
+.badge.current-user.status-rest{background:linear-gradient(135deg,rgba(34,211,238,.96),rgba(45,212,191,.82))}
+.badge.current-user.status-vacation,.badge.current-user.status-course,.badge.current-user.status-overtime,.badge.current-user.status-permission{
+  background:linear-gradient(135deg,rgba(77,226,255,.96),rgba(59,130,246,.84));
+  color:#04111a;
+}
+.badge.current-user .badge-copy small,
+.badge.current-user.status-vacation .badge-copy small,
+.badge.current-user.status-course .badge-copy small,
+.badge.current-user.status-overtime .badge-copy small,
+.badge.current-user.status-permission .badge-copy small{color:rgba(4,17,26,.74)}
+.more{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10.5px;color:#c9beed;padding-left:4px;font-weight:850;
+}
+.more::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.22),transparent)}
+.calendar-detail{
+  margin-top:14px;
+  padding:14px 16px 16px;
+  border-radius:28px;
+  background:
+    linear-gradient(180deg,rgba(25,17,52,.92),rgba(12,8,30,.95)),
+    linear-gradient(135deg,rgba(91,33,182,.14),transparent 40%);
+}
+.detail-grabber{width:64px;height:5px;border-radius:999px;background:rgba(192,87,255,.5);margin:0 auto 14px}
+.detail-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.detail-eyebrow{margin:0 0 4px;color:var(--purple2);font-size:11px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+.calendar-detail h3{margin:0;font-size:22px;line-height:1.05;letter-spacing:-.03em}
+.detail-count{margin:4px 0 0;color:var(--muted);font-size:13px}
+.detail-action{min-width:130px}
+.detail-items{display:grid;gap:8px;margin-bottom:14px}
+.status-legend{display:flex;flex-wrap:wrap;gap:10px 16px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px;color:#d6ccf4;font-size:12px}
+.status-legend span{display:inline-flex;align-items:center;gap:8px}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 3px rgba(255,255,255,.04)}
+.legend-work{background:#fb7185}
+.legend-rest{background:#22c55e}
+.legend-vacation{background:#38bdf8}
+.legend-course{background:#facc15}
+.legend-overtime{background:#a78bfa}
+.legend-you{background:linear-gradient(135deg,#4de2ff,#86efac)}
+#userFilter:disabled{opacity:.82;filter:saturate(.9)}
+@media(max-width:760px){
+  .toolbar{grid-template-columns:1fr;}
+  .toolbar-meta{grid-template-columns:1fr;}
+  .soft.accent{width:100%;}
+  .calendar-detail h3{font-size:19px}
+  .detail-header{flex-direction:column;align-items:stretch}
+  .detail-action{width:100%}
+}
+@media(max-width:430px){
+  .toggle-card{padding:13px 14px;border-radius:19px;min-height:70px}
+  .toggle-label{font-size:13.2px}
+  .slider{width:66px;height:36px}
+  .slider::before{width:28px;height:28px}
+  .switch input:checked + .slider::before{transform:translateX(28px)}
+  .day{min-height:112px;padding:7px;border-radius:18px}
+  .day-header{align-items:flex-start}
+  .date-bubble{min-width:28px;height:28px;font-size:13px;padding:0 8px}
+  .mini-count{font-size:10px;padding:4px 7px}
+  .badge{padding:5px 6px;gap:5px}
+  .badge-copy strong{font-size:10.4px}
+  .badge-copy small{display:none}
+  .badge-icon{width:18px;height:18px;font-size:10px}
+  .status-legend{gap:8px 12px;font-size:11px}
+}
+
+
+/* ═════ Corrección visual estados + colores editables ═════ */
+:root{
+  --status-work:#ef4444;
+  --status-work-dark:#7f1d1d;
+  --status-work-text:#ffffff;
+  --status-rest:#22c55e;
+  --status-rest-dark:#14532d;
+  --status-rest-text:#ffffff;
+  --status-vacation:#38bdf8;
+  --status-vacation-dark:#0e7490;
+  --status-vacation-text:#ffffff;
+  --status-course:#facc15;
+  --status-course-dark:#a16207;
+  --status-course-text:#1f1600;
+  --status-overtime:#a78bfa;
+  --status-overtime-dark:#4c1d95;
+  --status-overtime-text:#ffffff;
+  --status-permission:#94a3b8;
+  --status-permission-dark:#334155;
+  --status-permission-text:#ffffff;
+}
+.status-work,
+.badge.status-work,
+.badge.current-user.status-work{
+  background:linear-gradient(135deg,var(--status-work),var(--status-work-dark)) !important;
+  color:var(--status-work-text) !important;
+}
+.status-rest,
+.badge.status-rest,
+.badge.current-user.status-rest{
+  background:linear-gradient(135deg,var(--status-rest),var(--status-rest-dark)) !important;
+  color:var(--status-rest-text) !important;
+}
+.status-vacation,
+.badge.status-vacation,
+.badge.current-user.status-vacation{
+  background:linear-gradient(135deg,var(--status-vacation),var(--status-vacation-dark)) !important;
+  color:var(--status-vacation-text) !important;
+}
+.status-course,
+.badge.status-course,
+.badge.current-user.status-course{
+  background:linear-gradient(135deg,var(--status-course),var(--status-course-dark)) !important;
+  color:var(--status-course-text) !important;
+}
+.status-overtime,
+.badge.status-overtime,
+.badge.current-user.status-overtime{
+  background:linear-gradient(135deg,var(--status-overtime),var(--status-overtime-dark)) !important;
+  color:var(--status-overtime-text) !important;
+}
+.status-permission,
+.badge.status-permission,
+.badge.current-user.status-permission{
+  background:linear-gradient(135deg,var(--status-permission),var(--status-permission-dark)) !important;
+  color:var(--status-permission-text) !important;
+}
+.badge.current-user{
+  outline:2px solid rgba(255,255,255,.96) !important;
+  outline-offset:1px;
+  box-shadow:0 0 0 3px rgba(77,226,255,.20), 0 8px 18px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.badge-copy small,
+.badge.current-user .badge-copy small{
+  color:rgba(255,255,255,.86) !important;
+}
+.badge.status-course .badge-copy small,
+.badge.current-user.status-course .badge-copy small{
+  color:rgba(31,22,0,.72) !important;
+}
+.state-text{
+  font-weight:950;
+  letter-spacing:.01em;
+}
+.legend-work{background:var(--status-work) !important}
+.legend-rest{background:var(--status-rest) !important}
+.legend-vacation{background:var(--status-vacation) !important}
+.legend-course{background:var(--status-course) !important}
+.legend-overtime{background:var(--status-overtime) !important}
+.legend-permission{background:var(--status-permission) !important}
+.status-color-panel{
+  margin-top:14px;
+}
+.status-color-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.status-color-head h2{
+  margin:0 0 4px;
+}
+.status-color-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:10px;
+  align-items:end;
+}
+.status-color-grid input[type="color"]{
+  height:48px;
+  padding:6px;
+  border-radius:16px;
+  cursor:pointer;
+}
+.status-color-grid .primary{
+  min-height:48px;
+}
+@media(max-width:560px){
+  .status-color-head{flex-direction:column}
+  .status-color-head .soft{width:100%}
+  .status-color-grid{grid-template-columns:1fr 1fr}
+  .status-color-grid .primary{grid-column:1 / -1}
+}
+@media(max-width:430px){
+  .badge-copy small{
+    display:block !important;
+    font-size:9.2px !important;
+    line-height:1.05;
+  }
+  .badge{
+    min-height:36px;
+  }
+}
+
+
+/* ═════ AJUSTE DAVID — solo la barra del mes se mantiene fija ═════
+   El encabezado, usuario, título y pestañas se van hacia arriba al hacer scroll.
+   La sección con flechas + mes permanece disponible para cambiar de mes. */
+.hero{
+  position:relative !important;
+  top:auto !important;
+  z-index:5 !important;
+}
+.hero::after{
+  display:none !important;
+}
+.controls{
+  position:sticky !important;
+  top:calc(8px + env(safe-area-inset-top)) !important;
+  z-index:90 !important;
+  margin:6px 0 12px !important;
+  backdrop-filter:blur(26px) saturate(1.25) !important;
+  -webkit-backdrop-filter:blur(26px) saturate(1.25) !important;
+}
+.controls::before{
+  content:"";
+  position:absolute;
+  inset:-10px -8px -10px -8px;
+  border-radius:36px;
+  background:linear-gradient(180deg,rgba(6,4,13,.78),rgba(6,4,13,0));
+  pointer-events:none;
+  z-index:-1;
+}
+.calendar-context{
+  position:relative !important;
+  top:auto !important;
+  z-index:1 !important;
+}
+@media(max-width:760px){
+  .controls{
+    top:calc(6px + env(safe-area-inset-top)) !important;
+    border-radius:30px !important;
+  }
+}
+@media(max-width:430px){
+  .controls{
+    top:calc(5px + env(safe-area-inset-top)) !important;
+    margin:5px 0 10px !important;
+  }
+}
+
+
+
+/* ═════ Dashboard principal de asistencia y vacaciones ═════ */
+.main-dashboard{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin:8px 0 14px;
+}
+.dashboard-card{
+  border-radius:30px;
+  padding:18px;
+  overflow:hidden;
+  position:relative;
+}
+.dashboard-card::before{
+  content:"";
+  position:absolute;
+  inset:-35% auto auto -18%;
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(77,226,255,.14),transparent 70%);
+  pointer-events:none;
+}
+.dashboard-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.dashboard-user{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-width:0;
+}
+.dashboard-avatar{
+  width:58px;
+  height:58px;
+  border-radius:20px;
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  font-weight:950;
+  background:linear-gradient(135deg,#9d45ea,#4de2ff);
+  box-shadow:0 18px 38px rgba(77,226,255,.18), inset 0 1px 0 rgba(255,255,255,.22);
+  flex:0 0 auto;
+}
+.dashboard-user h2{
+  margin:0;
+  font-size:clamp(24px,5.7vw,38px);
+  line-height:.98;
+  letter-spacing:-.04em;
+}
+.dashboard-user p{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:12.5px;
+  font-weight:800;
+  letter-spacing:.05em;
+}
+
+.dashboard-user-signature{
+  align-items:stretch;
+}
+.dashboard-signature{
+  display:block;
+  width:100%;
+  max-width:none;
+  margin:0;
+}
+.dashboard-signature .user-signature-name{
+  font-style:italic;
+}
+.turn-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border-radius:999px;
+  padding:9px 12px;
+  background:rgba(77,226,255,.12);
+  border:1px solid rgba(77,226,255,.20);
+  color:#dffaff;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.vacation-card{
+  display:grid;
+  gap:12px;
+  background:
+    radial-gradient(circle at 12% 20%,rgba(34,197,94,.14),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.045));
+}
+.vacation-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+.vacation-title h2{
+  margin:0;
+  font-size:22px;
+  letter-spacing:-.03em;
+}
+.vacation-title p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.35;
+}
+.vacation-available{
+  text-align:right;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:800;
+}
+.vacation-available strong{
+  display:block;
+  color:#86efac;
+  font-size:34px;
+  line-height:1;
+  letter-spacing:-.05em;
+}
+.vacation-progress{
+  height:22px;
+  border-radius:999px;
+  padding:4px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:inset 0 1px 8px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.vacation-progress-fill{
+  width:0%;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#94a3b8,#4b5563);
+  box-shadow:0 0 18px rgba(148,163,184,.22);
+  transition:width .35s ease;
+}
+.vacation-metrics{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.vacation-metric{
+  border-radius:18px;
+  padding:11px 12px;
+  background:rgba(5,4,15,.46);
+  border:1px solid rgba(255,255,255,.07);
+}
+.vacation-metric span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+}
+.vacation-metric strong{
+  display:block;
+  margin-top:5px;
+  font-size:24px;
+  line-height:1;
+}
+.request-vacation-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-height:56px;
+  border-radius:22px;
+  text-decoration:none;
+  color:white;
+  font-weight:950;
+  background:linear-gradient(135deg,#22c55e,#06b6d4,#8b2fc9);
+  box-shadow:0 18px 38px rgba(34,197,94,.20), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.dashboard-kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.kpi-card{
+  border-radius:24px;
+  padding:14px 12px;
+  text-align:center;
+  min-height:104px;
+  display:grid;
+  align-content:center;
+  gap:4px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.055);
+}
+.kpi-card .kpi-icon{
+  width:36px;
+  height:36px;
+  margin:0 auto 2px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.08);
+  font-size:18px;
+}
+.kpi-card strong{
+  font-size:34px;
+  line-height:1;
+  letter-spacing:-.05em;
+}
+.kpi-card span{
+  color:#efe8ff;
+  font-size:12px;
+  font-weight:900;
+}
+.kpi-work strong,.kpi-work .kpi-icon{color:#86efac}
+.kpi-rest strong,.kpi-rest .kpi-icon{color:#fb7185}
+.kpi-extra strong,.kpi-extra .kpi-icon{color:#facc15}
+.kpi-vac strong,.kpi-vac .kpi-icon{color:#a855f7}
+/* Modo normal: cada usuario ve solo su pantalla personal.
+   Modo supervisor/propietario: se muestran herramientas de administración. */
+body:not(.admin-mode) .tabs,
+body:not(.admin-mode) .toolbar{
+  display:none !important;
+}
+body:not(.admin-mode) #agendaView,
+body:not(.admin-mode) #summaryView,
+body:not(.admin-mode) #usersView{
+  display:none !important;
+}
+body:not(.admin-mode) #calendarView{
+  display:block !important;
+}
+.admin-only{display:none !important;}
+body.admin-mode .admin-only{display:flex !important;}
+.admin-shortcut{
+  margin-top:10px;
+  background:linear-gradient(135deg,#4de2ff,#8b2fc9) !important;
+}
+.vacation-settings{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:end;
+  margin-top:2px;
+}
+.vacation-settings .field span{
+  font-size:10px;
+}
+.vacation-settings input{
+  min-height:46px;
+}
+.vacation-settings button{
+  min-height:46px;
+  padding:10px 14px;
+}
+@media(max-width:430px){
+  .vacation-settings{grid-template-columns:1fr;}
+}
+@media(min-width:860px){
+  .main-dashboard{grid-template-columns:1fr 1.15fr;align-items:stretch;}
+  .dashboard-kpis{grid-column:1 / -1;}
+}
+@media(max-width:560px){
+  .dashboard-card{padding:15px;border-radius:26px;}
+  .dashboard-head,.vacation-title{flex-direction:column;align-items:stretch;}
+  .turn-pill{width:max-content;max-width:100%;}
+  .vacation-available{text-align:left;}
+  .vacation-metrics{grid-template-columns:1fr 1fr 1fr;gap:6px;}
+  .vacation-metric{padding:10px 8px;border-radius:16px;}
+  .vacation-metric span{font-size:9.5px;letter-spacing:.08em;}
+  .vacation-metric strong{font-size:21px;}
+  .dashboard-kpis{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .kpi-card{min-height:94px;border-radius:20px;}
+  .kpi-card strong{font-size:30px;}
+}
+
+
+/* ═════ AJUSTE DAVID — distribución móvil sin cambiar estética ═════
+   Solo reacomoda la pantalla principal en celular para evitar recortes
+   y que cada bloque use mejor el ancho disponible. */
+@media(max-width:560px){
+  .main-dashboard{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+    margin:8px 0 14px !important;
+  }
+  .main-dashboard .dashboard-card{
+    width:100% !important;
+    max-width:100% !important;
+    overflow:visible !important;
+  }
+  .dashboard-head{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    align-items:stretch !important;
+    gap:12px !important;
+    margin-bottom:12px !important;
+  }
+  .dashboard-user-signature,
+  .dashboard-signature{
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .dashboard-signature{
+    padding-top:10px !important;
+  }
+  .dashboard-signature .user-signature-name{
+    font-size:clamp(40px,13.8vw,58px) !important;
+    line-height:.88 !important;
+    padding-top:2px !important;
+  }
+  .dashboard-signature .user-signature-meta{
+    flex-wrap:wrap !important;
+    row-gap:5px !important;
+  }
+  .turn-pill{
+    width:100% !important;
+    justify-content:center !important;
+    text-align:center !important;
+    white-space:normal !important;
+  }
+  .request-vacation-btn,
+  .admin-shortcut{
+    width:100% !important;
+  }
+  .vacation-card{
+    gap:11px !important;
+  }
+  .vacation-title{
+    display:grid !important;
+    grid-template-columns:1fr auto !important;
+    align-items:start !important;
+    gap:10px !important;
+  }
+  .vacation-title h2{
+    font-size:21px !important;
+  }
+  .vacation-title p{
+    font-size:12.5px !important;
+  }
+  .vacation-available{
+    text-align:right !important;
+    min-width:66px !important;
+  }
+  .vacation-available strong{
+    font-size:31px !important;
+  }
+  .vacation-progress{
+    height:18px !important;
+  }
+  .vacation-metrics{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+  .vacation-metric{
+    min-width:0 !important;
+  }
+  .vacation-settings{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+  .vacation-settings button{
+    width:100% !important;
+  }
+}
+@media(max-width:380px){
+  .dashboard-signature .user-signature-name{
+    font-size:clamp(36px,13vw,50px) !important;
+  }
+  .vacation-title{
+    grid-template-columns:1fr !important;
+  }
+  .vacation-available{
+    text-align:left !important;
+  }
+}
+
+
+
+/* ═════ AJUSTE DAVID 2.6 — menú móvil más compacto + filtro real de mi horario ═════ */
+@media(max-width:430px){
+  .tabs{
+    gap:4px !important;
+    margin-bottom:6px !important;
+  }
+  .tab{
+    min-height:38px !important;
+    padding:7px 3px !important;
+    border-radius:14px !important;
+    font-size:10px !important;
+  }
+  .tab svg{
+    width:12px !important;
+    height:12px !important;
+  }
+  .controls{
+    grid-template-columns:44px 1fr 44px !important;
+    padding:5px !important;
+    margin:3px 0 7px !important;
+    border-radius:24px !important;
+  }
+  .round{
+    height:42px !important;
+    border-radius:15px !important;
+    font-size:26px !important;
+  }
+  .month-title strong{
+    font-size:17px !important;
+    line-height:1.05 !important;
+  }
+  .month-title span{
+    margin-top:2px !important;
+    font-size:10.5px !important;
+  }
+  .toolbar{
+    padding:10px !important;
+    gap:8px !important;
+    border-radius:24px !important;
+    margin-bottom:8px !important;
+  }
+  .toolbar .field span{
+    font-size:9px !important;
+    letter-spacing:.12em !important;
+    margin-bottom:0 !important;
+  }
+  .toolbar .field input,
+  .toolbar .field select{
+    min-height:42px !important;
+    padding:10px 12px !important;
+    border-radius:14px !important;
+    font-size:14px !important;
+  }
+  .toolbar-meta{
+    gap:8px !important;
+  }
+  .toggle-card{
+    min-height:58px !important;
+    padding:10px 12px !important;
+    border-radius:16px !important;
+    gap:10px !important;
+  }
+  .toggle-label{
+    font-size:13px !important;
+  }
+  .toggle-card small{
+    font-size:10.5px !important;
+    line-height:1.2 !important;
+  }
+  .slider{
+    width:56px !important;
+    height:31px !important;
+  }
+  .slider::before{
+    width:23px !important;
+    height:23px !important;
+  }
+  .switch input:checked + .slider::before{
+    transform:translateX(25px) !important;
+  }
+  #todayBtn{
+    min-height:42px !important;
+    padding:10px 12px !important;
+    border-radius:15px !important;
+  }
+  .calendar-context{
+    margin:4px 0 8px !important;
+    padding:8px 10px !important;
+    border-radius:15px !important;
+    gap:6px !important;
+  }
+  .calendar-context-copy span{
+    font-size:9px !important;
+  }
+  .calendar-context-copy strong{
+    font-size:14px !important;
+  }
+  .calendar-context-selected{
+    padding:6px 8px !important;
+    border-radius:13px !important;
+  }
+  .calendar-context-selected small{
+    font-size:9.5px !important;
+  }
+  .calendar-context-selected strong{
+    font-size:11px !important;
+  }
+}
+
+
+
+/* ═════ AJUSTE DAVID 2.7 — panel superior móvil compacto ═════
+   Compacta únicamente la distribución en celular para que el calendario
+   aparezca antes. No cambia colores, datos, funciones ni escritorio. */
+@media(max-width:560px){
+  .app-shell{
+    padding-left:8px !important;
+    padding-right:8px !important;
+  }
+  .main-dashboard{
+    gap:8px !important;
+    margin:4px 0 10px !important;
+  }
+  .dashboard-card{
+    padding:10px !important;
+    border-radius:22px !important;
+  }
+  .dashboard-head{
+    gap:8px !important;
+    margin-bottom:8px !important;
+  }
+  .dashboard-signature{
+    padding:7px 12px 8px !important;
+    border-radius:20px !important;
+  }
+  .dashboard-signature .user-signature-kicker{
+    font-size:8px !important;
+    letter-spacing:.17em !important;
+    margin-bottom:0 !important;
+  }
+  .dashboard-signature .user-signature-name{
+    font-size:clamp(32px,10.6vw,44px) !important;
+    line-height:.76 !important;
+    padding:0 9px 3px 0 !important;
+  }
+  .dashboard-signature .user-signature-name::after{
+    bottom:-1px !important;
+  }
+  .dashboard-signature .user-signature-meta{
+    margin-top:3px !important;
+    font-size:9px !important;
+    letter-spacing:.13em !important;
+    gap:5px !important;
+  }
+  .dashboard-signature .user-signature-role{
+    font-size:8px !important;
+    padding:2px 6px !important;
+  }
+  .turn-pill{
+    min-height:34px !important;
+    padding:7px 10px !important;
+    border-radius:16px !important;
+    font-size:11px !important;
+    gap:6px !important;
+  }
+  .request-vacation-btn{
+    min-height:42px !important;
+    border-radius:17px !important;
+    font-size:14px !important;
+    gap:7px !important;
+  }
+  .admin-shortcut{
+    margin-top:7px !important;
+    min-height:42px !important;
+  }
+
+  .vacation-card{
+    gap:8px !important;
+  }
+  .vacation-title{
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:8px !important;
+    align-items:start !important;
+  }
+  .vacation-title h2{
+    font-size:19px !important;
+    line-height:1.05 !important;
+  }
+  .vacation-title p{
+    margin-top:3px !important;
+    font-size:11.5px !important;
+    line-height:1.22 !important;
+  }
+  .vacation-available{
+    min-width:58px !important;
+    font-size:10.5px !important;
+    line-height:1.05 !important;
+  }
+  .vacation-available strong{
+    font-size:29px !important;
+  }
+  .vacation-progress{
+    height:13px !important;
+    padding:3px !important;
+  }
+  .vacation-metrics{
+    gap:6px !important;
+  }
+  .vacation-metric{
+    padding:8px 8px !important;
+    border-radius:14px !important;
+  }
+  .vacation-metric span{
+    font-size:8.5px !important;
+    letter-spacing:.09em !important;
+  }
+  .vacation-metric strong{
+    margin-top:4px !important;
+    font-size:20px !important;
+  }
+  .vacation-settings{
+    grid-template-columns:minmax(0,1fr) 112px !important;
+    gap:8px !important;
+    align-items:end !important;
+    margin-top:0 !important;
+  }
+  .vacation-settings .field{
+    gap:5px !important;
+  }
+  .vacation-settings .field span{
+    font-size:8.5px !important;
+    letter-spacing:.13em !important;
+  }
+  .vacation-settings input{
+    min-height:39px !important;
+    padding:9px 11px !important;
+    border-radius:14px !important;
+  }
+  .vacation-settings button{
+    width:auto !important;
+    min-height:39px !important;
+    padding:8px 10px !important;
+    border-radius:14px !important;
+    font-size:13px !important;
+  }
+
+  .dashboard-kpis{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+  .kpi-card{
+    min-height:72px !important;
+    padding:8px 5px !important;
+    border-radius:16px !important;
+    gap:2px !important;
+  }
+  .kpi-card .kpi-icon{
+    width:25px !important;
+    height:25px !important;
+    margin-bottom:0 !important;
+    font-size:13px !important;
+  }
+  .kpi-card strong{
+    font-size:25px !important;
+  }
+  .kpi-card span{
+    font-size:10px !important;
+    line-height:1.05 !important;
+  }
+}
+
+@media(max-width:430px){
+  .hero-top{
+    padding-top:4px !important;
+    padding-bottom:6px !important;
+  }
+  .brand h1{
+    font-size:27px !important;
+  }
+  .subtitle{
+    margin-top:4px !important;
+    font-size:10.5px !important;
+    line-height:1.25 !important;
+  }
+  .main-dashboard{
+    gap:7px !important;
+    margin-top:3px !important;
+  }
+  .dashboard-card{
+    padding:9px !important;
+    border-radius:20px !important;
+  }
+  .dashboard-signature{
+    padding:6px 11px 7px !important;
+  }
+  .dashboard-signature .user-signature-name{
+    font-size:clamp(30px,10.2vw,41px) !important;
+    line-height:.74 !important;
+  }
+  .turn-pill{
+    min-height:32px !important;
+    padding:6px 9px !important;
+    font-size:10.5px !important;
+  }
+  .request-vacation-btn,
+  .admin-shortcut{
+    min-height:40px !important;
+    border-radius:16px !important;
+    font-size:13.5px !important;
+  }
+  .vacation-title h2{
+    font-size:18px !important;
+  }
+  .vacation-title p{
+    font-size:11px !important;
+  }
+  .vacation-available strong{
+    font-size:27px !important;
+  }
+  .vacation-settings{
+    grid-template-columns:minmax(0,1fr) 100px !important;
+    gap:7px !important;
+  }
+  .vacation-settings button{
+    font-size:12.5px !important;
+  }
+  .kpi-card{
+    min-height:68px !important;
+    border-radius:15px !important;
+  }
+  .kpi-card strong{
+    font-size:23px !important;
+  }
+  .kpi-card span{
+    font-size:9px !important;
+  }
+  .tabs{
+    margin-bottom:4px !important;
+  }
+  .tab{
+    min-height:34px !important;
+    padding:6px 2px !important;
+    border-radius:13px !important;
+    font-size:9.5px !important;
+  }
+  .controls{
+    grid-template-columns:40px 1fr 40px !important;
+    padding:4px !important;
+    margin:2px 0 5px !important;
+    border-radius:22px !important;
+  }
+  .round{
+    height:38px !important;
+    border-radius:14px !important;
+    font-size:24px !important;
+  }
+  .month-title strong{
+    font-size:16px !important;
+  }
+  .month-title span{
+    font-size:10px !important;
+  }
+  .toolbar{
+    padding:8px !important;
+    gap:6px !important;
+    border-radius:20px !important;
+    margin-bottom:6px !important;
+  }
+  .toolbar .field input,
+  .toolbar .field select{
+    min-height:38px !important;
+    padding:8px 10px !important;
+    font-size:13px !important;
+  }
+  .toggle-card{
+    min-height:48px !important;
+    padding:8px 10px !important;
+    border-radius:14px !important;
+  }
+  .toggle-label{
+    font-size:12px !important;
+  }
+  .toggle-card small{
+    font-size:9.5px !important;
+  }
+  .slider{
+    width:50px !important;
+    height:28px !important;
+  }
+  .slider::before{
+    width:20px !important;
+    height:20px !important;
+  }
+  .switch input:checked + .slider::before{
+    transform:translateX(22px) !important;
+  }
+  #todayBtn{
+    min-height:38px !important;
+    padding:8px 10px !important;
+    border-radius:14px !important;
+  }
+}
+
+@media(max-width:360px){
+  .vacation-settings{
+    grid-template-columns:1fr !important;
+  }
+  .vacation-settings button{
+    width:100% !important;
+  }
+  .dashboard-kpis{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+
+/* ═════ Calendario opción 1 — chips rectangulares suaves ═════
+   Cambia solo la marcación visual del calendario para evitar tantos círculos.
+   Mantiene colores, datos, edición, filtros y estructura. */
+.calendar-grid .day{
+  gap:6px !important;
+}
+.calendar-grid .badge{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:5px !important;
+  min-height:30px !important;
+  padding:6px 8px 6px 10px !important;
+  border-radius:10px !important;
+  overflow:hidden !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 6px 14px rgba(0,0,0,.16) !important;
+}
+.calendar-grid .badge::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:5px;
+  bottom:5px;
+  width:3px;
+  border-radius:999px;
+  background:rgba(255,255,255,.70);
+}
+.calendar-grid .badge-icon{
+  width:auto !important;
+  height:auto !important;
+  min-width:12px !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  opacity:.92;
+}
+.calendar-grid .badge-state{
+  width:auto !important;
+  height:auto !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  opacity:.82;
+}
+.calendar-grid .badge-copy strong{
+  font-size:10.2px !important;
+  line-height:1.05 !important;
+  letter-spacing:-.01em !important;
+}
+.calendar-grid .badge-copy small{
+  display:block !important;
+  margin-top:1px !important;
+  font-size:8.7px !important;
+  line-height:1.05 !important;
+  opacity:.90 !important;
+}
+.calendar-grid .you-chip{
+  padding:1px 4px !important;
+  font-size:7.5px !important;
+  margin-left:3px !important;
+}
+.calendar-grid .status-work,
+.calendar-grid .badge.status-work,
+.calendar-grid .badge.current-user.status-work{
+  background:linear-gradient(135deg,rgba(239,68,68,.78),rgba(127,29,29,.52)) !important;
+}
+.calendar-grid .status-rest,
+.calendar-grid .badge.status-rest,
+.calendar-grid .badge.current-user.status-rest{
+  background:linear-gradient(135deg,rgba(34,197,94,.78),rgba(20,83,45,.52)) !important;
+}
+.calendar-grid .status-vacation,
+.calendar-grid .badge.status-vacation,
+.calendar-grid .badge.current-user.status-vacation{
+  background:linear-gradient(135deg,rgba(56,189,248,.76),rgba(14,116,144,.50)) !important;
+}
+.calendar-grid .status-course,
+.calendar-grid .badge.status-course,
+.calendar-grid .badge.current-user.status-course{
+  background:linear-gradient(135deg,rgba(250,204,21,.86),rgba(161,98,7,.58)) !important;
+}
+.calendar-grid .status-overtime,
+.calendar-grid .badge.status-overtime,
+.calendar-grid .badge.current-user.status-overtime{
+  background:linear-gradient(135deg,rgba(167,139,250,.82),rgba(76,29,149,.54)) !important;
+}
+.calendar-grid .status-permission,
+.calendar-grid .badge.status-permission,
+.calendar-grid .badge.current-user.status-permission{
+  background:linear-gradient(135deg,rgba(148,163,184,.72),rgba(51,65,85,.50)) !important;
+}
+.calendar-grid .badge.current-user{
+  outline:1px solid rgba(255,255,255,.85) !important;
+  outline-offset:1px !important;
+  box-shadow:0 0 0 2px rgba(176,92,255,.16), inset 0 1px 0 rgba(255,255,255,.14), 0 6px 14px rgba(0,0,0,.18) !important;
+}
+.calendar-grid .more{
+  margin-top:auto !important;
+  padding:4px 7px !important;
+  border-radius:9px !important;
+  background:rgba(255,255,255,.055) !important;
+  border:1px solid rgba(255,255,255,.06) !important;
+  color:#d8cdf8 !important;
+  font-size:10px !important;
+}
+.calendar-grid .more::before{
+  display:none !important;
+}
+@media(max-width:760px){
+  .calendar-grid{
+    gap:5px !important;
+  }
+  .calendar-grid .day{
+    min-height:88px !important;
+    padding:6px !important;
+    gap:4px !important;
+    border-radius:15px !important;
+  }
+  .calendar-grid .day-header{
+    gap:4px !important;
+  }
+  .calendar-grid .date-bubble{
+    min-width:24px !important;
+    height:24px !important;
+    padding:0 6px !important;
+    font-size:12px !important;
+  }
+  .calendar-grid .mini-count{
+    padding:3px 5px !important;
+    font-size:8.5px !important;
+  }
+  .calendar-grid .mini-count svg{
+    width:9px !important;
+    height:9px !important;
+  }
+  .calendar-grid .badge{
+    min-height:23px !important;
+    padding:4px 5px 4px 8px !important;
+    border-radius:8px !important;
+    gap:3px !important;
+  }
+  .calendar-grid .badge::before{
+    top:4px !important;
+    bottom:4px !important;
+    width:2px !important;
+  }
+  .calendar-grid .badge-icon{
+    font-size:8.5px !important;
+  }
+  .calendar-grid .badge-state{
+    font-size:9px !important;
+  }
+  .calendar-grid .badge-copy strong{
+    font-size:8.7px !important;
+  }
+  .calendar-grid .badge-copy small{
+    display:none !important;
+  }
+  .calendar-grid .you-chip{
+    display:none !important;
+  }
+  .calendar-grid .more{
+    padding:3px 5px !important;
+    font-size:8.5px !important;
+    border-radius:7px !important;
+  }
+}
+@media(max-width:430px){
+  .calendar-grid .day{
+    min-height:78px !important;
+    padding:5px !important;
+    border-radius:14px !important;
+  }
+  .calendar-grid .badge{
+    min-height:20px !important;
+  }
+  .calendar-grid .badge-copy strong{
+    font-size:8px !important;
+  }
+  .calendar-grid .badge-icon,
+  .calendar-grid .badge-state{
+    font-size:8px !important;
+  }
+}
+
+
+/* ═════ AJUSTE DAVID 2.9 — vacaciones por fecha de ingreso ═════
+   Trabajo se muestra en rojo y descanso en verde, igual que la tabla.
+   El saldo de vacaciones permite capturar total, días ya tomados,
+   fecha de ingreso y los días que se suman en cada aniversario. */
+.kpi-work strong,
+.kpi-work .kpi-icon{
+  color:var(--status-work) !important;
+}
+.kpi-rest strong,
+.kpi-rest .kpi-icon{
+  color:var(--status-rest) !important;
+}
+.vacation-settings{
+  grid-template-columns:repeat(4,minmax(0,1fr)) auto !important;
+}
+@media(max-width:560px){
+  .vacation-settings{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  .vacation-settings button{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+  }
+}
+@media(max-width:360px){
+  .vacation-settings{
+    grid-template-columns:1fr !important;
+  }
+}
+
+</style>
+</head>
+<body class="locked">
+
+  <!-- SPLASH INICIAL - Portal de Horarios -->
+  <div id="splashHorarios" aria-label="Portal de Horarios">
+    <div class="splash-horarios-hero">
+      <div class="splash-horarios-word" aria-hidden="true">
+        <span style="--i:0">P</span><span style="--i:1">o</span><span style="--i:2">r</span><span style="--i:3">t</span><span style="--i:4">a</span><span style="--i:5">l</span><span class="space" style="--i:6">&nbsp;</span><span style="--i:7">d</span><span style="--i:8">e</span><span class="space" style="--i:9">&nbsp;</span><span style="--i:10">H</span><span style="--i:11">o</span><span style="--i:12">r</span><span style="--i:13">a</span><span style="--i:14">r</span><span style="--i:15">i</span><span style="--i:16">o</span><span style="--i:17">s</span>
+        <div class="splash-horarios-logo-shine"></div>
+      </div>
+      <div class="splash-horarios-divider"></div>
+      <p class="splash-horarios-caption">VOLARIS</p>
+    </div>
+  </div>
+
+
+  <section id="authScreen" class="auth-screen" aria-label="Inicio de sesión">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-mark">✈</div>
+        <div>
+          <span class="airline-name">VOLARIS</span>
+          <h2>Horarios</h2>
+        </div>
+      </div>
+      <p>Acceso compartido para consultar y actualizar turnos, cursos, vacaciones, permisos y tiempo extra.</p>
+      <div id="configWarning" class="config-warning hidden">
+        Falta configurar Firebase y tu número de empleado propietario dentro del archivo. La app está lista, pero primero debes pegar esos datos.
+      </div>
+      <form id="loginForm" class="auth-form">
+        <label class="field"><span>Número de empleado</span><input id="loginEmployee" type="text" inputmode="numeric" autocomplete="username" placeholder="Ej. 123456" required></label>
+        <label class="field"><span>PIN</span><input id="loginPin" type="password" autocomplete="current-password" minlength="4" inputmode="numeric" placeholder="4 dígitos" required></label>
+        <div class="auth-actions">
+          <button class="primary" type="submit">Entrar</button>
+        </div>
+      </form>
+      <div id="authError" class="auth-error"></div>
+      <p class="auth-note">Los embajadores solo pueden consultar y editar su propio calendario.</p>
+    </div>
+    <div class="auth-signature" aria-label="Firma de la app">
+      <div class="signature-inner">
+        <span class="signature-by">by laraclv</span>
+        <span class="signature-version">v 2.9.0</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="volaris-badge">
+            <img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/8QAKhAAAgICAAUFAAIDAQEAAAAAAwQCBQABBhETQGAQEhQg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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAZRCIEJnMQ4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIOQQDMy8uQlDeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATxMIddBOAABKMQAWdEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUAUuAAAAAAAAAADl3YwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ8cEIAAAAAAAAAAAAAALxYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC0tCkAAAAAAAAAAAAAAAAADWcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtiEAAAAAAAAAAAAAAAAAAAD7oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACUbAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACeIAAAACOVuGIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADFQAAAAADm8YAQb8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABKUAAAAAAAj7ARoTV8AAAAAAASAFtlGkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcAAAAAAAADaMhCAKjEUADbGsIAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAACLaZBoAoYrIAAAAAQB9cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADsAAAAAAAADCTMAAAAgAAIAAAIAICzgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIBR0ABoAAAIAAA6qcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+BYxA4AIAA8ZEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAxfBFAhAQCoKM7UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZPBUYAAAAAuCEAAANIgAoI80AAAAAAB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEsAABIWgcGIAAACAIQYCA6oAAAAAAAJ0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADkkAAJKEIAAAAQ6AAogRnBYAAAAAACsQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB60AAAIAQxyqoIsAYARAhkAAAAAAASIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAIASQWAAAACEAARyCAAAAAAABRkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcpmADTIAAAAACgAIBG0AAAAAAABQQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACcI0wAAAAAD6AAAcJUAAAAAAACcoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEbIAAAAAACwBAS54QAAAAAACiD0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYvyAAAAAAAlAEIyYAAAAAAAASW0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAeACmAAAAAAAAbWB+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADEJ8MAAAAAABHAJlsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC8MoAABeaIAAAAAABOmJfcIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWPIHgAAAAAABZrOUAvMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV9dvJiK+mBAgAOiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACD0UcpczH9hkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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" width="34" height="34" style="border-radius:9px;object-fit:cover;" alt="Volaris logo"/>
+            <span class="airline-name">VOLARIS</span>
+          </div>
+          <h1>Turno Nocturno</h1>
+          <p class="subtitle">
+            <svg class="icon-plane" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+            20:30 &#8211; 08:00 hrs &middot; Descansos, vacaciones, cursos y tiempo extra
+          </p>
+        </div>
+        <div class="top-actions">
+          <a class="ghost home-link" href="index.html" aria-label="Volver al centro de control">⌂ Inicio</a>
+          <span id="sessionBadge" class="session-badge hidden"></span>
+          <button id="logoutBtn" class="ghost hidden" type="button">Salir</button>
+          <button id="installBtn" class="ghost hidden">&#8595; Instalar</button>
+        </div>
+      </div>
+
+    </header>
+
+    <section class="main-dashboard" aria-label="Pantalla principal de asistencia">
+      <article class="dashboard-card glass">
+        <div class="dashboard-head">
+          <div class="dashboard-user dashboard-user-signature">
+            <div class="user-signature-hero dashboard-signature show" aria-label="Usuario activo">
+              <span class="user-signature-kicker">Sesión activa</span>
+              <div class="user-signature-name" id="dashboardName">Usuario</div>
+              <div class="user-signature-meta">
+                <span id="dashboardEmployee">—</span>
+                <span class="meta-dot" aria-hidden="true"></span>
+                <span class="user-signature-role" id="dashboardRole">—</span>
+              </div>
+            </div>
+          </div>
+          <span class="turn-pill">🌙 Turno Nocturno · 20:30 – 08:00 hrs</span>
+        </div>
+        <a class="request-vacation-btn" href="https://dtomx1106.deloitte.com.mx/BPO1CVA04/reportes/bienvenida.aspx" target="_blank" rel="noopener noreferrer">
+          🧳 Solicitud de vacaciones
+        </a>
+        <button id="adminPanelBtn" class="request-vacation-btn admin-shortcut admin-only" type="button">
+          👥 Administración de personal
+        </button>
+      </article>
+
+      <article class="dashboard-card glass vacation-card">
+        <div class="vacation-title">
+          <div>
+            <h2>Vacaciones disponibles</h2>
+            <p>Progreso anual calculado con tu saldo actual y vacaciones programadas.</p>
+          </div>
+          <div class="vacation-available"><strong id="vacationAvailable">0</strong>días restantes</div>
+        </div>
+        <div class="vacation-progress" aria-label="Progreso de vacaciones usadas">
+          <div id="vacationProgressFill" class="vacation-progress-fill"></div>
+        </div>
+        <div class="vacation-metrics">
+          <div class="vacation-metric"><span>Total</span><strong id="vacationTotal">0</strong></div>
+          <div class="vacation-metric"><span>Usados</span><strong id="vacationUsed">0</strong></div>
+          <div class="vacation-metric"><span>Este mes</span><strong id="vacationMonth">0</strong></div>
+        </div>
+        <form id="vacationDaysForm" class="vacation-settings" aria-label="Configurar saldo de vacaciones">
+          <label class="field"><span>Días totales</span><input id="vacationDaysInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 25" /></label>
+          <label class="field"><span>Días ya tomados</span><input id="vacationUsedInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 13" /></label>
+          <label class="field"><span>Fecha de ingreso</span><input id="hireDateInput" type="date" /></label>
+          <label class="field"><span>Suma anual</span><input id="vacationAnnualAddInput" type="number" min="0" max="365" step="1" inputmode="numeric" placeholder="Ej. 25" /></label>
+          <button class="soft" type="submit">Guardar</button>
+        </form>
+      </article>
+
+      <section class="dashboard-kpis" aria-label="Resumen del mes">
+        <article class="kpi-card glass kpi-work"><div class="kpi-icon">✓</div><strong id="kpiWorked">0</strong><span>Trabajados</span></article>
+        <article class="kpi-card glass kpi-rest"><div class="kpi-icon">★</div><strong id="kpiRest">0</strong><span>Descansados</span></article>
+        <article class="kpi-card glass kpi-extra"><div class="kpi-icon">◷</div><strong id="kpiExtra">0</strong><span>Extra</span></article>
+        <article class="kpi-card glass kpi-vac"><div class="kpi-icon">✈</div><strong id="kpiVacation">0</strong><span>Vacaciones</span></article>
+      </section>
+    </section>
+
+      <section class="controls glass">
+        <button id="prevMonth" class="round" aria-label="Mes anterior">&#8249;</button>
+        <div class="month-title">
+          <strong id="monthLabel">Julio 2026</strong>
+          <span id="todayLabel"></span>
+        </div>
+        <button id="nextMonth" class="round" aria-label="Mes siguiente">&#8250;</button>
+      </section>
+
+      <nav class="tabs" aria-label="Vistas">
+        <button class="tab active" data-view="calendar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          Calendario
+        </button>
+        <button class="tab" data-view="agenda">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+          Lista
+        </button>
+        <button class="tab" data-view="summary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          Resumen
+        </button>
+        <button class="tab" data-view="users">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          Personal
+        </button>
+      </nav>
+
+    <main>
+      <section class="toolbar glass">
+        <label class="field field-wide">
+          <span>Vista</span>
+          <select id="userFilter"><option value="all">Todo el personal</option></select>
+        </label>
+        <div class="toolbar-meta">
+          <label class="toggle-card" for="myScheduleToggle">
+            <div>
+              <span class="toggle-label">Ver solo mi horario</span>
+              <small>Resalta tu nombre y filtra tus turnos al instante</small>
+            </div>
+            <span class="switch">
+              <input id="myScheduleToggle" type="checkbox" />
+              <span class="slider"></span>
+            </span>
+          </label>
+          <label class="field">
+            <span>Marca r&#225;pida</span>
+            <select id="quickStatus">
+              <option value="">Tocar d&#237;a para editar</option>
+              <option value="work">Turno nocturno</option>
+              <option value="rest">Descanso</option>
+              <option value="vacation">Vacaciones</option>
+              <option value="course">Curso</option>
+              <option value="overtime">Tiempo extra</option>
+              <option value="permission">Permiso</option>
+              <option value="clear">Quitar modificaci&#243;n</option>
+            </select>
+          </label>
+        </div>
+        <button id="todayBtn" class="soft accent">Hoy</button>
+      </section>
+
+      <section id="calendarView" class="view active">
+        <div class="calendar-context glass" aria-label="Mes y fecha seleccionada">
+          <div class="calendar-context-copy">
+            <span>Mes visible</span>
+            <strong id="calendarContextMonth">Junio de 2026</strong>
+          </div>
+          <div class="calendar-context-selected">
+            <small id="calendarContextHelper">Fecha seleccionada</small>
+            <strong id="calendarContextSelected">Toca un d&#237;a para editar</strong>
+          </div>
+        </div>
+        <div class="weekdays">
+          <span>Dom</span><span>Lun</span><span>Mar</span><span>Mi&#233;</span><span>Jue</span><span>Vie</span><span>S&#225;b</span>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+        <aside id="calendarDetail" class="calendar-detail glass">
+          <div class="detail-grabber"></div>
+          <div class="detail-header">
+            <div>
+              <p class="detail-eyebrow">Vista del d&#237;a</p>
+              <h3 id="detailDate">Selecciona un d&#237;a</h3>
+              <p id="detailCount" class="detail-count">Toca cualquier celda para ver el detalle.</p>
+            </div>
+            <button id="detailAction" class="soft detail-action" type="button">Ver detalle</button>
+          </div>
+          <div id="detailItems" class="detail-items"></div>
+          <div class="status-legend">
+            <span><b class="legend-dot legend-work"></b>Turno nocturno</span>
+            <span><b class="legend-dot legend-rest"></b>Descanso</span>
+            <span><b class="legend-dot legend-vacation"></b>Vacaciones</span>
+            <span><b class="legend-dot legend-course"></b>Curso</span>
+            <span><b class="legend-dot legend-overtime"></b>Tiempo extra</span>
+            <span><b class="legend-dot legend-you"></b>Eres t&#250;</span>
+          </div>
+        </aside>
+      </section>
+
+      <section id="agendaView" class="view">
+        <div id="agendaList" class="agenda-list"></div>
+      </section>
+
+      <section id="summaryView" class="view">
+        <div id="summaryCards" class="summary-grid"></div>
+      </section>
+
+      <section id="usersView" class="view">
+        <div class="panel glass">
+          <h2>Agregar personal</h2>
+          <p class="hint">Elige la fecha base donde el empleado inicia su primer d&#237;a de trabajo. La app calcula autom&#225;ticamente el patr&#243;n 2 trabajo / 2 descanso.</p>
+          <form id="userForm" class="user-form">
+            <label class="field"><span>No. empleado</span><input id="employeeId" type="text" inputmode="numeric" placeholder="Ej. 123456" required /></label>
+            <label class="field"><span>Nombre</span><input id="userName" type="text" placeholder="Ej. Embajador" required /></label>
+            <label class="field"><span>Puesto o &#225;rea</span><input id="userRole" type="text" placeholder="Ej. Turno nocturno" /></label>
+            <label class="field"><span>Fecha base</span><input id="baseDate" type="date" required /></label>
+            <label class="field"><span>Color</span><input id="userColor" type="color" value="#8b2fc9" /></label>
+            <label class="field"><span>Rol</span><select id="accessRole"><option value="user">Embajador</option><option value="admin">Supervisor</option></select></label>
+            <label class="field"><span>Días vacaciones</span><input id="userVacationDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="15" required /></label>
+            <label class="field"><span>Días ya tomados</span><input id="userVacationUsedDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="0" required /></label>
+            <label class="field"><span>Fecha ingreso</span><input id="userHireDate" type="date" /></label>
+            <label class="field"><span>Suma anual</span><input id="userVacationAnnualAddDays" type="number" min="0" max="365" step="1" inputmode="numeric" value="15" /></label>
+            <label class="field"><span>PIN inicial</span><input id="userPin" type="password" minlength="4" inputmode="numeric" placeholder="Mín. 4" required /></label>
+            <button class="primary" type="submit">Agregar</button>
+          </form>
+        </div>
+        
+        <div id="statusColorPanel" class="panel glass status-color-panel">
+          <div class="status-color-head">
+            <div>
+              <h2>Colores de estados</h2>
+              <p class="hint">Edita los colores del calendario. Por defecto: rojo = días de trabajo y verde = días de descanso.</p>
+            </div>
+            <button id="resetStatusColors" type="button" class="soft">Restablecer</button>
+          </div>
+          <form id="statusColorForm" class="status-color-grid">
+            <label class="field"><span>Trabajo</span><input id="colorWork" type="color" value="#ef4444" /></label>
+            <label class="field"><span>Descanso</span><input id="colorRest" type="color" value="#22c55e" /></label>
+            <label class="field"><span>Vacaciones</span><input id="colorVacation" type="color" value="#38bdf8" /></label>
+            <label class="field"><span>Curso</span><input id="colorCourse" type="color" value="#facc15" /></label>
+            <label class="field"><span>Tiempo extra</span><input id="colorOvertime" type="color" value="#a78bfa" /></label>
+            <label class="field"><span>Permiso</span><input id="colorPermission" type="color" value="#94a3b8" /></label>
+            <button class="primary" type="submit">Guardar colores</button>
+          </form>
+        </div>
+
+        <div id="usersList" class="users-list"></div>
+      </section>
+    </main>
+    <footer class="app-signature" aria-label="Firma de la app">
+      <div class="signature-inner">
+        <span class="signature-by">by laraclv</span>
+        <span class="signature-version">v 2.9.0</span>
+      </div>
+    </footer>
+  </div>
+
+  <dialog id="dayDialog" class="dialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">Editar d&#237;a</p>
+          <h2 id="dialogDate">Fecha</h2>
+        </div>
+        <button class="icon" value="cancel" aria-label="Cerrar">&#215;</button>
+      </div>
+      <label class="field"><span>Empleado</span><select id="dialogUser"></select></label>
+      <label class="field">
+        <span>Tipo de d&#237;a</span>
+        <select id="dialogStatus">
+          <option value="auto">Autom&#225;tico 2x2</option>
+          <option value="work">Turno nocturno</option>
+          <option value="rest">Descanso</option>
+          <option value="vacation">Vacaciones</option>
+          <option value="course">Curso</option>
+          <option value="overtime">Tiempo extra</option>
+          <option value="permission">Permiso</option>
+        </select>
+      </label>
+
+      <!-- RANGO DE FECHAS -->
+      <div id="rangeSection" style="display:none;gap:10px;margin-top:2px">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Aplicar a un rango de fechas</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label class="field"><span>Fecha inicio</span><input type="date" id="rangeFrom"></label>
+          <label class="field"><span>Fecha fin</span><input type="date" id="rangeTo"></label>
+        </div>
+        <p id="rangeInfo" style="margin:4px 0 0;font-size:12px;color:var(--purple2);font-weight:700"></p>
+      </div>
+
+      <label class="field">
+        <span>Nota</span>
+        <textarea id="dialogNote" rows="3" placeholder="Ej. Curso de seguridad, cambio de turno, horas extra..."></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button id="deleteOverride" type="button" class="danger">Quitar modificaci&#243;n</button>
+        <button id="saveDay" type="button" class="primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="emptyTemplate">
+    <div class="empty glass">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5" style="margin-bottom:12px"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" fill="#a855f7" opacity=".3"/></svg>
+      <h2>Agrega tu primer empleado</h2>
+      <p>Registra al personal y ve todos los calendarios al mismo tiempo o revisa a cada persona individualmente.</p>
+      <button class="primary go-users">Agregar personal</button>
+    </div>
+  </template>
+
+  <script type="module">
+/* ══════════════════════════════════════════════════════
+   Turno Nocturno · Volaris
+   Versión compartida: Firebase Auth + Firestore
+   Roles: propietario / administrador / usuario
+   ══════════════════════════════════════════════════════ */
+
+import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+  serverTimestamp,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* ─────────────────────────────────────────────────────
+   CONFIGURACIÓN NECESARIA
+   1) Crea un Firebase NUEVO solo para Horarios.
+   2) Pega aquí la configuración web de Firebase.
+   3) Cambia OWNER_EMPLOYEE_ID por TU número de empleado.
+   4) Cambia OWNER_BOOTSTRAP_PIN antes de subirlo a GitHub.
+   ───────────────────────────────────────────────────── */
+const APP_CONFIG = {
+  firebase: {
+    apiKey: "AIzaSyDgOYh2R6Zv5fICqgVDxmEDs3BOjHKJ9OM",
+    authDomain: "horarios-ac03d.firebaseapp.com",
+    projectId: "horarios-ac03d",
+    storageBucket: "horarios-ac03d.firebasestorage.app",
+    messagingSenderId: "347764954480",
+    appId: "1:347764954480:web:9fb6b6ab6e4b01bed9abb5",
+    measurementId: "G-40V944M9W0"
+  },
+  OWNER_EMPLOYEE_ID: "2771",
+  OWNER_BOOTSTRAP_PIN: "1006"
+};
+
+const $ = (q) => document.querySelector(q);
+const $$ = (q) => [...document.querySelectorAll(q)];
+
+const STATUS = {
+  work:       { label: "Turno noche",  short: "N",   css: "status-work",       color: "#ef4444", time: "20:30 – 08:00 hrs" },
+  rest:       { label: "Descanso",     short: "D",   css: "status-rest",       color: "#22c55e", time: "Libre" },
+  vacation:   { label: "Vacaciones",   short: "VAC", css: "status-vacation",   color: "#38bdf8", time: "Programado" },
+  course:     { label: "Curso",        short: "CUR", css: "status-course",     color: "#facc15", time: "Capacitación" },
+  overtime:   { label: "Tiempo extra", short: "TE",  css: "status-overtime",   color: "#a78bfa", time: "Extra" },
+  permission: { label: "Permiso",      short: "PER", css: "status-permission", color: "#94a3b8", time: "Autorizado" },
+};
+
+const STATUS_COLOR_STORAGE_KEY = "volturnos_status_colors_v1";
+const STATUS_COLOR_IDS = {
+  work: "colorWork",
+  rest: "colorRest",
+  vacation: "colorVacation",
+  course: "colorCourse",
+  overtime: "colorOvertime",
+  permission: "colorPermission"
+};
+const DEFAULT_STATUS_COLORS = Object.fromEntries(Object.entries(STATUS).map(([key, value]) => [key, value.color]));
+
+function hexToRgb(hex) {
+  const clean = String(hex || "").replace("#", "").trim();
+  const full = clean.length === 3 ? clean.split("").map(c => c + c).join("") : clean;
+  const n = parseInt(full, 16);
+  if (Number.isNaN(n)) return { r: 139, g: 47, b: 201 };
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function shadeHex(hex, amount=-42) {
+  const { r, g, b } = hexToRgb(hex);
+  const clamp = v => Math.max(0, Math.min(255, v));
+  return "#" + [clamp(r + amount), clamp(g + amount), clamp(b + amount)]
+    .map(v => v.toString(16).padStart(2, "0")).join("");
+}
+function readableTextColor(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > .68 ? "#1a1028" : "#ffffff";
+}
+function getStoredStatusColors() {
+  try {
+    return { ...DEFAULT_STATUS_COLORS, ...JSON.parse(localStorage.getItem(STATUS_COLOR_STORAGE_KEY) || "{}") };
+  } catch {
+    return { ...DEFAULT_STATUS_COLORS };
+  }
+}
+function applyStatusColors(colors=getStoredStatusColors()) {
+  const root = document.documentElement;
+  Object.entries(colors).forEach(([key, color]) => {
+    if (!STATUS[key] || !/^#[0-9a-fA-F]{6}$/.test(color)) return;
+    STATUS[key].color = color;
+    root.style.setProperty(`--status-${key}`, color);
+    root.style.setProperty(`--status-${key}-dark`, shadeHex(color, -70));
+    root.style.setProperty(`--status-${key}-text`, readableTextColor(color));
+  });
+}
+function renderStatusColorPanel() {
+  Object.entries(STATUS_COLOR_IDS).forEach(([key, id]) => {
+    const input = document.getElementById(id);
+    if (input && STATUS[key]) input.value = STATUS[key].color;
+  });
+}
+applyStatusColors();
+
+let app = null;
+let auth = null;
+let db = null;
+let firebaseReady = false;
+let currentUser = null;
+let currentProfile = null;
+let unsubProfiles = null;
+let unsubOverrides = null;
+let selectedDate = null;
+let current = startOfMonth(new Date());
+let deferredPrompt = null;
+let isBootstrappingOwner = false;
+let state = { users: [], overrides: {} };
+let authPersistenceReady = Promise.resolve();
+const VACATION_ACCRUAL_PENDING = new Set();
+
+const HORARIOS_CACHE_KEY = 'horarios_offline_cache_v1';
+
+function firebaseConfigured() {
+  const f = APP_CONFIG.firebase;
+  return Object.values(f).every(v => v && !String(v).includes("PEGA_AQUI")) &&
+    APP_CONFIG.OWNER_EMPLOYEE_ID && !APP_CONFIG.OWNER_EMPLOYEE_ID.includes("PEGA_TU");
+}
+
+function initFirebase() {
+  if (!firebaseConfigured()) {
+    $("#configWarning").classList.remove("hidden");
+    authError("Configura Firebase y el número de empleado propietario dentro del archivo antes de usar la app.");
+    return false;
+  }
+  app = initializeApp(APP_CONFIG.firebase);
+  auth = getAuth(app);
+  authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch(err => console.warn('Persistencia Auth no disponible:', err));
+  try {
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+    });
+  } catch (err) {
+    console.warn('Caché offline Firestore no disponible, usando conexión normal:', err);
+    db = getFirestore(app);
+  }
+  firebaseReady = true;
+  return true;
+}
+
+function employeeToEmail(employeeId) {
+  const clean = normalizeEmployee(employeeId);
+  return `emp${clean}@horarios.volapp.app`;
+}
+function normalizeEmployee(v="") { return String(v).trim().replace(/\s+/g, "").toLowerCase(); }
+function roleLabel(role) { return role === "owner" ? "Propietario" : role === "admin" ? "Supervisor" : "Embajador"; }
+function isOwner() { return currentProfile?.accessRole === "owner"; }
+function isAdmin() { return ["owner","admin"].includes(currentProfile?.accessRole); }
+function canManageUsers() { return isAdmin(); }
+function canEditUser(userId) { return isAdmin() || currentUser?.uid === userId; }
+function visibleUsers() { return state.users.filter(u => u.active !== false); }
+function currentProfileId() { return currentProfile?.uid || currentUser?.uid || ""; }
+function isMyScheduleOnly() { return !!$("#myScheduleToggle")?.checked; }
+function isCurrentProfileUser(user) { return !!user && user.id === currentProfileId(); }
+function statusIcon(status) {
+  return ({ work:"🌙", rest:"✅", vacation:"🧳", course:"📚", overtime:"⏱", permission:"🛡" }[status]) || "•";
+}
+function statusTail(status) {
+  return ({ work:"🌙", rest:"✓", vacation:"✈", course:"✎", overtime:"＋", permission:"•" }[status]) || "•";
+}
+function recordMetaLabel(record) {
+  const s = STATUS[record.status] || STATUS.work;
+  return record.note ? record.note : s.label;
+}
+function sortRecordsForDisplay(records=[]) {
+  return [...records].sort((a,b)=> {
+    const mine = Number(isCurrentProfileUser(b.user)) - Number(isCurrentProfileUser(a.user));
+    if (mine) return mine;
+    return String(a.user?.name || "").localeCompare(String(b.user?.name || ""),"es");
+  });
+}
+
+function authError(msg="") {
+  const box = $("#authError");
+  box.textContent = msg;
+  box.classList.toggle("show", !!msg);
+}
+function setBusy(btn, busy, label="Procesando...") {
+  if (!btn) return;
+  if (busy) { btn.dataset.oldText = btn.textContent; btn.textContent = label; btn.disabled = true; }
+  else { btn.textContent = btn.dataset.oldText || btn.textContent; btn.disabled = false; }
+}
+
+function readHorariosCache() {
+  try { return JSON.parse(localStorage.getItem(HORARIOS_CACHE_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function writeHorariosCache(partial) {
+  const prev = readHorariosCache();
+  localStorage.setItem(HORARIOS_CACHE_KEY, JSON.stringify({ ...prev, ...partial, savedAt: Date.now() }));
+}
+function cacheCurrentState() {
+  writeHorariosCache({ users: state.users || [], overrides: state.overrides || {} });
+}
+function cacheProfile(profile) {
+  if (!profile?.uid && !profile?.id) return;
+  const id = profile.uid || profile.id;
+  const cache = readHorariosCache();
+  writeHorariosCache({ profiles: { ...(cache.profiles || {}), [id]: profile } });
+}
+function loadCachedStateForCurrentUser() {
+  const cache = readHorariosCache();
+  if (Array.isArray(cache.users)) state.users = cache.users;
+  if (cache.overrides && typeof cache.overrides === 'object') state.overrides = cache.overrides;
+  if ((cache.users || cache.overrides) && typeof render === 'function') render();
+}
+function offlineLoginMessage() {
+  return 'Sin conexión. Para iniciar sesión por primera vez necesitas internet. Si ya habías entrado antes, abre la app sin cerrar sesión.';
+}
+
+/* ══════════════════════════════════
+   AUTENTICACIÓN
+   ══════════════════════════════════ */
+function pinToFirebasePassword(pin) {
+  const cleanPin = String(pin || "").trim();
+  return `Horarios-${cleanPin}-V1!`;
+}
+
+async function login(employeeId, pin) {
+  if (!firebaseReady) return;
+  if (!navigator.onLine) throw new Error('OFFLINE_LOGIN');
+  await authPersistenceReady;
+  await signInWithEmailAndPassword(auth, employeeToEmail(employeeId), pinToFirebasePassword(pin));
+}
+
+async function setupOwner(employeeId, pin) {
+  const clean = normalizeEmployee(employeeId);
+  if (clean !== normalizeEmployee(APP_CONFIG.OWNER_EMPLOYEE_ID)) throw new Error("Este número no coincide con el propietario configurado.");
+  if (pin !== APP_CONFIG.OWNER_BOOTSTRAP_PIN) throw new Error("PIN inicial incorrecto.");
+  isBootstrappingOwner = true;
+  try {
+    await authPersistenceReady;
+    const cred = await createUserWithEmailAndPassword(auth, employeeToEmail(clean), pinToFirebasePassword(pin));
+    await setDoc(doc(db, "profiles", cred.user.uid), {
+      uid: cred.user.uid,
+      employeeId: clean,
+      name: "Supervisor Principal",
+      area: "Propietario",
+      baseDate: ymd(new Date()),
+      color: "#8b2fc9",
+      accessRole: "owner",
+      vacationTotalDays: 15,
+      vacationUsedDays: 0,
+      hireDate: ymd(new Date()),
+      vacationAnnualAddDays: 15,
+      vacationLastAccrualYear: new Date().getFullYear(),
+      active: true,
+      protected: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    currentUser = cred.user;
+    currentProfile = await loadProfile(cred.user);
+    showApp();
+    startRealtime();
+  } finally {
+    isBootstrappingOwner = false;
+  }
+}
+
+async function loadProfile(user) {
+  try {
+    const snap = await getDoc(doc(db, "profiles", user.uid));
+    if (!snap.exists()) throw new Error("Tu usuario no tiene perfil activo en Horarios.");
+    const profile = { id: snap.id, ...snap.data() };
+    if (profile.active === false) throw new Error("Tu acceso fue desactivado. Contacta al administrador.");
+    cacheProfile(profile);
+    return profile;
+  } catch (err) {
+    const cached = readHorariosCache().profiles?.[user.uid];
+    if (cached && cached.active !== false) {
+      console.warn('Perfil cargado desde caché offline:', err);
+      return cached;
+    }
+    throw err;
+  }
+}
+
+function startRealtime() {
+  stopRealtime();
+  unsubProfiles = onSnapshot(collection(db, "profiles"), (snap) => {
+    state.users = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .filter(u => u.active !== false)
+      .sort((a,b) => (a.name || "").localeCompare(b.name || "", "es"));
+    cacheCurrentState();
+    render();
+  }, (err) => { console.warn("profiles", err); loadCachedStateForCurrentUser(); });
+
+  unsubOverrides = onSnapshot(collection(db, "overrides"), (snap) => {
+    const data = {};
+    snap.docs.forEach(d => {
+      const ov = d.data();
+      if (ov.userId && ov.date) data[overrideKey(ov.userId, ov.date)] = ov;
+    });
+    state.overrides = data;
+    cacheCurrentState();
+    render();
+  }, (err) => { console.warn("overrides", err); loadCachedStateForCurrentUser(); });
+}
+function stopRealtime() {
+  if (unsubProfiles) unsubProfiles();
+  if (unsubOverrides) unsubOverrides();
+  unsubProfiles = null; unsubOverrides = null;
+}
+
+function showApp() {
+  document.body.classList.remove("locked");
+  $("#authScreen").classList.add("hidden");
+  $("#logoutBtn").classList.remove("hidden");
+  $("#sessionBadge").classList.remove("hidden");
+  updateRoleUI();
+}
+function showLogin() {
+  document.body.classList.add("locked");
+  $("#authScreen").classList.remove("hidden");
+  $("#logoutBtn").classList.add("hidden");
+  $("#sessionBadge").classList.add("hidden");
+  $("#mainUserSignature")?.classList.remove("show");
+}
+function updateRoleUI() {
+  if (!currentProfile) return;
+  document.body.classList.toggle("admin-mode", isAdmin());
+  $("#sessionBadge").textContent = `${currentProfile.name || currentProfile.employeeId} · ${roleLabel(currentProfile.accessRole)}`;
+
+  const signature = $("#mainUserSignature");
+  if (signature) {
+    $("#mainUserSignatureName").textContent = currentProfile.name || "Usuario";
+    $("#mainUserSignatureEmp").textContent = currentProfile.employeeId || "—";
+    $("#mainUserSignatureRole").textContent = roleLabel(currentProfile.accessRole);
+    signature.classList.add("show");
+  }
+
+  const usersTab = document.querySelector('[data-view="users"]');
+  if (usersTab) usersTab.classList.remove("hidden");
+  $(".tabs").classList.toggle("staff-mode", false);
+
+}
+
+/* ══════════════════════════════════
+   UTILIDADES DE FECHA
+   ══════════════════════════════════ */
+function ymd(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function parseYMD(s) { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+function addDays(d,n) { const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function diffDays(a,b) { return Math.floor((parseYMD(ymd(a))-parseYMD(ymd(b)))/86400000); }
+function monthName(d) { return d.toLocaleDateString("es-MX",{month:"long",year:"numeric"}).replace(/^./,c=>c.toUpperCase()); }
+function longDate(d) { return d.toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"}).replace(/^./,c=>c.toUpperCase()); }
+
+/* ══════════════════════════════════
+   LÓGICA DE TURNOS
+   ══════════════════════════════════ */
+function activeView() { return $(".tab.active")?.dataset.view || "calendar"; }
+function selectedUserId() { return $("#userFilter").value; }
+function getUsersForView() {
+  const mine = visibleUsers().find(u => u.id === currentProfileId()) || currentProfile;
+  if (!isAdmin()) return mine ? [mine] : [];
+  if (isMyScheduleOnly()) return mine ? [mine] : [];
+  const selected = selectedUserId();
+  if (!selected || selected === "all") return visibleUsers();
+  const target = visibleUsers().find(u => u.id === selected);
+  return target ? [target] : (mine ? [mine] : []);
+}
+function getEditableUsersForView() {
+  return getUsersForView().filter(u => canEditUser(u.id));
+}
+function getDashboardUser() {
+  const mine = visibleUsers().find(u => u.id === currentProfileId()) || currentProfile;
+  if (isAdmin()) {
+    const selected = selectedUserId();
+    if (selected && selected !== "all") {
+      return visibleUsers().find(u => u.id === selected) || mine;
+    }
+  }
+  return mine;
+}
+function overrideKey(userId,date) { return `${userId}|${date}`; }
+function overrideDocId(userId,date) { return `${userId}_${date}`.replace(/[^a-zA-Z0-9_-]/g,"_"); }
+
+function autoStatus(user,date) {
+  if (!user?.baseDate) return "work";
+  const idx = ((diffDays(parseYMD(date), parseYMD(user.baseDate)) % 4) + 4) % 4;
+  return idx === 0 || idx === 1 ? "work" : "rest";
+}
+function dayRecord(user,date) {
+  const ov = state.overrides[overrideKey(user.id,date)];
+  const status = ov?.status && ov.status !== "auto" ? ov.status : autoStatus(user,date);
+  return { user, date, status, note: ov?.note || "", auto: !ov || ov.status === "auto" };
+}
+
+/* ══════════════════════════════════
+   RENDERIZADO
+   ══════════════════════════════════ */
+function render() {
+  if (!currentProfile) return;
+  updateRoleUI();
+  checkVacationAnniversaries();
+  renderMonthHeader(); renderUserFilter(); renderMainDashboard(); renderCalendar(); renderCalendarDetail(); renderAgenda(); renderSummary(); renderUsers(); renderStatusColorPanel();
+}
+function renderMonthHeader() {
+  $("#monthLabel").textContent = monthName(current);
+  $("#todayLabel").innerHTML = `Hoy: <strong style="color:var(--purple2);font-weight:900">${new Date().toLocaleDateString("es-MX",{day:"numeric",month:"short",year:"numeric"})}</strong>`;
+}
+function renderCalendarContext() {
+  const monthEl = $("#calendarContextMonth");
+  const helperEl = $("#calendarContextHelper");
+  const selectedEl = $("#calendarContextSelected");
+  if (!monthEl || !helperEl || !selectedEl) return;
+  monthEl.textContent = monthName(current);
+  const focus = selectedDate ? parseYMD(selectedDate) : null;
+  if (!focus) {
+    helperEl.textContent = "Fecha seleccionada";
+    selectedEl.textContent = "Toca un día para editar";
+    return;
+  }
+  helperEl.textContent = "Fecha seleccionada";
+  const outside = focus.getMonth() !== current.getMonth() || focus.getFullYear() !== current.getFullYear();
+  selectedEl.textContent = outside ? `${longDate(focus)} · fuera del mes actual` : longDate(focus);
+}
+function renderUserFilter() {
+  const filter = $("#userFilter");
+  if (!filter) return;
+  const previous = filter.value;
+  const mine = visibleUsers().find(u => u.id === currentProfileId()) || currentProfile;
+  if (isAdmin()) {
+    filter.innerHTML = `<option value="all">Todo el personal</option>` +
+      visibleUsers().map(u => `<option value="${u.id}">${escapeHtml(u.name || u.employeeId || "Usuario")}</option>`).join("");
+    filter.value = previous && [...filter.options].some(o => o.value === previous) ? previous : "all";
+    filter.disabled = false;
+    return;
+  }
+  filter.innerHTML = mine ? `<option value="${mine.id}">${escapeHtml(mine.name || "Mi horario")}</option>` : `<option value="">Mi horario</option>`;
+  filter.value = mine?.id || "";
+  filter.disabled = true;
+}
+function countUserMonth(user, baseDate=current) {
+  const days = new Date(baseDate.getFullYear(), baseDate.getMonth()+1, 0).getDate();
+  const counts = Object.keys(STATUS).reduce((a,k)=>(a[k]=0,a),{});
+  for (let n=1; n<=days; n++) {
+    const date = ymd(new Date(baseDate.getFullYear(), baseDate.getMonth(), n));
+    counts[dayRecord(user, date).status]++;
+  }
+  return counts;
+}
+function countUserYearVacation(user, year=current.getFullYear()) {
+  let used = 0;
+  const start = new Date(year, 0, 1);
+  const end = new Date(year, 11, 31);
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+    if (dayRecord(user, ymd(d)).status === "vacation") used++;
+  }
+  return used;
+}
+function safeDays(value, fallback=0) {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback;
+}
+function clampDays(value, min=0, max=365) {
+  return Math.max(min, Math.min(max, safeDays(value, min)));
+}
+function vacationTotalForUser(user) {
+  return clampDays(user?.vacationTotalDays ?? user?.vacationTotal ?? 15, 0, 365);
+}
+function vacationTakenForUser(user) {
+  return clampDays(user?.vacationUsedDays ?? user?.vacationTakenDays ?? user?.vacationUsedPrevious ?? 0, 0, 365);
+}
+function isValidYMD(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return false;
+  const d = parseYMD(value);
+  return ymd(d) === value;
+}
+function vacationHireDateForUser(user) {
+  const value = user?.hireDate || user?.fechaIngreso || "";
+  return isValidYMD(value) ? value : "";
+}
+function vacationAnnualAddForUser(user) {
+  return clampDays(user?.vacationAnnualAddDays ?? user?.vacationAnnualDays ?? vacationTotalForUser(user), 0, 365);
+}
+function anniversaryDateForYear(hireDate, year) {
+  if (!isValidYMD(hireDate)) return null;
+  const hire = parseYMD(hireDate);
+  let anniversary = new Date(year, hire.getMonth(), hire.getDate());
+  // Si la fecha de ingreso fue 29/feb y el año no es bisiesto, usa el último día de febrero.
+  if (anniversary.getMonth() !== hire.getMonth()) {
+    anniversary = new Date(year, hire.getMonth() + 1, 0);
+  }
+  return anniversary;
+}
+function defaultVacationLastAccrualYear(hireDate, refDate=new Date()) {
+  const year = refDate.getFullYear();
+  const anniversary = anniversaryDateForYear(hireDate, year);
+  if (!anniversary) return 0;
+  return parseYMD(ymd(refDate)) >= anniversary ? year : year - 1;
+}
+async function applyVacationAnniversaryIfNeeded(user) {
+  if (!firebaseReady || !currentUser || !user?.id || !canEditUser(user.id)) return;
+  const hireDate = vacationHireDateForUser(user);
+  if (!hireDate) return;
+  const today = new Date();
+  const year = today.getFullYear();
+  const anniversary = anniversaryDateForYear(hireDate, year);
+  if (!anniversary || parseYMD(ymd(today)) < anniversary) return;
+
+  // Para no duplicar saldos de usuarios existentes, solo suma cuando el perfil ya tiene
+  // marcado el último año de aniversario aplicado. Al guardar fecha de ingreso se inicializa.
+  const rawLast = Number(user.vacationLastAccrualYear ?? user.vacationLastAddedYear ?? 0);
+  if (!Number.isFinite(rawLast) || rawLast <= 0 || rawLast >= year) return;
+
+  const addDays = vacationAnnualAddForUser(user);
+  if (addDays <= 0) return;
+  const key = `${user.id}|${year}`;
+  if (VACATION_ACCRUAL_PENDING.has(key)) return;
+  VACATION_ACCRUAL_PENDING.add(key);
+  const newTotal = Math.min(365, vacationTotalForUser(user) + addDays);
+  try {
+    const updates = {
+      vacationTotalDays: newTotal,
+      vacationLastAccrualYear: year,
+      vacationLastAccrualAt: serverTimestamp(),
+      vacationLastAccrualDays: addDays,
+      updatedAt: serverTimestamp(),
+      updatedBy: currentUser.uid
+    };
+    await updateDoc(doc(db, "profiles", user.id), updates);
+    if (currentProfile?.id === user.id || currentProfile?.uid === user.id) {
+      currentProfile = { ...currentProfile, ...updates, updatedAt: new Date() };
+    }
+  } catch (err) {
+    console.warn("No se pudo sumar aniversario de vacaciones", err);
+    VACATION_ACCRUAL_PENDING.delete(key);
+  }
+}
+function checkVacationAnniversaries() {
+  visibleUsers().forEach(u => {
+    if (canEditUser(u.id)) applyVacationAnniversaryIfNeeded(u);
+  });
+}
+function vacationBalanceForUser(user, year=current.getFullYear()) {
+  const total = vacationTotalForUser(user);
+  const alreadyTaken = Math.min(total, vacationTakenForUser(user));
+  const programmedInApp = countUserYearVacation(user, year);
+  const used = Math.min(total, alreadyTaken + programmedInApp);
+  const available = Math.max(0, total - used);
+  return { total, alreadyTaken, programmedInApp, used, available };
+}
+function countDashboardMonth(user, baseDate=current) {
+  const days = new Date(baseDate.getFullYear(), baseDate.getMonth()+1, 0).getDate();
+  const counts = Object.keys(STATUS).reduce((a,k)=>(a[k]=0,a),{});
+  for (let n=1; n<=days; n++) {
+    const date = ymd(new Date(baseDate.getFullYear(), baseDate.getMonth(), n));
+    const record = dayRecord(user, date);
+    const status = record.status;
+    if (counts[status] === undefined) counts[status] = 0;
+    counts[status]++;
+
+    // Las vacaciones también son días descansados para el KPI superior.
+    // Así, si julio tiene 14 descansos normales y capturas 3 vacaciones,
+    // el cuadro de descansados mostrará 17 y vacaciones seguirá mostrando 3.
+    if (status === "vacation") counts.rest++;
+  }
+  return counts;
+}
+function renderMainDashboard() {
+  const user = getDashboardUser();
+  if (!user) return;
+  const monthCounts = countDashboardMonth(user, current);
+  const balance = vacationBalanceForUser(user, current.getFullYear());
+  const percent = balance.total > 0 ? Math.min(100, Math.max(0, (balance.used / balance.total) * 100)) : 0;
+  const initials = String(user.name || "U").trim().split(/\s+/).slice(0,2).map(p=>p[0]).join("").toUpperCase();
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+  setText("dashboardName", user.name || "Usuario");
+  setText("dashboardEmployee", user.employeeId || "—");
+  setText("dashboardRole", roleLabel(user.accessRole));
+  setText("dashboardAvatar", initials || "✈");
+  setText("vacationAvailable", balance.available);
+  setText("vacationTotal", balance.total);
+  setText("vacationUsed", balance.used);
+  setText("vacationMonth", monthCounts.vacation || 0);
+  setText("kpiWorked", monthCounts.work || 0);
+  setText("kpiRest", monthCounts.rest || 0);
+  setText("kpiExtra", monthCounts.overtime || 0);
+  setText("kpiVacation", monthCounts.vacation || 0);
+  const totalInput = document.getElementById("vacationDaysInput");
+  const usedInput = document.getElementById("vacationUsedInput");
+  const hireInput = document.getElementById("hireDateInput");
+  const annualInput = document.getElementById("vacationAnnualAddInput");
+  const form = document.getElementById("vacationDaysForm");
+  if (totalInput) {
+    totalInput.value = balance.total;
+    totalInput.disabled = !canEditUser(user.id);
+  }
+  if (usedInput) {
+    usedInput.value = balance.alreadyTaken;
+    usedInput.disabled = !canEditUser(user.id);
+    usedInput.max = String(balance.total);
+  }
+  if (hireInput) {
+    hireInput.value = vacationHireDateForUser(user);
+    hireInput.disabled = !canEditUser(user.id);
+  }
+  if (annualInput) {
+    annualInput.value = vacationAnnualAddForUser(user);
+    annualInput.disabled = !canEditUser(user.id);
+  }
+  if (form) form.dataset.userId = user.id;
+  const fill = document.getElementById("vacationProgressFill");
+  if (fill) fill.style.width = `${percent}%`;
+}
+
+function renderCalendar() {
+  const grid = $("#calendarGrid"); grid.innerHTML="";
+  if (!visibleUsers().length) { grid.append(emptyNode()); return; }
+  const first = startOfMonth(current); const start = addDays(first, -first.getDay());
+  const today = ymd(new Date());
+  const activeDate = selectedDate || today;
+  for (let i=0; i<42; i++) {
+    const d=addDays(start,i); const date=ymd(d); let records=sortRecordsForDisplay(getUsersForView().map(u=>dayRecord(u,date)));
+    const cell=document.createElement("button");
+    cell.className=`day ${d.getMonth()!==current.getMonth()?"other":""} ${date===today?"today":""} ${date===activeDate?"selected":""}`;
+    cell.dataset.date=date;
+    const max = (selectedUserId()==="all" && !isMyScheduleOnly()) ? 2 : 4;
+    const countLabel = records.length ? `<span class="mini-count"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>${records.length}</span>` : "";
+    cell.innerHTML = `<div class="day-header"><span class="date-bubble">${d.getDate()}</span>${countLabel}</div>` +
+      records.slice(0,max).map(recordBadge).join("") + (records.length>max?`<span class="more">+${records.length-max} más</span>`:"");
+    cell.addEventListener("click", ()=>handleDayClick(date));
+    grid.append(cell);
+  }
+}
+function recordBadge(r) {
+  const s=STATUS[r.status] || STATUS.work;
+  const mine = isCurrentProfileUser(r.user);
+  const safeName = escapeHtml(r.user.name);
+  const note = r.note ? ` · ${escapeHtml(r.note)}` : "";
+  return `<div class="badge ${s.css} ${mine?"current-user":""}" title="${safeName} · ${s.label}${note}">` +
+    `<span class="badge-icon">${mine ? "★" : statusIcon(r.status)}</span>` +
+    `<div class="badge-copy"><strong>${safeName}${mine ? '<span class="you-chip">Tú</span>' : ''}</strong><small><b class="state-text">${escapeHtml(s.label)}</b>${note}</small></div>` +
+    `<span class="badge-state">${statusTail(r.status)}</span>` +
+  `</div>`;
+}
+function renderCalendarDetail() {
+  const detail = $("#calendarDetail");
+  if (!detail || !currentProfile) return;
+  const baseDate = selectedDate || ymd(new Date());
+  const date = parseYMD(baseDate);
+  const records = sortRecordsForDisplay(getUsersForView().map(u=>dayRecord(u, baseDate)));
+  $("#detailDate").textContent = longDate(date);
+  $("#detailCount").textContent = records.length ? `${records.length} persona${records.length===1?"":"s"} programada${records.length===1?"":"s"}` : "Sin personal programado para este día.";
+  $("#detailItems").innerHTML = records.length ? records.map(recordBadge).join("") : `<div class="badge status-permission"><span class="badge-icon">i</span><div class="badge-copy"><strong>Sin registros</strong><small>El día seleccionado no tiene personal visible en esta vista.</small></div><span class="badge-state">•</span></div>`;
+  const btn = $("#detailAction");
+  if (btn) {
+    btn.onclick = () => handleDayClick(baseDate);
+    btn.textContent = getEditableUsersForView().length ? "Ver detalle" : "Solo lectura";
+  }
+}
+function renderAgenda() {
+  const box=$("#agendaList"); box.innerHTML="";
+  if (!visibleUsers().length) { box.append(emptyNode()); return; }
+  const days = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+  for (let n=1; n<=days; n++) {
+    const d=new Date(current.getFullYear(), current.getMonth(), n); const date=ymd(d);
+    const records=getUsersForView().map(u=>dayRecord(u,date)).filter(r=>["work","vacation","course","overtime","permission"].includes(r.status));
+    if (!records.length) continue;
+    const card=document.createElement("div"); card.className="agenda-day glass";
+    card.innerHTML=`<h3>${longDate(d)}</h3><div class="agenda-items">${records.map(recordBadge).join("")}</div>`;
+    box.append(card);
+  }
+  if (!box.children.length) box.innerHTML=`<div class="empty glass"><h2>Sin eventos especiales</h2><p>Este mes solo hay descansos o no hay registros para la vista elegida.</p></div>`;
+}
+function renderSummary() {
+  const box=$("#summaryCards"); box.innerHTML="";
+  if (!visibleUsers().length) { box.append(emptyNode()); return; }
+  const days = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+  getUsersForView().forEach(u=>{
+    const counts = Object.keys(STATUS).reduce((a,k)=>(a[k]=0,a),{});
+    for (let n=1; n<=days; n++) {
+      const date=ymd(new Date(current.getFullYear(), current.getMonth(), n));
+      counts[dayRecord(u,date).status]++;
+    }
+    const card=document.createElement("div"); card.className="summary-card glass";
+    card.innerHTML=`<h3><span class="dot" style="display:inline-block;background:${u.color || "#8b2fc9"};width:11px;height:11px;border-radius:50%;margin-right:7px"></span>${escapeHtml(u.name)} <span class="role-pill">${roleLabel(u.accessRole)}</span></h3>`+
+      Object.entries(STATUS).map(([k,s])=>`<div class="metric"><span>${s.label}</span><strong>${counts[k]}</strong></div>`).join("");
+    box.append(card);
+  });
+}
+function renderUsers() {
+  const list=$("#usersList"); list.innerHTML="";
+  const canManage = canManageUsers();
+  const panel = document.querySelector("#usersView .panel");
+  if (panel) panel.classList.toggle("hidden", !canManage);
+  $("#baseDate").value ||= ymd(new Date());
+  const usersToShow = canManage ? visibleUsers() : visibleUsers().filter(u => u.id === currentUser?.uid);
+  usersToShow.forEach(u=>{
+    const protectedOwner = u.accessRole === "owner";
+    const isSelf = currentUser?.uid === u.id;
+    const canModifyRole = !protectedOwner && !isSelf;
+    const card=document.createElement("div");
+    card.className=`user-card ${protectedOwner ? "owner-card" : ""}`;
+    card.innerHTML=`
+      <div class="user-card-top">
+        <div style="display:flex;gap:11px;align-items:center">
+          <div class="avatar" style="background:${u.color || "#8b2fc9"}">${escapeHtml((u.name||"U")[0])}</div>
+          <div>
+            <h3>${escapeHtml(u.name)} <span class="role-pill">${roleLabel(u.accessRole)}</span></h3>
+            <p>No. ${escapeHtml(u.employeeId || "—")} · ${escapeHtml(u.area || "Sin área")} · Base ${u.baseDate || "—"} · Ingreso ${vacationHireDateForUser(u) || "—"} · Vacaciones ${vacationTotalForUser(u)} · Tomados ${vacationTakenForUser(u)} · Suma anual ${vacationAnnualAddForUser(u)}</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="soft view-user" data-id="${u.id}">Ver individual</button>
+        ${canManage && (isOwner() || !protectedOwner) ? `<button class="soft edit-user" data-id="${u.id}">Editar datos</button>` : ""}
+        ${isAdmin() && canModifyRole && u.accessRole === "user" ? `<button class="soft make-admin" data-id="${u.id}">Hacer supervisor</button>` : ""}
+        ${isAdmin() && canModifyRole && u.accessRole === "admin" ? `<button class="soft make-user" data-id="${u.id}">Hacer embajador</button>` : ""}
+        ${canManage ? (protectedOwner ? `<button class="danger" disabled>Protegido</button>` : `<button class="danger delete-user" data-id="${u.id}">Eliminar</button>`) : ""}
+      </div>`;
+    list.append(card);
+  });
+  $$(".view-user").forEach(b=>b.addEventListener("click",()=>{ $("#userFilter").value=b.dataset.id; switchView("calendar"); render(); }));
+  $$('.edit-user').forEach(b=>b.addEventListener("click",()=>editUserProfile(b.dataset.id)));
+  $$(".make-admin").forEach(b=>b.addEventListener("click",()=>changeAccessRole(b.dataset.id,"admin")));
+  $$(".make-user").forEach(b=>b.addEventListener("click",()=>changeAccessRole(b.dataset.id,"user")));
+  $$(".delete-user").forEach(b=>b.addEventListener("click",()=>deactivateUser(b.dataset.id)));
+}
+function emptyNode() {
+  const node=$("#emptyTemplate").content.cloneNode(true);
+  const btn=node.querySelector(".go-users");
+  if (btn) btn.addEventListener("click",()=> canManageUsers() ? switchView("users") : alert("Solo supervisores pueden agregar personal."));
+  return node;
+}
+
+/* ══════════════════════════════════
+   ADMINISTRACIÓN
+   ══════════════════════════════════ */
+async function findEmployeeProfiles(employeeId) {
+  const clean = normalizeEmployee(employeeId);
+  const q = query(collection(db, "profiles"), where("employeeId", "==", clean));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function employeeExists(employeeId) {
+  const profiles = await findEmployeeProfiles(employeeId);
+  // Solo bloquea si el empleado sigue activo. Los perfiles eliminados/desactivados
+  // ya no deben impedir volver a crear el mismo número de empleado.
+  return profiles.some(p => p.active !== false);
+}
+async function createStaff({ employeeId, name, area, baseDate, color, accessRole, pin, vacationTotalDays=15, vacationUsedDays=0, hireDate="", vacationAnnualAddDays=15 }) {
+  if (!canManageUsers()) throw new Error("Solo supervisores pueden agregar personal.");
+  const clean = normalizeEmployee(employeeId);
+  if (!clean || !name || !pin) throw new Error("Completa número de empleado, nombre y PIN.");
+  if (pin.length < 4) throw new Error("El PIN debe tener mínimo 4 caracteres.");
+  if (clean === normalizeEmployee(APP_CONFIG.OWNER_EMPLOYEE_ID) && !isOwner()) throw new Error("Solo el propietario puede administrar su propio número.");
+  const vacationDays = clampDays(vacationTotalDays, 0, 365);
+  const vacationUsed = Math.min(vacationDays, clampDays(vacationUsedDays, 0, 365));
+  const cleanHireDate = String(hireDate || "").trim();
+  if (cleanHireDate && !isValidYMD(cleanHireDate)) throw new Error("La fecha de ingreso debe tener formato válido AAAA-MM-DD.");
+  const annualAddDays = clampDays(vacationAnnualAddDays || vacationDays, 0, 365);
+  const lastAccrualYear = cleanHireDate ? defaultVacationLastAccrualYear(cleanHireDate) : 0;
+
+  const previousProfiles = await findEmployeeProfiles(clean);
+  if (previousProfiles.some(p => p.active !== false)) throw new Error("Ese número de empleado ya existe activo.");
+
+  const secondary = initializeApp(APP_CONFIG.firebase, `secondary-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const secondaryAuth = getAuth(secondary);
+  try {
+    let cred;
+    try {
+      cred = await createUserWithEmailAndPassword(secondaryAuth, employeeToEmail(clean), pinToFirebasePassword(pin));
+    } catch (err) {
+      if (err?.code === "auth/email-already-in-use") {
+        throw new Error("El perfil ya estaba eliminado/desactivado, pero la cuenta todavía existe en Firebase Authentication. Borra también el usuario emp" + clean + "@horarios.volapp.app en Authentication y vuelve a agregarlo con el mismo número.");
+      }
+      throw err;
+    }
+
+    // Limpia perfiles anteriores inactivos del mismo número para que no queden duplicados fantasma.
+    await Promise.all(previousProfiles
+      .filter(p => p.active === false && p.id !== cred.user.uid)
+      .map(p => deleteDoc(doc(db, "profiles", p.id)).catch(()=>{}))
+    );
+
+    await setDoc(doc(db, "profiles", cred.user.uid), {
+      uid: cred.user.uid,
+      employeeId: clean,
+      name,
+      area,
+      baseDate,
+      color,
+      accessRole: accessRole === "admin" ? "admin" : "user",
+      vacationTotalDays: vacationDays,
+      vacationUsedDays: vacationUsed,
+      hireDate: cleanHireDate,
+      vacationAnnualAddDays: annualAddDays,
+      vacationLastAccrualYear: lastAccrualYear,
+      active: true,
+      protected: false,
+      createdBy: currentUser.uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    await signOut(secondaryAuth).catch(()=>{});
+  } finally {
+    await deleteApp(secondary).catch(()=>{});
+  }
+}
+async function editUserProfile(userId) {
+  const target = state.users.find(u=>u.id===userId);
+  if (!target) return;
+  const protectedOwner = target.accessRole === "owner";
+
+  if (protectedOwner && !isOwner()) {
+    alert("El supervisor principal está protegido. Solo el propietario puede modificar sus propios datos.");
+    return;
+  }
+  if (!isOwner() && !isAdmin()) {
+    alert("Solo supervisores pueden editar datos de personal.");
+    return;
+  }
+
+  const name = prompt("Nombre que aparecerá en el calendario:", target.name || "");
+  if (name === null) return;
+  const cleanName = name.trim();
+  if (!cleanName) { alert("El nombre no puede quedar vacío."); return; }
+
+  const area = prompt("Puesto o área:", target.area || "");
+  if (area === null) return;
+
+  const baseDate = prompt("Fecha base del patrón 2x2 (AAAA-MM-DD):", target.baseDate || ymd(new Date()));
+  if (baseDate === null) return;
+  const cleanBaseDate = baseDate.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(cleanBaseDate)) {
+    alert("La fecha base debe tener formato AAAA-MM-DD, por ejemplo 2026-06-19.");
+    return;
+  }
+
+  const color = prompt("Color del usuario en hexadecimal:", target.color || "#8b2fc9");
+  if (color === null) return;
+  const cleanColor = color.trim() || (target.color || "#8b2fc9");
+  if (!/^#[0-9a-fA-F]{6}$/.test(cleanColor)) {
+    alert("El color debe tener formato hexadecimal, por ejemplo #8b2fc9.");
+    return;
+  }
+
+  const vacationTotalDays = prompt("Días totales de vacaciones:", String(target.vacationTotalDays ?? 15));
+  if (vacationTotalDays === null) return;
+  const cleanVacationTotalDays = clampDays(vacationTotalDays, 0, 365);
+
+  const vacationUsedDays = prompt("Días ya tomados / usados antes de cargarlos en la app:", String(target.vacationUsedDays ?? 0));
+  if (vacationUsedDays === null) return;
+  const cleanVacationUsedDays = Math.min(cleanVacationTotalDays, clampDays(vacationUsedDays, 0, 365));
+
+  const hireDate = prompt("Fecha de ingreso del usuario (AAAA-MM-DD). Déjalo vacío si no aplica:", vacationHireDateForUser(target));
+  if (hireDate === null) return;
+  const cleanHireDate = hireDate.trim();
+  if (cleanHireDate && !isValidYMD(cleanHireDate)) {
+    alert("La fecha de ingreso debe tener formato AAAA-MM-DD, por ejemplo 2020-07-15.");
+    return;
+  }
+
+  const vacationAnnualAddDays = prompt("Días que se suman cada aniversario de ingreso:", String(target.vacationAnnualAddDays ?? cleanVacationTotalDays));
+  if (vacationAnnualAddDays === null) return;
+  const cleanAnnualAddDays = clampDays(vacationAnnualAddDays || cleanVacationTotalDays, 0, 365);
+
+  const updates = {
+    name: cleanName,
+    area: area.trim(),
+    baseDate: cleanBaseDate,
+    color: cleanColor,
+    vacationTotalDays: cleanVacationTotalDays,
+    vacationUsedDays: cleanVacationUsedDays,
+    hireDate: cleanHireDate,
+    vacationAnnualAddDays: cleanAnnualAddDays,
+    updatedAt: serverTimestamp(),
+    updatedBy: currentUser.uid
+  };
+  if (cleanHireDate && (!target.vacationLastAccrualYear || cleanHireDate !== vacationHireDateForUser(target))) {
+    updates.vacationLastAccrualYear = defaultVacationLastAccrualYear(cleanHireDate);
+  }
+  if (!cleanHireDate) updates.vacationLastAccrualYear = 0;
+
+  await updateDoc(doc(db,"profiles",userId), updates);
+  if (currentUser?.uid === userId && currentProfile) {
+    currentProfile = { ...currentProfile, ...updates, updatedAt: new Date() };
+    updateRoleUI();
+  }
+}
+
+async function changeAccessRole(userId, accessRole) {
+  const target = state.users.find(u=>u.id===userId);
+  if (!target) return;
+  if (target.accessRole === "owner") { alert("El supervisor principal no se puede modificar."); return; }
+  if (target.id === currentUser.uid) { alert("No puedes cambiar tu propio rol."); return; }
+  if (!confirm(accessRole === "admin" ? `¿Hacer supervisor a ${target.name}?` : `¿Hacer embajador a ${target.name}?`)) return;
+  await updateDoc(doc(db,"profiles",userId), { accessRole, updatedAt: serverTimestamp(), updatedBy: currentUser.uid });
+}
+async function deactivateUser(userId) {
+  const target = state.users.find(u=>u.id===userId);
+  if (!target) return;
+  if (target.accessRole === "owner") { alert("El supervisor principal está protegido y no se puede eliminar."); return; }
+  if (target.id === currentUser.uid) { alert("No puedes eliminar tu propio usuario."); return; }
+  if (!confirm(`¿Eliminar/desactivar a ${target.name}? Ya no podrá entrar a la app.`)) return;
+  await updateDoc(doc(db,"profiles",userId), { active:false, deletedAt: serverTimestamp(), deletedBy: currentUser.uid });
+}
+
+/* ══════════════════════════════════
+   INTERACCIONES DE CALENDARIO
+   ══════════════════════════════════ */
+function handleDayClick(date) {
+  selectedDate = date;
+  renderCalendarDetail();
+  const quick=$("#quickStatus").value;
+  const users=getEditableUsersForView();
+  if (!users.length) { render(); alert("No tienes permiso para editar este día de otra persona."); return; }
+  if (quick) {
+    applyQuickStatus(users,date,quick);
+    $("#quickStatus").value="";
+    render();
+    return;
+  }
+  render();
+  openDialog(date);
+}
+async function applyQuickStatus(users,date,quick) {
+  const batch = writeBatch(db);
+  users.forEach(u=>{
+    const ref = doc(db,"overrides",overrideDocId(u.id,date));
+    if (quick === "clear") batch.delete(ref);
+    else batch.set(ref,{ userId:u.id, date, status:quick, note:state.overrides[overrideKey(u.id,date)]?.note || "", updatedBy: currentUser.uid, updatedAt: serverTimestamp() }, { merge:true });
+  });
+  await batch.commit();
+}
+function openDialog(date) {
+  $("#dialogDate").textContent=longDate(parseYMD(date));
+  const sel=$("#dialogUser"); const users=getEditableUsersForView();
+  sel.innerHTML=users.map(u=>`<option value="${u.id}">${escapeHtml(u.name)}</option>`).join("");
+  if (users[0]) sel.value=users[0].id;
+  $("#rangeFrom").value=date;
+  $("#rangeTo").value=date;
+  updateRangeInfo();
+  loadDialogUser();
+  $("#dayDialog").showModal();
+}
+function loadDialogUser() {
+  const uid=$("#dialogUser").value; const ov=state.overrides[overrideKey(uid,selectedDate)];
+  const status=ov?.status || "auto";
+  $("#dialogStatus").value=status;
+  $("#dialogNote").value=ov?.note || "";
+  toggleRangeSection(status);
+}
+function toggleRangeSection(status) {
+  const multiDay=["vacation","course","overtime","permission","rest","work"];
+  const rs=$("#rangeSection");
+  rs.style.display=multiDay.includes(status) ? "block" : "none";
+  updateRangeInfo();
+}
+function updateRangeInfo() {
+  const from=$("#rangeFrom").value; const to=$("#rangeTo").value;
+  if (!from||!to) { $("#rangeInfo").textContent=""; return; }
+  const d1=parseYMD(from); const d2=parseYMD(to);
+  if (d2<d1) { $("#rangeInfo").textContent="⚠ La fecha fin debe ser igual o mayor a inicio"; return; }
+  const days=diffDays(d2,d1)+1;
+  $("#rangeInfo").textContent=days===1?"Se aplica a 1 día":`Se aplica a ${days} días (${from} → ${to})`;
+}
+function switchView(view) {
+  $$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===view));
+  $$(".view").forEach(v=>v.classList.remove("active"));
+  $(`#${view}View`).classList.add("active");
+}
+function escapeHtml(str="") {
+  return String(str).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+}
+
+/* ══════════════════════════════════
+   EVENT LISTENERS
+   ══════════════════════════════════ */
+$("#loginForm").addEventListener("submit", async e=>{
+  e.preventDefault(); authError("");
+  const btn=e.submitter;
+  try { setBusy(btn,true,"Entrando..."); await login($("#loginEmployee").value,$("#loginPin").value); }
+  catch(err) {
+    authError(err?.message === 'OFFLINE_LOGIN' ? offlineLoginMessage() : "No se pudo entrar. Revisa número de empleado y PIN.");
+    console.warn(err);
+  }
+  finally { setBusy(btn,false); }
+});
+$("#logoutBtn").addEventListener("click",()=>signOut(auth));
+
+$("#prevMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()-1,1); render(); });
+$("#nextMonth").addEventListener("click",()=>{ current=new Date(current.getFullYear(), current.getMonth()+1,1); render(); });
+$("#todayBtn").addEventListener("click",()=>{ current=startOfMonth(new Date()); selectedDate = ymd(new Date()); render(); });
+$("#userFilter").addEventListener("change",()=>{ selectedDate = selectedDate || ymd(new Date()); render(); });
+$("#myScheduleToggle")?.addEventListener("change",()=>{ selectedDate = selectedDate || ymd(new Date()); render(); });
+$("#detailAction")?.addEventListener("click",()=>{ if (selectedDate) handleDayClick(selectedDate); });
+$("#statusColorForm")?.addEventListener("submit", e=>{
+  e.preventDefault();
+  const colors = {};
+  Object.entries(STATUS_COLOR_IDS).forEach(([key, id]) => {
+    const value = document.getElementById(id)?.value;
+    if (value) colors[key] = value;
+  });
+  localStorage.setItem(STATUS_COLOR_STORAGE_KEY, JSON.stringify(colors));
+  applyStatusColors(colors);
+  render();
+});
+$("#resetStatusColors")?.addEventListener("click", ()=>{
+  localStorage.removeItem(STATUS_COLOR_STORAGE_KEY);
+  applyStatusColors(DEFAULT_STATUS_COLORS);
+  render();
+});
+$$(".tab").forEach(t=>t.addEventListener("click",()=>{ switchView(t.dataset.view); render(); }));
+$("#adminPanelBtn")?.addEventListener("click",()=>{ switchView("users"); render(); });
+$("#vacationDaysForm")?.addEventListener("submit", async e=>{
+  e.preventDefault();
+  const userId = e.currentTarget.dataset.userId || currentProfileId();
+  if (!canEditUser(userId)) { alert("No tienes permiso para modificar esos días de vacaciones."); return; }
+  const totalValue = clampDays($("#vacationDaysInput").value, 0, 365);
+  const usedValue = Math.min(totalValue, clampDays($("#vacationUsedInput").value, 0, 365));
+  const hireDateValue = String($("#hireDateInput")?.value || "").trim();
+  if (hireDateValue && !isValidYMD(hireDateValue)) { alert("La fecha de ingreso no es válida."); return; }
+  const annualAddValue = clampDays($("#vacationAnnualAddInput")?.value || totalValue, 0, 365);
+  const target = state.users.find(u=>u.id===userId) || currentProfile;
+  const updates = {
+    vacationTotalDays: totalValue,
+    vacationUsedDays: usedValue,
+    hireDate: hireDateValue,
+    vacationAnnualAddDays: annualAddValue,
+    updatedAt: serverTimestamp(),
+    updatedBy: currentUser.uid
+  };
+  if (hireDateValue && (!target?.vacationLastAccrualYear || hireDateValue !== vacationHireDateForUser(target))) {
+    updates.vacationLastAccrualYear = defaultVacationLastAccrualYear(hireDateValue);
+  }
+  if (!hireDateValue) updates.vacationLastAccrualYear = 0;
+  await updateDoc(doc(db,"profiles",userId), updates);
+});
+
+$("#userForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const btn=e.submitter;
+  try {
+    setBusy(btn,true,"Agregando...");
+    await createStaff({
+      employeeId: $("#employeeId").value,
+      name: $("#userName").value.trim(),
+      area: $("#userRole").value.trim(),
+      baseDate: $("#baseDate").value,
+      color: $("#userColor").value,
+      accessRole: $("#accessRole").value,
+      pin: $("#userPin").value,
+      vacationTotalDays: Number($("#userVacationDays").value || 15),
+      vacationUsedDays: Number($("#userVacationUsedDays").value || 0),
+      hireDate: $("#userHireDate").value,
+      vacationAnnualAddDays: Number($("#userVacationAnnualAddDays").value || $("#userVacationDays").value || 15)
+    });
+    e.target.reset(); $("#baseDate").value=ymd(new Date()); $("#userColor").value="#8b2fc9"; $("#userVacationDays").value="15"; $("#userVacationUsedDays").value="0"; $("#userHireDate").value=""; $("#userVacationAnnualAddDays").value="15";
+  } catch(err) { alert(err.message || "No se pudo agregar el usuario."); console.warn(err); }
+  finally { setBusy(btn,false); }
+});
+
+$("#userVacationDays")?.addEventListener("input",()=>{
+  const annual = $("#userVacationAnnualAddDays");
+  if (annual && (!annual.value || annual.value === "15")) annual.value = $("#userVacationDays").value || "15";
+});
+$("#dialogUser").addEventListener("change",loadDialogUser);
+$("#dialogStatus").addEventListener("change",()=>toggleRangeSection($("#dialogStatus").value));
+$("#rangeFrom").addEventListener("change",updateRangeInfo);
+$("#rangeTo").addEventListener("change",updateRangeInfo);
+
+$("#saveDay").addEventListener("click",async()=>{
+  const uid=$("#dialogUser").value; const status=$("#dialogStatus").value;
+  if (!canEditUser(uid)) { alert("No tienes permiso para editar este registro."); return; }
+  const note=$("#dialogNote").value.trim();
+  const from=$("#rangeFrom").value; const to=$("#rangeTo").value;
+  let dates=[];
+  if (from && to && $("#rangeSection").style.display!=="none") {
+    const d1=parseYMD(from); const d2=parseYMD(to);
+    if (d2>=d1) for (let d=new Date(d1); d<=d2; d=addDays(d,1)) dates.push(ymd(d));
+  }
+  if (!dates.length) dates=[selectedDate];
+  const batch=writeBatch(db);
+  dates.forEach(date=>{
+    const ref=doc(db,"overrides",overrideDocId(uid,date));
+    if(status==="auto" && !note) batch.delete(ref);
+    else batch.set(ref,{ userId:uid, date, status, note, updatedBy: currentUser.uid, updatedAt: serverTimestamp() }, { merge:true });
+  });
+  await batch.commit();
+  $("#dayDialog").close();
+});
+$("#deleteOverride").addEventListener("click",async()=>{
+  const uid=$("#dialogUser").value;
+  if (!canEditUser(uid)) { alert("No tienes permiso para borrar este registro."); return; }
+  const from=$("#rangeFrom").value; const to=$("#rangeTo").value;
+  let dates=[];
+  if (from && to && $("#rangeSection").style.display!=="none") {
+    const d1=parseYMD(from); const d2=parseYMD(to);
+    if (d2>=d1) for (let d=new Date(d1); d<=d2; d=addDays(d,1)) dates.push(ymd(d));
+  }
+  if (!dates.length) dates=[selectedDate];
+  const batch=writeBatch(db);
+  dates.forEach(date=>batch.delete(doc(db,"overrides",overrideDocId(uid,date))));
+  await batch.commit();
+  $("#dayDialog").close();
+});
+
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault(); deferredPrompt=e; $("#installBtn").classList.remove("hidden");
+});
+$("#installBtn").addEventListener("click",async()=>{
+  if(!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt=null;
+  $("#installBtn").classList.add("hidden");
+});
+
+
+/* ══════════════════════════════════
+   SPLASH INICIAL - Portal de Horarios
+   ══════════════════════════════════ */
+(function(){
+  const splash = document.getElementById("splashHorarios");
+  if (!splash) return;
+  let done = false;
+  function finishSplash(){
+    if (done) return;
+    done = true;
+    splash.classList.add("splash-out");
+    setTimeout(()=>{
+      splash.remove();
+      const authScreen = document.getElementById("authScreen");
+      const loginEmployee = document.getElementById("loginEmployee");
+      if (authScreen && !authScreen.classList.contains("hidden") && loginEmployee) {
+        loginEmployee.focus({ preventScroll:true });
+      }
+    }, 620);
+  }
+  window.addEventListener("load",()=>setTimeout(finishSplash, 2350), { once:true });
+  setTimeout(finishSplash, 3600);
+})();
+
+/* ══════════════════════════════════
+   ARRANQUE
+   ══════════════════════════════════ */
+if (initFirebase()) {
+  onAuthStateChanged(auth, async (user)=>{
+    if (isBootstrappingOwner) return;
+    stopRealtime();
+    currentUser = user;
+    currentProfile = null;
+    state = { users: [], overrides: {} };
+    if (!user) { showLogin(); return; }
+    try {
+      currentProfile = await loadProfile(user);
+      showApp();
+      loadCachedStateForCurrentUser();
+      startRealtime();
+    } catch(err) {
+      console.warn(err);
+      await signOut(auth);
+      authError(err.message || "No tienes acceso activo.");
+      showLogin();
+    }
+  });
+}
+  </script>
+
+
+<script>
+(function(){
+  const APP_FILE = './horarios.html';
+  function avisar(msg){
+    try {
+      const el = document.createElement('div');
+      el.textContent = msg;
+      el.style.cssText = 'position:fixed;left:12px;right:12px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:30000;padding:12px 14px;border-radius:18px;text-align:center;font:800 13px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#fff;background:rgba(20,8,45,.92);border:1px solid rgba(176,92,255,.32);box-shadow:0 16px 40px rgba(0,0,0,.35);backdrop-filter:blur(18px);';
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.style.transition='opacity .25s ease, transform .25s ease'; el.style.opacity='0'; el.style.transform='translateY(12px)'; setTimeout(()=>el.remove(),280); }, 2600);
+    } catch(e) {}
+  }
+  if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    window.addEventListener('online', () => { avisar('✅ Conexión recuperada. Revisando cambios...'); revisar(); });
+    window.addEventListener('offline', () => avisar('📴 Modo sin datos: usando horarios guardados'));
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      avisar('✨ Actualización instalada. Abriendo versión nueva...');
+      setTimeout(()=>location.reload(), 900);
+    });
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'APP_UPDATED') {
+        avisar('✨ Nueva versión de Horarios encontrada. Actualizando...');
+        setTimeout(()=>location.reload(), 1200);
+      }
+    });
+    async function revisar(){
+      try {
+        const reg = await navigator.serviceWorker.getRegistration('./');
+        if (reg) {
+          await reg.update();
+          if (reg.active) reg.active.postMessage({ type:'CHECK_UPDATE', file: APP_FILE });
+        }
+        await fetch(APP_FILE + '?update=' + Date.now(), { cache:'no-store' });
+      } catch(e) {}
+    }
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js', { scope:'./' });
+        if (reg.waiting) reg.waiting.postMessage({ type:'SKIP_WAITING' });
+        await revisar();
+        setInterval(revisar, 10 * 60 * 1000);
+      } catch(e) { console.warn(e); }
+    });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) revisar(); });
+  }
+})();
+</script>
+
+</body>
+</html>

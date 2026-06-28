@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#7a19ff">
+<meta name="apple-mobile-web-app-title" content="N/P Volaris">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest-np.json">
+<link rel="apple-touch-icon" href="./icon-np-192.png">
+<title>Números de Parte</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root {
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2333;--border:#2a3045;
+  --text:#e8eaf0;--muted:#6b7280;
+  --sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --tab-bg:transparent;--tab-hover:rgba(92,45,145,.07);
+  --tab-active-bg:rgba(92,45,145,.15);--tab-active-shadow:0 0 0 1px rgba(92,45,145,.35);
+  --volaris-purple:#5C2D91;--volaris-magenta:#E6007E;
+}
+[data-theme="light"]{
+  --bg:#f5f6fa;--surface:#ffffff;--surface2:#eef0f6;--border:#dde1ed;
+  --text:#1a1d2e;--muted:#7c85a0;
+  --tab-hover:rgba(92,45,145,.06);
+  --tab-active-bg:rgba(92,45,145,.12);--tab-active-shadow:0 0 0 1px rgba(92,45,145,.28);
+}
+body,header,.search-box,.table-wrap,table,thead tr,.panel,.login-panel,.tabs-wrap,.tab,.form-group input,.form-group select,.status-bar{transition:background .25s,color .25s,border-color .25s;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;position:relative;overflow-x:hidden;}
+
+/* ══ VOLARIS BACKGROUND ══ */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% -5%, rgba(92,45,145,0.22) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 45% at 90% 5%, rgba(230,0,126,0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 85% 95%, rgba(92,45,145,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at 5% 90%, rgba(230,0,126,0.08) 0%, transparent 60%);
+}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle at 1px 1px, rgba(92,45,145,0.09) 1px, transparent 0);
+  background-size:32px 32px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+.volaris-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(72px);opacity:0.5;animation:orbFloat 14s ease-in-out infinite alternate;}
+.volaris-orb-1{width:420px;height:420px;background:radial-gradient(circle,rgba(92,45,145,0.5) 0%,transparent 70%);top:-130px;left:-100px;animation-duration:15s;}
+.volaris-orb-2{width:320px;height:320px;background:radial-gradient(circle,rgba(230,0,126,0.4) 0%,transparent 70%);top:50px;right:-70px;animation-duration:11s;animation-delay:-5s;}
+.volaris-orb-3{width:270px;height:270px;background:radial-gradient(circle,rgba(92,45,145,0.3) 0%,transparent 70%);bottom:10%;left:15%;animation-duration:17s;animation-delay:-8s;}
+@keyframes orbFloat{0%{transform:translate(0,0) scale(1);}33%{transform:translate(20px,-25px) scale(1.05);}66%{transform:translate(-14px,16px) scale(0.97);}100%{transform:translate(12px,-10px) scale(1.02);}}
+[data-theme="light"] .volaris-orb{opacity:0.2;}
+[data-theme="light"] body::before{background:
+  radial-gradient(ellipse 70% 55% at 15% -5%, rgba(92,45,145,0.09) 0%, transparent 65%),
+  radial-gradient(ellipse 55% 45% at 90% 5%, rgba(230,0,126,0.06) 0%, transparent 60%);}
+header,main,.search-wrap,.tabs-wrap,.status-bar{position:relative;z-index:1;}
+
+header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(15,17,23,0.7);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#5C2D91,#E6007E);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.logo h1{font-size:16px;font-weight:600;letter-spacing:-0.3px;}
+.logo p{font-size:11px;color:var(--muted);font-weight:300;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.lock-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--muted);font-family:var(--sans);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;}
+.lock-btn:hover{border-color:#4a8cff;color:#4a8cff;}
+.lock-btn.unlocked{border-color:#4ecb71;color:#4ecb71;}
+
+.search-wrap{padding:14px 20px 0;}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-family:var(--sans);font-size:14px;width:100%;}
+.search-box input::placeholder{color:var(--muted);}
+
+.tabs-wrap{padding:12px 20px 0;display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:flex-end;}
+.tabs-wrap::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;padding:8px 16px;font-size:12.5px;font-weight:600;font-family:var(--sans);background:var(--tab-bg);border:1px solid transparent;border-radius:12px 12px 0 0;cursor:pointer;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:7px;transition:color .2s,background .2s,border-color .2s,transform .15s,box-shadow .2s;margin-bottom:-1px;border-bottom:2px solid transparent;position:relative;outline:none;overflow:hidden;}
+.tab::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(92,45,145,0.12),rgba(230,0,126,0.08));opacity:0;transition:opacity .25s;border-radius:inherit;}
+.tab:hover{color:var(--text);background:var(--tab-hover);transform:translateY(-2px);box-shadow:0 4px 16px rgba(92,45,145,0.18);}
+.tab:hover::before{opacity:1;}
+.tab:active{transform:scale(.95) translateY(0);}
+.tab.active{color:#fff;background:linear-gradient(135deg,#5C2D91,#8B3FC8);border-color:rgba(92,45,145,.4);border-bottom-color:var(--bg);box-shadow:0 -2px 20px rgba(92,45,145,.3),0 0 0 1px rgba(92,45,145,.3);}
+.tab.active::before{opacity:0;}
+[data-theme="light"] .tab.active{color:#fff;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tab-count{font-size:10.5px;font-weight:700;color:var(--muted);background:var(--surface2);border-radius:99px;padding:1px 7px;transition:background .15s,color .15s;}
+.tab.active .tab-count{color:#5C2D91;background:rgba(255,255,255,0.25);}
+.tab-ripple{position:absolute;border-radius:50%;background:rgba(230,0,126,.3);width:6px;height:6px;transform:scale(0);pointer-events:none;animation:tabRipple .45s ease-out forwards;}
+@keyframes tabRipple{to{transform:scale(22);opacity:0;}}
+[data-theme="light"] .tab-ripple{background:rgba(0,0,0,.08);}
+
+main{padding:16px 20px;}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.result-count{font-size:12px;color:var(--muted);}
+.btn{font-family:var(--sans);font-size:13px;font-weight:500;padding:9px 16px;border-radius:8px;cursor:pointer;transition:opacity .15s,transform .1s;border:none;white-space:nowrap;min-height:38px;}
+.btn:active{transform:scale(.97);}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:#4a8cff;color:#4a8cff;}
+.btn-primary{background:linear-gradient(135deg,#5C2D91,#E6007E);color:#fff;box-shadow:0 4px 16px rgba(92,45,145,0.3);}
+.btn-primary:hover{opacity:.88;}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+
+.table-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+thead tr{background:var(--surface2);position:sticky;top:0;z-index:2;}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr{transition:background .1s;}
+tbody tr:hover{background:var(--surface2);}
+.np-badge{font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 7px;display:inline-block;white-space:nowrap;}
+.cat-pill{font-size:11px;font-weight:500;border-radius:99px;padding:2px 9px;display:inline-block;white-space:nowrap;}
+.app-text{color:var(--muted);font-size:12px;}
+.action-btns{display:flex;gap:2px;align-items:center;}
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:5px 6px;border-radius:6px;transition:color .1s,background .1s;min-width:30px;min-height:30px;display:flex;align-items:center;justify-content:center;}
+.icon-btn:hover{background:var(--surface2);}
+.icon-btn.edit:hover{color:#4a8cff;background:rgba(74,140,255,.12);}
+.icon-btn.del:hover{color:#ff6b6b;background:rgba(255,107,107,.12);}
+.empty{padding:48px;text-align:center;color:var(--muted);font-size:14px;}
+.loading{padding:48px;text-align:center;color:var(--muted);font-size:13px;display:flex;align-items:center;justify-content:center;gap:10px;}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:#5C2D91;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* IMAGEN EN TABLA */
+.img-cell{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.img-thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;border:1px solid var(--border);display:block;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.img-thumb:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(0,0,0,.4);}
+.img-placeholder{width:42px;height:42px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;}
+.img-upload-lbl{width:42px;height:42px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:17px;cursor:pointer;transition:border-color .15s,color .15s;position:relative;overflow:hidden;}
+.img-upload-lbl:hover{border-color:#4a8cff;color:#4a8cff;}
+.img-upload-lbl input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.img-del-tiny{background:none;border:none;cursor:pointer;color:#ff6b6b;font-size:10px;padding:1px 4px;border-radius:3px;font-family:var(--sans);transition:background .1s;line-height:1.4;}
+.img-del-tiny:hover{background:rgba(255,107,107,.15);}
+
+/* OVERLAY / PANEL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;}
+@media(min-width:600px){.overlay{align-items:center;padding:20px;}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:500px;animation:slideUp .22s ease;max-height:92vh;overflow-y:auto;}
+@media(min-width:600px){.panel{border-radius:16px;padding:28px;}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.panel h2{font-size:16px;font-weight:600;margin-bottom:18px;}
+.form-grid{display:grid;gap:14px;}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase;}
+.form-group input,.form-group select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 12px;color:var(--text);font-family:var(--sans);font-size:15px;outline:none;transition:border-color .15s;-webkit-appearance:none;}
+.form-group input:focus,.form-group select:focus{border-color:#4a8cff;}
+.form-group select option{background:var(--surface2);}
+.panel-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+
+/* FOTO EN PANEL EDITAR */
+.edit-img-section{border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:14px;}
+.edit-img-section img{width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.edit-img-section .no-img{width:64px;height:64px;border-radius:8px;border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:22px;flex-shrink:0;}
+.edit-img-info{flex:1;}
+.edit-img-info p{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.edit-img-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-sm{font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 12px;border-radius:7px;cursor:pointer;border:none;transition:opacity .15s,background .15s;}
+.btn-sm-outline{background:none;border:1px solid var(--border);color:var(--text);}
+.btn-sm-outline:hover{border-color:#4a8cff;color:#4a8cff;}
+.btn-sm-danger{background:none;border:1px solid #ff6b6b;color:#ff6b6b;}
+.btn-sm-danger:hover{background:#ff6b6b;color:#fff;}
+.btn-sm-upload{background:none;border:1px solid var(--border);color:var(--text);position:relative;overflow:hidden;}
+.btn-sm-upload:hover{border-color:#4a8cff;color:#4a8cff;}
+.btn-sm-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden;}
+.upload-zone:hover,.upload-zone.dragover{border-color:#4a8cff;background:rgba(74,140,255,.05);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upload-zone .uz-icon{font-size:26px;margin-bottom:6px;}
+.upload-zone .uz-text{font-size:13px;color:var(--muted);}
+.upload-zone .uz-hint{font-size:11px;color:var(--muted);margin-top:3px;opacity:.7;}
+.img-preview-wrap{position:relative;display:inline-block;margin-top:8px;}
+.img-preview-wrap img{width:76px;height:76px;border-radius:8px;object-fit:cover;border:1px solid var(--border);display:block;}
+.remove-img-btn{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ff6b6b;border:none;cursor:pointer;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.upload-progress{width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden;display:none;}
+.upload-progress.show{display:block;}
+.upload-progress-bar{height:100%;background:linear-gradient(90deg,#5C2D91,#E6007E);border-radius:2px;transition:width .2s;}
+
+/* COLOR PICKER */
+.color-options{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.color-opt{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .1s,border-color .1s;}
+.color-opt:hover{transform:scale(1.15);}
+.color-opt.selected{border-color:#fff;transform:scale(1.15);}
+.color-preview{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--muted);}
+.color-preview-dot{width:8px;height:8px;border-radius:50%;}
+
+/* GESTIÓN DE SECCIONES */
+.sec-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px;}
+.sec-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.sec-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.sec-name-input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--sans);font-size:14px;font-weight:500;min-width:0;}
+.sec-name-input:focus{border-bottom:1px solid #4a8cff;}
+.sec-del-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:2px 5px;border-radius:5px;transition:color .1s,background .1s;flex-shrink:0;}
+.sec-del-btn:hover{color:#ff6b6b;background:rgba(255,107,107,.12);}
+.sec-save-btn{background:none;border:1px solid #4ecb71;color:#4ecb71;font-family:var(--sans);font-size:11px;font-weight:600;padding:4px 9px;border-radius:6px;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.sec-save-btn:hover{background:rgba(78,203,113,.15);}
+
+/* MODAL IMAGEN GRANDE */
+.img-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;align-items:center;justify-content:center;cursor:pointer;}
+.img-modal.open{display:flex;}
+.img-modal img{max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+
+/* LOGIN */
+.login-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:340px;animation:slideUp .22s ease;}
+.login-panel h2{font-size:16px;font-weight:600;margin-bottom:6px;}
+.login-panel p{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.error-msg{font-size:12px;color:#ff6b6b;margin-top:8px;display:none;}
+.error-msg.show{display:block;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 18px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;opacity:0;transition:all .25s;z-index:300;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+.status-bar{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);padding:8px 20px;border-top:1px solid var(--border);margin-top:16px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
+.status-dot.online{background:#4ecb71;}
+
+
+/* ════════════════════════════════════════
+   VISUAL IOS / MODO DIOS — NP APP
+   Capa visual únicamente: no modifica funciones ni JavaScript
+   ════════════════════════════════════════ */
+:root{
+  --ios-bg-0:#05000f;
+  --ios-bg-1:#0d0223;
+  --ios-bg-2:#1b0645;
+  --ios-glass:rgba(24,8,48,.64);
+  --ios-glass-strong:rgba(35,11,70,.78);
+  --ios-card:rgba(30,10,58,.68);
+  --ios-line:rgba(210,135,255,.20);
+  --ios-line-soft:rgba(210,135,255,.12);
+  --ios-shadow:0 22px 60px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.08);
+  --ios-shadow-soft:0 14px 36px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);
+  --ios-blur:blur(22px) saturate(1.22);
+  --ios-radius-xl:28px;
+  --ios-radius-lg:22px;
+  --ios-radius-md:17px;
+  --bg:#060012;
+  --surface:rgba(25,8,49,.62);
+  --surface2:rgba(43,15,82,.58);
+  --border:rgba(205,132,255,.18);
+  --text:#f4ebff;
+  --muted:rgba(218,185,255,.66);
+  --tab-hover:rgba(177,75,255,.10);
+  --tab-active-bg:rgba(177,75,255,.18);
+  --volaris-purple:#8a2cff;
+  --volaris-magenta:#e454ff;
+}
+[data-theme="light"]{
+  --ios-bg-0:#f8f3ff;
+  --ios-bg-1:#efe4ff;
+  --ios-bg-2:#e5d5ff;
+  --ios-glass:rgba(255,255,255,.76);
+  --ios-glass-strong:rgba(255,255,255,.92);
+  --ios-card:rgba(255,255,255,.78);
+  --ios-line:rgba(126,58,205,.20);
+  --ios-line-soft:rgba(126,58,205,.12);
+  --ios-shadow:0 18px 50px rgba(94,52,160,.18),inset 0 1px 0 rgba(255,255,255,.95);
+  --ios-shadow-soft:0 12px 30px rgba(94,52,160,.12),inset 0 1px 0 rgba(255,255,255,.95);
+  --bg:#f8f3ff;
+  --surface:rgba(255,255,255,.78);
+  --surface2:rgba(244,236,255,.88);
+  --border:rgba(126,58,205,.18);
+  --text:#201039;
+  --muted:rgba(83,42,145,.66);
+  --tab-hover:rgba(126,58,205,.08);
+  --tab-active-bg:rgba(126,58,205,.14);
+}
+html{background:var(--ios-bg-0);scroll-behavior:smooth;}
+body{
+  background:
+    radial-gradient(900px 540px at 50% -18%,rgba(222,85,255,.24),transparent 70%),
+    radial-gradient(680px 540px at 4% 96%,rgba(83,205,255,.12),transparent 72%),
+    radial-gradient(520px 440px at 94% 20%,rgba(170,34,255,.16),transparent 70%),
+    linear-gradient(160deg,var(--ios-bg-0) 0%,var(--ios-bg-1) 48%,var(--ios-bg-2) 100%) !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+body::before{
+  background:
+    linear-gradient(115deg,transparent 0 42%,rgba(255,255,255,.055) 49%,transparent 56% 100%),
+    radial-gradient(circle at 18% 18%,rgba(255,255,255,.060) 0 1px,transparent 2px),
+    radial-gradient(circle at 76% 32%,rgba(204,85,255,.105) 0 1px,transparent 2px),
+    radial-gradient(circle at 42% 84%,rgba(85,204,255,.085) 0 1px,transparent 2px) !important;
+  background-size:auto,92px 92px,118px 118px,132px 132px !important;
+  opacity:.95;
+  mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.92) 55%,transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.92) 55%,transparent 100%);
+}
+body::after{
+  content:'';
+  position:fixed;
+  inset:auto 18px calc(10px + env(safe-area-inset-bottom)) 18px;
+  height:5px;
+  max-width:145px;
+  margin:auto;
+  border-radius:999px;
+  background:rgba(222,191,255,.26);
+  pointer-events:none;
+  z-index:500;
+  box-shadow:0 0 18px rgba(190,80,255,.22);
+}
+.volaris-orb{opacity:.42;filter:blur(78px);}
+[data-theme="light"] .volaris-orb{opacity:.18;}
+header{
+  position:sticky;
+  top:0;
+  z-index:80;
+  margin:10px clamp(10px,3vw,20px) 0;
+  padding:12px 14px;
+  border:1px solid var(--ios-line) !important;
+  border-radius:24px;
+  background:linear-gradient(135deg,rgba(170,34,255,.14),rgba(85,204,255,.055)),var(--ios-glass) !important;
+  box-shadow:var(--ios-shadow-soft);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+.logo{gap:11px;min-width:0;}
+.logo-icon{
+  width:44px;height:44px;border-radius:17px;
+  background:linear-gradient(135deg,#7a19ff,#bf2cff 50%,#ef6cff) !important;
+  box-shadow:0 12px 28px rgba(170,34,255,.28),inset 0 1px 0 rgba(255,255,255,.18);
+}
+.logo h1{font-size:17px;line-height:1.05;color:var(--text);letter-spacing:-.045em;}
+.logo p{font-size:10px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
+.header-right{gap:7px;}
+#btnTheme,.lock-btn,.btn,.btn-sm,.sec-save-btn,.sec-del-btn,.icon-btn{
+  -webkit-tap-highlight-color:transparent;
+}
+#btnTheme,.lock-btn{
+  min-height:38px;
+  border:1px solid var(--ios-line) !important;
+  border-radius:15px !important;
+  background:rgba(255,255,255,.055) !important;
+  color:var(--muted) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+#btnTheme:hover,.lock-btn:hover{border-color:rgba(224,112,255,.42) !important;color:var(--text) !important;background:rgba(170,34,255,.10) !important;}
+.lock-btn.unlocked{border-color:rgba(72,240,182,.42) !important;color:#48f0b6 !important;background:rgba(72,240,182,.11) !important;}
+.search-wrap{padding:12px clamp(10px,3vw,20px) 0;}
+.search-box{
+  min-height:50px;
+  border:1px solid var(--ios-line) !important;
+  border-radius:22px;
+  background:var(--ios-glass) !important;
+  box-shadow:var(--ios-shadow-soft);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+.search-box input{font-size:16px;color:var(--text);font-weight:600;}
+.search-box:focus-within{border-color:rgba(224,112,255,.62) !important;box-shadow:0 0 0 4px rgba(170,34,255,.13),var(--ios-shadow-soft);}
+.tabs-wrap{
+  position:sticky;
+  top:78px;
+  z-index:70;
+  margin:10px clamp(10px,3vw,20px) 0;
+  padding:7px;
+  gap:6px;
+  border:1px solid var(--ios-line) !important;
+  border-radius:999px;
+  background:rgba(16,2,35,.58) !important;
+  box-shadow:var(--ios-shadow-soft);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+[data-theme="light"] .tabs-wrap{background:rgba(255,255,255,.70) !important;}
+.tab{
+  margin:0;
+  min-height:40px;
+  padding:9px 13px;
+  border:1px solid transparent !important;
+  border-radius:999px !important;
+  color:var(--muted);
+  overflow:hidden;
+}
+.tab:hover{transform:translateY(-1px);background:rgba(170,34,255,.10);box-shadow:none;color:var(--text);}
+.tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,rgba(122,25,255,.95),rgba(191,44,255,.95),rgba(228,92,255,.95)) !important;
+  border-color:rgba(255,255,255,.14) !important;
+  box-shadow:0 10px 22px rgba(170,34,255,.28),inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+.tab-count{background:rgba(255,255,255,.08);border:1px solid var(--ios-line-soft);color:var(--muted);}
+.tab.active .tab-count{color:#fff;background:rgba(255,255,255,.22);}
+main{padding:14px clamp(10px,3vw,20px) 0;}
+.toolbar{
+  margin:0 0 12px;
+  padding:12px;
+  border:1px solid var(--ios-line);
+  border-radius:22px;
+  background:var(--ios-glass);
+  box-shadow:var(--ios-shadow-soft);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+.result-count{font-weight:700;color:var(--muted);}
+.btn,.btn-sm,.sec-save-btn{
+  border-radius:16px !important;
+  min-height:40px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+}
+.btn:active,.btn-sm:active,.icon-btn:active,.tab:active{transform:scale(.965) !important;}
+.btn-primary{
+  background:linear-gradient(135deg,#7a19ff,#bf2cff 48%,#e454ff) !important;
+  box-shadow:0 14px 30px rgba(170,34,255,.30),inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+.btn-outline,.btn-sm-outline,.btn-sm-upload{
+  background:rgba(255,255,255,.045) !important;
+  border:1px solid var(--ios-line) !important;
+  color:var(--text) !important;
+}
+.btn-outline:hover,.btn-sm-outline:hover,.btn-sm-upload:hover{border-color:rgba(224,112,255,.48) !important;background:rgba(170,34,255,.10) !important;color:var(--text) !important;}
+.table-wrap{
+  border:1px solid var(--ios-line) !important;
+  border-radius:24px;
+  background:var(--ios-glass);
+  box-shadow:var(--ios-shadow);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+thead tr{background:rgba(255,255,255,.055) !important;}
+th{color:var(--muted);border-bottom:1px solid var(--ios-line-soft);font-size:10px;letter-spacing:.12em;}
+td{border-bottom:1px solid var(--ios-line-soft);}
+tbody tr{transition:background .18s ease,transform .18s ease;}
+tbody tr:hover{background:rgba(170,34,255,.08) !important;}
+.np-badge{
+  border:1px solid var(--ios-line);
+  border-radius:12px;
+  background:rgba(255,255,255,.060);
+  color:var(--text);
+  font-weight:500;
+}
+.cat-pill{border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);}
+.app-text{color:var(--muted);}
+.icon-btn{border-radius:12px;background:rgba(255,255,255,.035);}
+.icon-btn:hover{background:rgba(170,34,255,.12);}
+.img-thumb,.img-placeholder,.img-upload-lbl,.edit-img-section img,.edit-img-section .no-img,.img-preview-wrap img{
+  border-radius:14px !important;
+  border:1px solid var(--ios-line) !important;
+  box-shadow:0 10px 22px rgba(0,0,0,.20);
+}
+.img-upload-lbl,.img-placeholder{background:rgba(255,255,255,.045);}
+.img-del-tiny,.btn-sm-danger{
+  border-color:rgba(255,95,126,.38) !important;
+  color:#ff5f7e !important;
+  background:rgba(255,95,126,.10) !important;
+}
+.overlay{
+  background:rgba(3,0,9,.68) !important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  padding:12px;
+}
+.panel,.login-panel{
+  border:1px solid var(--ios-line) !important;
+  border-radius:28px !important;
+  background:var(--ios-glass-strong) !important;
+  box-shadow:var(--ios-shadow);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+.panel h2,.login-panel h2{letter-spacing:-.03em;color:var(--text);}
+.form-group label{color:var(--muted);font-size:10px;letter-spacing:.13em;}
+.form-group input,.form-group select,.sec-name-input{
+  min-height:46px;
+  border:1px solid var(--ios-line) !important;
+  border-radius:17px !important;
+  background:rgba(255,255,255,.055) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.08);
+  color:var(--text) !important;
+  font-size:16px !important;
+  font-weight:650;
+}
+.form-group input:focus,.form-group select:focus,.sec-name-input:focus{
+  border-color:rgba(224,112,255,.72) !important;
+  box-shadow:0 0 0 4px rgba(170,34,255,.14),0 12px 28px rgba(170,34,255,.12) !important;
+}
+.upload-zone,.edit-img-section,.sec-item{
+  border:1px solid var(--ios-line) !important;
+  border-radius:20px !important;
+  background:rgba(255,255,255,.045) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.upload-zone:hover,.upload-zone.dragover{background:rgba(170,34,255,.10) !important;box-shadow:0 0 0 4px rgba(170,34,255,.09);}
+.upload-progress{border-radius:999px;background:rgba(255,255,255,.08);}
+.upload-progress-bar{background:linear-gradient(90deg,#7a19ff,#e454ff) !important;}
+.color-opt{box-shadow:0 8px 16px rgba(0,0,0,.20);}
+.color-opt.selected{border-color:#fff;box-shadow:0 0 0 4px rgba(170,34,255,.18),0 8px 16px rgba(0,0,0,.24);}
+.img-modal{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.img-modal img{border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,.62);}
+.toast{
+  bottom:calc(22px + env(safe-area-inset-bottom));
+  border:1px solid var(--ios-line);
+  border-radius:999px;
+  background:var(--ios-glass-strong);
+  box-shadow:var(--ios-shadow-soft);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+.status-bar{
+  margin:14px clamp(10px,3vw,20px) 18px;
+  padding:10px 12px;
+  border:1px solid var(--ios-line);
+  border-radius:999px;
+  background:var(--ios-glass);
+  box-shadow:var(--ios-shadow-soft);
+  backdrop-filter:var(--ios-blur);
+  -webkit-backdrop-filter:var(--ios-blur);
+}
+.status-dot.online{box-shadow:0 0 14px #4ecb71;}
+@media(min-width:769px){
+  .table-wrap,.toolbar,.panel,.search-box,header{transition:transform .20s ease,border-color .20s ease,box-shadow .20s ease,background .20s ease;}
+  .table-wrap:hover,.toolbar:hover,.search-box:hover{transform:translateY(-1px);border-color:rgba(224,112,255,.34) !important;}
+}
+@media(max-width:760px){
+  header{margin:8px 10px 0;padding:10px 11px;border-radius:22px;}
+  .logo-icon{width:40px;height:40px;border-radius:15px;}
+  .logo h1{font-size:15px;}
+  .logo p{font-size:9px;}
+  #btnTheme,.lock-btn{padding:7px 9px;}
+  .lock-btn span:last-child{display:none;}
+  .search-wrap{padding:10px 10px 0;}
+  .tabs-wrap{top:70px;margin:9px 10px 0;padding:6px;border-radius:22px;}
+  .tab{min-height:37px;padding:8px 12px;font-size:11.5px;}
+  main{padding:12px 10px 0;}
+  .toolbar{border-radius:21px;display:grid;gap:10px;}
+  .toolbar>div{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+  .toolbar .btn,.toolbar label.btn{width:100%;justify-content:center;}
+  .toolbar #addBtn{grid-column:1/-1;}
+  .table-wrap{border:0 !important;background:transparent !important;box-shadow:none !important;overflow:visible;backdrop-filter:none;-webkit-backdrop-filter:none;}
+  table,thead,tbody,tr,th,td{display:block;min-width:0 !important;width:100%;}
+  thead{display:none;}
+  tbody{display:grid;gap:10px;}
+  tbody tr{
+    position:relative;
+    padding:12px;
+    border:1px solid var(--ios-line);
+    border-radius:22px;
+    background:var(--ios-glass);
+    box-shadow:var(--ios-shadow-soft);
+    backdrop-filter:var(--ios-blur);
+    -webkit-backdrop-filter:var(--ios-blur);
+  }
+  tbody tr::before{content:'';position:absolute;left:0;top:16px;width:4px;height:42px;border-radius:0 999px 999px 0;background:linear-gradient(180deg,#e454ff,#55ccff);}
+  tbody td{border:0 !important;padding:6px 0;display:flex;gap:10px;align-items:flex-start;justify-content:space-between;}
+  tbody td:nth-child(2)::before{content:'Categoría';}
+  tbody td:nth-child(3)::before{content:'N/P';}
+  tbody td:nth-child(4)::before{content:'Descripción';}
+  tbody td:nth-child(5)::before{content:'Aplicación';}
+  tbody td:nth-child(6)::before{content:'Acciones';}
+  tbody td:nth-child(n+2)::before{min-width:88px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}
+  tbody td:first-child{justify-content:flex-start;padding-left:8px;}
+  tbody td[colspan]{display:block;text-align:center;}
+  tbody td[colspan]::before{display:none;}
+  .img-cell{align-items:flex-start;}
+  .img-thumb,.img-placeholder,.img-upload-lbl{width:52px;height:52px;}
+  .action-btns{justify-content:flex-end;width:100%;}
+  .panel,.login-panel{max-height:88vh;padding:22px 18px calc(26px + env(safe-area-inset-bottom));}
+  .panel-actions{display:grid;grid-template-columns:1fr 1fr;}
+  .panel-actions .btn{justify-content:center;}
+  .toast{left:12px;right:12px;max-width:none;justify-content:center;white-space:normal;}
+}
+@media(max-width:430px){
+  body::after{bottom:8px;}
+  header{align-items:center;}
+  .logo{flex:1;}
+  .tabs-wrap{border-radius:20px;}
+  .tab{font-size:11px;padding:8px 11px;}
+  .toolbar>div{grid-template-columns:1fr;}
+  .panel-actions{grid-template-columns:1fr;}
+  tbody td{display:grid;grid-template-columns:88px 1fr;}
+  tbody td:first-child{display:block;}
+  tbody td:nth-child(6){grid-template-columns:1fr;}
+  tbody td:nth-child(6)::before{display:none;}
+}
+
+</style>
+</head>
+<body>
+<!-- Volaris orbs -->
+<div class="volaris-orb volaris-orb-1"></div>
+<div class="volaris-orb volaris-orb-2"></div>
+<div class="volaris-orb volaris-orb-3"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🔩</div>
+    <div>
+      <h1>Números de Parte</h1>
+      <p>Catálogo Aeronáutico — Volaris</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <button id="btnTheme" onclick="toggleTheme()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;transition:border-color .15s,transform .2s;">🌙</button>
+    <button class="lock-btn" id="lockBtn" onclick="toggleAuth()">
+      <span id="lockIcon">🔒</span><span id="lockLabel">Editar</span>
+    </button>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="search" placeholder="Buscar N/P, descripción, aplicación…">
+  </div>
+</div>
+
+<div class="tabs-wrap" id="tabs"></div>
+
+<main>
+  <div class="toolbar">
+    <span class="result-count" id="count"></span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-outline" onclick="exportarJSON()" title="Exportar respaldo JSON" style="font-size:12px;padding:7px 13px;">📤 Exportar</button>
+      <label class="btn btn-outline" style="font-size:12px;padding:7px 13px;cursor:pointer;margin:0;" title="Importar respaldo JSON">
+        📥 Importar
+        <input type="file" id="importJSON" accept=".json" style="display:none" onchange="importarJSON(event)">
+      </label>
+      <button class="btn btn-primary" id="addBtn" onclick="openAddPanel()" disabled>+ Agregar</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th style="width:58px">Foto</th>
+        <th id="th-cat" style="width:100px">Categoría</th>
+        <th style="width:190px">N/P</th>
+        <th>Descripción</th>
+        <th style="width:150px">Aplicación</th>
+        <th style="width:72px" id="th-del"></th>
+      </tr></thead>
+      <tbody id="tbody">
+        <tr><td colspan="6"><div class="loading"><div class="spinner"></div>Conectando…</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<div class="status-bar">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Conectando…</span>
+</div>
+
+<!-- PANEL AGREGAR -->
+<div class="overlay" id="addOverlay" onclick="closeOnBg(event,'addOverlay')">
+  <div class="panel">
+    <h2>➕ Agregar producto</h2>
+    <div class="form-grid">
+      <div class="form-group"><label>Categoría</label><select id="f-cat"></select></div>
+      <div class="form-group"><label>N/P</label><input type="text" id="f-np" placeholder="Ej: 41177 M751 9 551" autocomplete="off" autocapitalize="characters"></div>
+      <div class="form-group"><label>Descripción</label><input type="text" id="f-desc" placeholder="Ej: Gris claro" autocomplete="off"></div>
+      <div class="form-group"><label>Aplicación <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label><input type="text" id="f-app" placeholder="Ej: Fuselaje…" autocomplete="off"></div>
+      <div class="form-group">
+        <label>Foto <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="f-img" accept="image/*" onchange="handleFileSelect(this)">
+          <div class="uz-icon">📷</div>
+          <div class="uz-text">Toca para elegir foto</div>
+          <div class="uz-hint">JPG · PNG · WEBP · Máx 5MB</div>
+        </div>
+        <div id="imgPreviewContainer"></div>
+        <div class="upload-progress" id="uploadProgress"><div class="upload-progress-bar" id="uploadProgressBar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn btn-outline" onclick="closePanel('addOverlay')">Cancelar</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="addRow()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL EDITAR -->
+<div class="overlay" id="editOverlay" onclick="closeOnBg(event,'editOverlay')">
+  <div class="panel">
+    <h2>✏️ Editar producto</h2>
+    <div class="form-grid">
+      <div class="form-group"><label>Categoría</label><select id="e-cat"></select></div>
+      <div class="form-group"><label>N/P</label><input type="text" id="e-np" autocomplete="off" autocapitalize="characters"></div>
+      <div class="form-group"><label>Descripción</label><input type="text" id="e-desc" autocomplete="off"></div>
+      <div class="form-group"><label>Aplicación</label><input type="text" id="e-app" autocomplete="off"></div>
+      <div class="form-group">
+        <label>Foto</label>
+        <div class="edit-img-section" id="editImgSection">
+          <div class="no-img" id="editImgPreview">📷</div>
+          <div class="edit-img-info">
+            <p id="editImgStatus">Sin foto</p>
+            <div class="edit-img-btns">
+              <label class="btn-sm btn-sm-upload">
+                <input type="file" accept="image/*" onchange="editUploadImg(this)">
+                📷 Subir foto
+              </label>
+              <button class="btn-sm btn-sm-danger" id="editDelImgBtn" onclick="editDeleteImg()" style="display:none">🗑 Borrar foto</button>
+            </div>
+          </div>
+        </div>
+        <div class="upload-progress" id="editUploadProgress"><div class="upload-progress-bar" id="editUploadProgressBar" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn btn-outline" onclick="closePanel('editOverlay')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL NUEVA SECCIÓN -->
+<div class="overlay" id="sectionOverlay" onclick="closeOnBg(event,'sectionOverlay')">
+  <div class="panel">
+    <h2>🗂 Nueva sección</h2>
+    <div class="form-grid">
+      <div class="form-group"><label>Nombre</label><input type="text" id="f-sec-name" placeholder="Ej: Selladores…" autocomplete="off" autocapitalize="words"></div>
+      <div class="form-group">
+        <label>Color</label>
+        <div class="color-options" id="colorPicker"></div>
+        <div class="color-preview"><span class="color-preview-dot" id="colorPreviewDot"></span><span id="colorPreviewName">Selecciona</span></div>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button class="btn btn-outline" onclick="closePanel('sectionOverlay')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addSection()">Crear</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL GESTIONAR SECCIONES -->
+<div class="overlay" id="manageSectionsOverlay" onclick="closeOnBg(event,'manageSectionsOverlay')">
+  <div class="panel">
+    <h2>⚙️ Gestionar secciones</h2>
+    <div id="secListContainer" class="sec-list"></div>
+    <div class="panel-actions" style="margin-top:14px;">
+      <button class="btn btn-outline" onclick="closePanel('manageSectionsOverlay')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="overlay" id="loginOverlay" onclick="closeOnBg(event,'loginOverlay')">
+  <div class="login-panel">
+    <h2>🔐 Modo edición</h2>
+    <p>Ingresa la contraseña para editar el catálogo.</p>
+    <div class="form-group"><label>Contraseña</label><input type="password" id="f-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPass()"></div>
+    <div class="error-msg" id="passError">Contraseña incorrecta</div>
+    <div class="panel-actions">
+      <button class="btn btn-outline" onclick="closePanel('loginOverlay')">Cancelar</button>
+      <button class="btn btn-primary" onclick="checkPass()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL IMAGEN GRANDE -->
+<div class="img-modal" id="imgModal" onclick="document.getElementById('imgModal').classList.remove('open')">
+  <img id="imgModalSrc" src="" alt="">
+</div>
+
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<script>
+const firebaseConfig = {
+  apiKey:"AIzaSyB466OuQzG-aM0PbsO59KM40cgqn2bXa9Y",
+  authDomain:"partsnumber-7f239.firebaseapp.com",
+  projectId:"partsnumber-7f239",
+  storageBucket:"partsnumber-7f239.firebasestorage.app",
+  messagingSenderId:"201020408501",
+  appId:"1:201020408501:web:f9ae183f7fc3903533b4fc"
+};
+const EDIT_PASSWORD = "Vol2026";
+
+const SECCIONES_DEFAULT = [
+  {name:"General",color:"#4a8cff"},
+  {name:"Radomo",color:"#ff6b6b"},
+  {name:"Exterior",color:"#4ecb71"},
+  {name:"Interior",color:"#c084fc"},
+  {name:"Primer",color:"#fb923c"},
+];
+
+const PALETTE = [
+  {hex:"#4a8cff",name:"Azul"},{hex:"#ff6b6b",name:"Rojo"},{hex:"#4ecb71",name:"Verde"},
+  {hex:"#c084fc",name:"Violeta"},{hex:"#fb923c",name:"Naranja"},{hex:"#facc15",name:"Amarillo"},
+  {hex:"#22d3ee",name:"Cyan"},{hex:"#f472b6",name:"Rosa"},{hex:"#a3e635",name:"Lima"},
+  {hex:"#e2e8f0",name:"Blanco"},{hex:"#94a3b8",name:"Gris"},{hex:"#f87171",name:"Coral"},
+];
+
+const DATOS_INICIALES = [
+  {cat:"General",np:"06728",desc:"Protective plastic film",app:""},{cat:"General",np:"PAPEL KRAFT",desc:"Papel Kraft",app:""},{cat:"General",np:"203-025",desc:'Masking 1/4"',app:""},{cat:"General",np:"203-05",desc:'Masking 1/2"',app:""},{cat:"General",np:"234-1",desc:"Masking 1 pulgada",app:""},{cat:"General",np:"0234-02",desc:"Masking 2 pulgadas",app:""},{cat:"General",np:"T 127",desc:"Thinner",app:""},{cat:"General",np:"MEK",desc:"Methyl Ethyl Ketone",app:""},{cat:"General",np:"MIL-T-81533 / CITRA-SAFE",desc:"Citra Safe Solvent",app:""},{cat:"General",np:"ASTMD329",desc:"Acetona",app:""},{cat:"General",np:"AE24105012",desc:"Lija 120",app:""},{cat:"General",np:"5424185022 / AE24105025",desc:"Lija 220",app:""},{cat:"General",np:"5424185041",desc:"Lija 400",app:""},{cat:"General",np:"POLYSTOP LP",desc:"Resanador",app:""},{cat:"General",np:"267",desc:"Spray Gun",app:""},{cat:"General",np:"TURCO 5351",desc:"Removedor de pintura",app:""},{cat:"General",np:"S-10226",desc:"Cinta Magica Scotch",app:""},{cat:"General",np:"ABS1238-26-30B",desc:"Lampara fluorescente",app:""},{cat:"General",np:"PR-3500",desc:"Paint Stripper",app:""},{cat:"General",np:"Alodine 1200",desc:"Alodine",app:""},
+  {cat:"Radomo",np:"0778-9000-LI",desc:"Hardener",app:""},{cat:"Radomo",np:"0470-9000 NV LI",desc:"Thinner",app:""},{cat:"Radomo",np:"54680000",desc:"Pintura blanca radomo",app:"Radomo"},{cat:"Radomo",np:"5468000",desc:"Filler",app:"Radomo"},{cat:"Radomo",np:"0707-9000",desc:"Hardener",app:""},{cat:"Radomo",np:"0491/9000",desc:"Thinner",app:""},{cat:"Radomo",np:"0986/2620",desc:"Antistatic Type II",app:"Anti estatico"},{cat:"Radomo",np:"0986/2620",desc:"Antistatic Ty II Hardener",app:""},{cat:"Radomo",np:"54780000",desc:"Celoflex - Pintura blanca antierosion",app:""},{cat:"Radomo",np:"0778-9000-LI",desc:"Activator",app:""},{cat:"Radomo",np:"0470/9000 NV LI",desc:"Thinner",app:""},
+  {cat:"Exterior",np:"90337 0000 0 553",desc:"Thinner",app:""},{cat:"Exterior",np:"40577 0000 0 501",desc:"Hardener",app:""},{cat:"Exterior",np:"41177 9107 9 551",desc:"Blanco",app:"Fuselaje"},{cat:"Exterior",np:"41177 M926 9 551",desc:"Negro",app:"Estabilizador vertical"},{cat:"Exterior",np:"41177 M751 9 551",desc:"Gris claro",app:"Logotipo"},{cat:"Exterior",np:"41177 M531 9 551",desc:"Azul fuerte",app:"Logotipo"},{cat:"Exterior",np:"41177 M530 9 551",desc:"Azul claro",app:"Logotipo"},{cat:"Exterior",np:"41177 M610 9 551",desc:"Verde fuerte",app:"Logotipo"},{cat:"Exterior",np:"41177 M611 9 551",desc:"Verde claro",app:"Logotipo"},{cat:"Exterior",np:"41177 M401 9 551",desc:"Violeta claro",app:"Logotipo"},{cat:"Exterior",np:"41177 M403 9 551",desc:"Violeta fuerte",app:"Logotipo"},{cat:"Exterior",np:"41177 M916 9 551",desc:"Gris claro",app:"Alas"},{cat:"Exterior",np:"41177 M750 9 551",desc:"Gris obscuro",app:"Logotipo"},{cat:"Exterior",np:"MIL-P-21563",desc:"Fluorescent Orange Paint",app:"Latches"},{cat:"Exterior",np:"MIL-P-21563 CLEAR LACQUER",desc:"Clear Lacquer",app:"Latches"},{cat:"Exterior",np:"ALEXITS 909-88",desc:"Paint Accelerator",app:""},{cat:"Exterior",np:"411-14",desc:"Clear",app:"Stickers"},{cat:"Exterior",np:"PANTONE 187-C",desc:"Pintura roja",app:"Puertos de estatica"},{cat:"Exterior",np:"41177 441A 9 502",desc:"Paint Pink",app:"Motores Neo"},{cat:"Exterior",np:"AERODUR FINISH C 21/100",desc:"Top Coat Polyurethane",app:"Trenes principales"},{cat:"Exterior",np:"S66/22R",desc:"Hardener",app:""},{cat:"Exterior",np:"C25/90S",desc:"Thinner",app:""},{cat:"Exterior",np:"SERMETEL 249",desc:"Base Material",app:""},{cat:"Exterior",np:"SERMETEL 273",desc:"Catalyst",app:""},{cat:"Exterior",np:"AVIOX FINISH 77702",desc:"Paint",app:"Trenes principales"},{cat:"Exterior",np:"90150",desc:"Hardener",app:""},{cat:"Exterior",np:"99321",desc:"Thinner",app:""},
+  {cat:"Interior",np:"40500 0000 0 549",desc:"Hardener 400",app:""},{cat:"Interior",np:"90062 0000 0 553",desc:"Thinner Verduner 62",app:""},{cat:"Interior",np:"40412 M535 7 550",desc:"Azul obscuro",app:"Cabina de pilotos"},{cat:"Interior",np:"40412 5237 7 550",desc:"Azul claro",app:"Cabina de pilotos"},{cat:"Interior",np:"40412 M753 7 550",desc:"Gris obscuro",app:"Asientos sobrecargo"},{cat:"Interior",np:"40412 M919 7 550",desc:"Blanco",app:"Sombrereras"},{cat:"Interior",np:"40412 M123 7 550",desc:"Beige",app:"Asientos clientes"},{cat:"Interior",np:"40412 M755 7 550",desc:"Gris claro",app:"Puerta cabina"},{cat:"Interior",np:"42804 7321 1 575",desc:"Nextel Suede Coating 3101",app:"Tornillos asientos cabina pilotos"},{cat:"Interior",np:"4080 TOPCOAT MATT GREY BL",desc:"Topcoat Matt Grey",app:"Tornillos asientos cabina pilotos"},{cat:"Interior",np:"NEXTEL-HARTER 6018",desc:"Hardener",app:""},{cat:"Interior",np:"NEXTEL-VERDUNNER 8061",desc:"Thinner",app:""},
+  {cat:"Primer",np:"11322 633B 3 551",desc:"Primer (base)",app:"Exterior"},{cat:"Primer",np:"135-20",desc:"Hardener",app:""},{cat:"Primer",np:"MIL-PRF-85582D TYPE 1 CLA",desc:"Primer (base)",app:""},{cat:"Primer",np:"MILPRF-85582D TYPE 1",desc:"Catalizador",app:""},{cat:"Primer",np:"0513X384XX13G22K",desc:"Primer (base)",app:""},{cat:"Primer",np:"910X456",desc:"Activador",app:""},{cat:"Primer",np:"BMS10-11",desc:"Primer (base)",app:"Resistente a fluidos"},{cat:"Primer",np:"0515X384XXIKG22K",desc:"Primer (base)",app:"Exterior"},{cat:"Primer",np:"0513X384XXIKG22K",desc:"Activador",app:""},{cat:"Primer",np:"463-12-8",desc:"Fluid Resistant Epoxy Primer Base",app:"Resistente a fluidos"},{cat:"Primer",np:"CA-116",desc:"Thinner",app:""},{cat:"Primer",np:"11344-1821-N-K30",desc:"Chrome Free Primer - CF Primer",app:""},{cat:"Primer",np:"41122-441A-0K19",desc:"Rose Pink",app:""},
+];
+
+/* ── Estado ── */
+let data=[], secciones=[...SECCIONES_DEFAULT], activeCat="Todos", isEditor=false;
+let db=null, storage=null, selectedColor=PALETTE[0].hex;
+let pendingFile=null, editingId=null, editingCurrentImgUrl="";
+const NP_CACHE_KEY = 'np_firestore_cache_v1';
+function readNPCache(){ try { return JSON.parse(localStorage.getItem(NP_CACHE_KEY) || 'null'); } catch(e) { return null; } }
+function writeNPCache(){ try { localStorage.setItem(NP_CACHE_KEY, JSON.stringify({ secciones, data, savedAt: Date.now() })); } catch(e) {} }
+
+/* ── Helpers ── */
+const getColor=n=>{const s=secciones.find(s=>s.name===n);return s?s.color:"#6b7280";};
+function hexToRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`;}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/'/g,"&#39;");}
+
+/* ── Firebase ── */
+function initFirebase(){
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db=firebase.firestore();
+    storage=firebase.storage();
+    try { db.enablePersistence({ synchronizeTabs:true }).catch(()=>{}); } catch(e) {}
+    const auth = firebase.auth();
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{}).finally(()=>{
+      auth.onAuthStateChanged(user=>{
+        if(user){ setStatus(true); loadData(); return; }
+        if(!navigator.onLine){ setStatus(false); usarDatosLocales(); return; }
+        auth.signInAnonymously().then(()=>{ setStatus(true); loadData(); }).catch(()=>{ setStatus(false); usarDatosLocales(); });
+      });
+    });
+  }catch(e){setStatus(false);usarDatosLocales();}
+}
+function setStatus(on){
+  document.getElementById("statusDot").className="status-dot"+(on?" online":"");
+  document.getElementById("statusText").textContent=on?"Conectado — cambios en tiempo real":"Sin conexión — datos locales";
+}
+async function loadData(){
+  try{
+    const ss=await db.collection("secciones").orderBy("orden").get();
+    if(!ss.empty) secciones=ss.docs.map(d=>({id:d.id,...d.data()}));
+    else await seedSecciones();
+    const sn=await db.collection("pinturas").orderBy("orden").get();
+    if(sn.empty) await seedData();
+    else{data=sn.docs.map(d=>({id:d.id,...d.data()}));writeNPCache();buildTabs();render();}
+    db.collection("pinturas").orderBy("orden").onSnapshot(sn=>{data=sn.docs.map(d=>({id:d.id,...d.data()}));writeNPCache();buildTabs();render();},()=>usarDatosLocales());
+    db.collection("secciones").orderBy("orden").onSnapshot(sn=>{secciones=sn.docs.map(d=>({id:d.id,...d.data()}));writeNPCache();rebuildSelects();buildTabs();render();},()=>usarDatosLocales());
+  }catch(e){setStatus(false);usarDatosLocales();}
+}
+async function seedSecciones(){const b=db.batch();SECCIONES_DEFAULT.forEach((s,i)=>{b.set(db.collection("secciones").doc(),{...s,orden:i});});await b.commit();}
+async function seedData(){
+  toast("⏳","Cargando datos iniciales…");
+  const b=db.batch();
+  DATOS_INICIALES.forEach((r,i)=>{b.set(db.collection("pinturas").doc(),{...r,orden:i,imgUrl:""});});
+  await b.commit();toast("✓","Base de datos lista");
+}
+function usarDatosLocales(){
+  const cache = readNPCache();
+  if(cache && Array.isArray(cache.secciones) && Array.isArray(cache.data)){
+    secciones = cache.secciones;
+    data = cache.data;
+  }else{
+    secciones=[...SECCIONES_DEFAULT];
+    data=DATOS_INICIALES.map((r,i)=>({...r,id:String(i),imgUrl:""}));
+  }
+  rebuildSelects();buildTabs();render();
+}
+
+/* ── Storage ── */
+function handleFileSelect(input){
+  const f=input.files[0];if(!f)return;
+  if(f.size>5*1024*1024){toast("⚠","Máx 5MB");input.value="";return;}
+  pendingFile=f;
+  const rd=new FileReader();
+  rd.onload=e=>{
+    document.getElementById("imgPreviewContainer").innerHTML=`<div class="img-preview-wrap"><img src="${e.target.result}"><button class="remove-img-btn" onclick="clearPendingImg()">✕</button></div>`;
+    document.getElementById("uploadZone").style.display="none";
+  };
+  rd.readAsDataURL(f);
+}
+function clearPendingImg(){
+  pendingFile=null;document.getElementById("f-img").value="";
+  document.getElementById("imgPreviewContainer").innerHTML="";
+  document.getElementById("uploadZone").style.display="";
+}
+async function uploadImg(file,id,progressId,barId){
+  if(!file)return"";
+  const pw=document.getElementById(progressId),pb=document.getElementById(barId);
+  pw.classList.add("show");
+  
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onprogress=(e)=>{
+      if(e.lengthComputable) pb.style.width=(e.loaded/e.total*100)+"%";
+    };
+    reader.onload=(e)=>{
+      try{
+        const base64=e.target.result;
+        const key=`img_${id}`;
+        localStorage.setItem(key, base64);
+        pb.style.width="0%";
+        pw.classList.remove("show");
+        res(base64);
+      }catch(err){
+        pw.classList.remove("show");
+        rej(err);
+      }
+    };
+    reader.onerror=(e)=>{
+      pw.classList.remove("show");
+      rej(e);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function deleteImgFromStorage(url){
+  // En local no hay que borrar de storage, solo de datos
+}
+async function uploadImgForRow(rowId,input){
+  const f=input.files[0];if(!f)return;
+  if(f.size>5*1024*1024){toast("⚠","Máx 5MB");return;}
+  toast("⏳","Subiendo imagen…");
+  try{
+    const url=await uploadImg(f,rowId,"uploadProgress","uploadProgressBar");
+    if(db)await db.collection("pinturas").doc(rowId).update({imgUrl:url});
+    else{const it=data.find(r=>r.id===rowId);if(it)it.imgUrl=url;buildTabs();render();}
+    toast("✓","Imagen guardada");
+  }catch(e){toast("⚠","Error al subir");}
+}
+
+/* ── Auth ── */
+function toggleAuth(){
+  if(isEditor){
+    isEditor=false;
+    document.getElementById("lockBtn").className="lock-btn";
+    document.getElementById("lockIcon").textContent="🔒";
+    document.getElementById("lockLabel").textContent="Editar";
+    document.getElementById("addBtn").disabled=true;
+    buildTabs();render();toast("🔒","Modo edición desactivado");
+  }else{
+    document.getElementById("f-pass").value="";
+    document.getElementById("passError").className="error-msg";
+    document.getElementById("loginOverlay").classList.add("open");
+    setTimeout(()=>document.getElementById("f-pass").focus(),300);
+  }
+}
+function checkPass(){
+  if(document.getElementById("f-pass").value===EDIT_PASSWORD){
+    isEditor=true;closePanel("loginOverlay");
+    document.getElementById("lockBtn").className="lock-btn unlocked";
+    document.getElementById("lockIcon").textContent="🔓";
+    document.getElementById("lockLabel").textContent="Editando";
+    document.getElementById("addBtn").disabled=false;
+    buildTabs();render();toast("🔓","Modo edición activado");
+  }else{
+    document.getElementById("passError").className="error-msg show";
+    document.getElementById("f-pass").value="";
+    document.getElementById("f-pass").focus();
+  }
+}
+
+/* ── Selects ── */
+function rebuildSelects(){
+  ["f-cat","e-cat"].forEach(id=>{
+    const sel=document.getElementById(id),prev=sel.value;
+    sel.innerHTML=secciones.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join("");
+    if(prev&&secciones.find(s=>s.name===prev))sel.value=prev;
+  });
+}
+
+/* ── Tabs ── */
+function buildTabs(){
+  const wrap=document.getElementById("tabs");wrap.innerHTML="";
+  const btnT=document.createElement("button");
+  btnT.className="tab"+(activeCat==="Todos"?" active":"");
+  btnT.innerHTML=`Todos<span class="tab-count">${data.length}</span>`;
+  btnT.onclick=()=>{activeCat="Todos";buildTabs();render();};
+  if(activeCat==="Todos"){btnT.style.setProperty("--tab-active-border","#4a8cff");btnT.style.color="#4a8cff";}
+  wrap.appendChild(btnT);
+  secciones.forEach(sec=>{
+    const cnt=data.filter(r=>r.cat===sec.name).length;
+    const btn=document.createElement("button");
+    btn.className="tab"+(activeCat===sec.name?" active":"");
+    btn.innerHTML=`<span class="dot" style="background:${sec.color}"></span>${esc(sec.name)}<span class="tab-count">${cnt}</span>`;
+    btn.onclick=()=>{activeCat=sec.name;buildTabs();render();};
+    if(activeCat===sec.name){btn.style.setProperty("--tab-active-border",sec.color);btn.style.color=sec.color;btn.style.setProperty("--tab-active-bg",hexToRgba(sec.color,.08));}
+    wrap.appendChild(btn);
+  });
+  if(isEditor){
+    const b=document.createElement("button");b.className="tab";
+    b.innerHTML=`<span style="font-size:16px;line-height:1">＋</span> Sección`;
+    b.onclick=openSectionPanel;wrap.appendChild(b);
+    const bg=document.createElement("button");bg.className="tab";
+    bg.innerHTML=`⚙️ Gestionar`;bg.title="Renombrar o eliminar secciones";
+    bg.onclick=openManageSections;wrap.appendChild(bg);
+  }
+  document.getElementById("th-cat").style.display=activeCat==="Todos"?"":"none";
+  document.getElementById("th-del").style.display=isEditor?"":"none";
+}
+
+/* ── Render ── */
+function render(){
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  const rows=data.filter(r=>{
+    const mc=activeCat==="Todos"||r.cat===activeCat;
+    const mq=!q||(r.np||"").toLowerCase().includes(q)||(r.desc||"").toLowerCase().includes(q)||(r.app||"").toLowerCase().includes(q)||(r.cat||"").toLowerCase().includes(q);
+    return mc&&mq;
+  });
+  document.getElementById("count").textContent=`${rows.length} resultado${rows.length!==1?"s":""}`;
+  const tbody=document.getElementById("tbody"),showCat=activeCat==="Todos";
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty">Sin resultados</div></td></tr>`;return;}
+  tbody.innerHTML=rows.map(r=>{
+    const color=getColor(r.cat),bg=hexToRgba(color,.12);
+    // celda imagen
+    let imgCell;
+    if(r.imgUrl){
+      imgCell=`<td><div class="img-cell">
+        <img class="img-thumb" src="${esc(r.imgUrl)}" onclick="document.getElementById('imgModalSrc').src='${esc(r.imgUrl)}';document.getElementById('imgModal').classList.add('open')">
+        ${isEditor?`<button class="img-del-tiny" onclick="quickDeleteImg('${r.id}','${esc(r.imgUrl)}')">🗑 quitar</button>`:""}
+      </div></td>`;
+    }else if(isEditor){
+      imgCell=`<td><label class="img-upload-lbl" title="Subir foto"><input type="file" accept="image/*" onchange="uploadImgForRow('${r.id}',this)">📷</label></td>`;
+    }else{
+      imgCell=`<td><div class="img-placeholder">·</div></td>`;
+    }
+    const catCol=showCat?`<td><span class="cat-pill" style="background:${bg};color:${color}">${esc(r.cat)}</span></td>`:"";
+    const actCol=isEditor
+      ?`<td><div class="action-btns">
+          <button class="icon-btn edit" onclick="openEdit('${r.id}')" title="Editar">✏️</button>
+          <button class="icon-btn del" onclick="deleteRow('${r.id}','${esc(r.np)}')"
+            onmouseover="this.style.color='${color}';this.style.background='${hexToRgba(color,.12)}'"
+            onmouseout="this.style.color='';this.style.background=''" title="Eliminar">✕</button>
+        </div></td>`
+      :"<td></td>";
+    return `<tr>${imgCell}${catCol}<td><span class="np-badge">${esc(r.np)}</span></td><td>${esc(r.desc)}</td><td><span class="app-text">${esc(r.app)}</span></td>${actCol}</tr>`;
+  }).join("");
+}
+
+/* ── Agregar ── */
+function openAddPanel(){
+  if(!isEditor)return;
+  rebuildSelects();clearPendingImg();
+  ["f-np","f-desc","f-app"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("addOverlay").classList.add("open");
+  if(activeCat!=="Todos")document.getElementById("f-cat").value=activeCat;
+  setTimeout(()=>document.getElementById("f-np").focus(),300);
+}
+async function addRow(){
+  const cat=document.getElementById("f-cat").value.trim();
+  const np=document.getElementById("f-np").value.trim();
+  const desc=document.getElementById("f-desc").value.trim();
+  const app=document.getElementById("f-app").value.trim();
+  if(!np||!desc){toast("⚠","N/P y Descripción son requeridos");return;}
+  const btn=document.getElementById("saveBtn");btn.disabled=true;btn.textContent="Guardando…";
+  try{
+    const orden=data.length>0?Math.max(...data.map(r=>r.orden||0))+1:0;
+    if(db){
+      const ref=await db.collection("pinturas").add({cat,np,desc,app,orden,imgUrl:""});
+      if(pendingFile){toast("⏳","Subiendo imagen…");const url=await uploadImg(pendingFile,ref.id,"uploadProgress","uploadProgressBar");await ref.update({imgUrl:url});}
+    }else{data.push({cat,np,desc,app,orden,imgUrl:"",id:Date.now().toString()});writeNPCache();}
+    closePanel("addOverlay");activeCat=cat;clearPendingImg();buildTabs();render();
+    toast("✓",`"${np}" agregado`);
+  }catch(e){toast("⚠","Error: "+e.message);}
+  finally{btn.disabled=false;btn.textContent="Guardar";}
+}
+
+/* ── Editar ── */
+function openEdit(id){
+  const row=data.find(r=>r.id===id);if(!row)return;
+  editingId=id;editingCurrentImgUrl=row.imgUrl||"";
+  rebuildSelects();
+  document.getElementById("e-cat").value=row.cat||"";
+  document.getElementById("e-np").value=row.np||"";
+  document.getElementById("e-desc").value=row.desc||"";
+  document.getElementById("e-app").value=row.app||"";
+  // foto actual
+  const prev=document.getElementById("editImgPreview");
+  const status=document.getElementById("editImgStatus");
+  const delBtn=document.getElementById("editDelImgBtn");
+  if(editingCurrentImgUrl){
+    prev.outerHTML=`<img id="editImgPreview" src="${esc(editingCurrentImgUrl)}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;cursor:pointer;" onclick="document.getElementById('imgModalSrc').src='${esc(editingCurrentImgUrl)}';document.getElementById('imgModal').classList.add('open')">`;
+    status.textContent="Foto actual (toca para ver)";
+    delBtn.style.display="";
+  }else{
+    const el=document.getElementById("editImgPreview");
+    if(el.tagName==="IMG"){el.outerHTML=`<div class="no-img" id="editImgPreview">📷</div>`;}
+    status.textContent="Sin foto";
+    delBtn.style.display="none";
+  }
+  document.getElementById("editOverlay").classList.add("open");
+  setTimeout(()=>document.getElementById("e-np").focus(),300);
+}
+
+async function editUploadImg(input){
+  const f=input.files[0];if(!f)return;
+  if(f.size>5*1024*1024){toast("⚠","Máx 5MB");return;}
+  if(!editingId)return;
+  toast("⏳","Subiendo imagen…");
+  try{
+    // si ya tiene imagen, borrar la anterior
+    if(editingCurrentImgUrl)await deleteImgFromStorage(editingCurrentImgUrl);
+    const url=await uploadImg(f,editingId,"editUploadProgress","editUploadProgressBar");
+    editingCurrentImgUrl=url;
+    if(db)await db.collection("pinturas").doc(editingId).update({imgUrl:url});
+    else{const it=data.find(r=>r.id===editingId);if(it)it.imgUrl=url;}
+    // actualizar preview en panel
+    const prev=document.getElementById("editImgPreview");
+    prev.outerHTML=`<img id="editImgPreview" src="${esc(url)}" style="width:64px;height:64px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;cursor:pointer;" onclick="document.getElementById('imgModalSrc').src='${esc(url)}';document.getElementById('imgModal').classList.add('open')">`;
+    document.getElementById("editImgStatus").textContent="Foto actualizada";
+    document.getElementById("editDelImgBtn").style.display="";
+    toast("✓","Imagen guardada");
+  }catch(e){toast("⚠","Error al subir imagen");}
+}
+
+async function editDeleteImg(){
+  if(!editingId||!editingCurrentImgUrl){toast("⚠","Sin imagen que borrar");return;}
+  if(!confirm("¿Borrar la foto de este producto?"))return;
+  try{
+    localStorage.removeItem(`img_${editingId}`);
+    if(db)await db.collection("pinturas").doc(editingId).update({imgUrl:""});
+    else{const it=data.find(r=>r.id===editingId);if(it)it.imgUrl="";}
+    editingCurrentImgUrl="";
+    const prev=document.getElementById("editImgPreview");
+    if(prev.tagName==="IMG")prev.outerHTML=`<div class="no-img" id="editImgPreview">📷</div>`;
+    document.getElementById("editImgStatus").textContent="Sin foto";
+    document.getElementById("editDelImgBtn").style.display="none";
+    toast("🗑","Foto eliminada");
+  }catch(e){toast("⚠","Error al eliminar");}
+}
+
+async function saveEdit(){
+  if(!editingId)return;
+  const cat=document.getElementById("e-cat").value.trim();
+  const np=document.getElementById("e-np").value.trim();
+  const desc=document.getElementById("e-desc").value.trim();
+  const app=document.getElementById("e-app").value.trim();
+  if(!np||!desc){toast("⚠","N/P y Descripción son requeridos");return;}
+  try{
+    if(db)await db.collection("pinturas").doc(editingId).update({cat,np,desc,app});
+    else{const it=data.find(r=>r.id===editingId);if(it)Object.assign(it,{cat,np,desc,app});writeNPCache();buildTabs();render();}
+    closePanel("editOverlay");
+    toast("✓",`"${np}" actualizado`);
+  }catch(e){toast("⚠","Error al guardar");}
+  editingId=null;editingCurrentImgUrl="";
+}
+
+/* ── Eliminar registro ── */
+async function deleteRow(id,np){
+  if(!confirm(`¿Eliminar "${np}"?`))return;
+  try{
+    const row=data.find(r=>r.id===id);
+    if(row&&row.imgUrl)await deleteImgFromStorage(row.imgUrl);
+    if(db)await db.collection("pinturas").doc(id).delete();
+    else{data=data.filter(r=>r.id!==id);buildTabs();render();}
+    toast("✓","Eliminado");
+  }catch(e){toast("⚠","Error al eliminar");}
+}
+
+/* ── Borrar imagen rápido desde tabla ── */
+async function quickDeleteImg(rowId,imgUrl){
+  if(!confirm("¿Quitar la foto de este producto?"))return;
+  try{
+    await deleteImgFromStorage(imgUrl);
+    if(db)await db.collection("pinturas").doc(rowId).update({imgUrl:""});
+    else{const it=data.find(r=>r.id===rowId);if(it)it.imgUrl="";buildTabs();render();}
+    toast("🗑","Foto eliminada");
+  }catch(e){toast("⚠","Error");}
+}
+
+/* ── Secciones ── */
+function openSectionPanel(){
+  selectedColor=PALETTE[0].hex;
+  document.getElementById("colorPicker").innerHTML=PALETTE.map((p,i)=>
+    `<div class="color-opt${i===0?" selected":""}" style="background:${p.hex}" title="${p.name}" onclick="selectColor(this,'${p.hex}','${p.name}')"></div>`
+  ).join("");
+  document.getElementById("colorPreviewDot").style.background=PALETTE[0].hex;
+  document.getElementById("colorPreviewName").textContent=PALETTE[0].name;
+  document.getElementById("f-sec-name").value="";
+  document.getElementById("sectionOverlay").classList.add("open");
+  setTimeout(()=>document.getElementById("f-sec-name").focus(),300);
+}
+function selectColor(el,hex,name){
+  document.querySelectorAll(".color-opt").forEach(e=>e.classList.remove("selected"));
+  el.classList.add("selected");selectedColor=hex;
+  document.getElementById("colorPreviewDot").style.background=hex;
+  document.getElementById("colorPreviewName").textContent=name;
+}
+async function addSection(){
+  const name=document.getElementById("f-sec-name").value.trim();
+  if(!name){toast("⚠","Escribe un nombre");return;}
+  if(secciones.find(s=>s.name.toLowerCase()===name.toLowerCase())){toast("⚠","Ya existe");return;}
+  try{
+    if(db)await db.collection("secciones").add({name,color:selectedColor,orden:secciones.length});
+    else{secciones.push({name,color:selectedColor,id:Date.now().toString()});rebuildSelects();buildTabs();render();}
+    closePanel("sectionOverlay");activeCat=name;toast("✓",`Sección "${name}" creada`);
+  }catch(e){toast("⚠","Error");}
+}
+
+/* ── Gestionar secciones ── */
+function openManageSections(){
+  renderSecList();
+  document.getElementById("manageSectionsOverlay").classList.add("open");
+}
+function renderSecList(){
+  const container=document.getElementById("secListContainer");
+  if(!secciones.length){container.innerHTML=`<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px 0">No hay secciones personalizadas</p>`;return;}
+  container.innerHTML=secciones.map(s=>`
+    <div class="sec-item" id="secitem-${s.id}">
+      <span class="sec-dot" style="background:${s.color}"></span>
+      <input class="sec-name-input" id="secinput-${s.id}" value="${esc(s.name)}" maxlength="40">
+      <button class="sec-save-btn" onclick="renameSection('${s.id}')">✓ Guardar</button>
+      <button class="sec-del-btn" title="Eliminar sección" onclick="deleteSection('${s.id}','${esc(s.name)}')">🗑</button>
+    </div>`).join("");
+}
+async function renameSection(id){
+  const input=document.getElementById("secinput-"+id);
+  const newName=input.value.trim();
+  if(!newName){toast("⚠","El nombre no puede estar vacío");return;}
+  const sec=secciones.find(s=>s.id===id);
+  if(!sec)return;
+  const oldName=sec.name;
+  if(newName===oldName){toast("ℹ","Sin cambios");return;}
+  if(secciones.find(s=>s.name.toLowerCase()===newName.toLowerCase()&&s.id!==id)){toast("⚠","Ya existe una sección con ese nombre");return;}
+  try{
+    if(db){
+      await db.collection("secciones").doc(id).update({name:newName});
+      // actualizar registros que usen este nombre
+      const snap=await db.collection("pinturas").where("cat","==",oldName).get();
+      const batch=db.batch();
+      snap.docs.forEach(d=>batch.update(d.ref,{cat:newName}));
+      await batch.commit();
+    }else{
+      sec.name=newName;
+      data.forEach(r=>{if(r.cat===oldName)r.cat=newName;});
+      rebuildSelects();buildTabs();render();
+    }
+    if(activeCat===oldName)activeCat=newName;
+    toast("✓",`Renombrado a "${newName}"`);
+  }catch(e){toast("⚠","Error al renombrar");}
+}
+async function deleteSection(id,name){
+  const count=data.filter(r=>r.cat===name).length;
+  const msg=count>0
+    ?`¿Eliminar la sección "${name}"?\nTiene ${count} producto(s) — quedarán sin sección asignada.`
+    :`¿Eliminar la sección "${name}"?`;
+  if(!confirm(msg))return;
+  try{
+    if(db)await db.collection("secciones").doc(id).delete();
+    else{secciones=secciones.filter(s=>s.id!==id);rebuildSelects();buildTabs();render();}
+    if(activeCat===name)activeCat="Todos";
+    renderSecList();
+    toast("🗑",`Sección "${name}" eliminada`);
+  }catch(e){toast("⚠","Error al eliminar sección");}
+}
+
+/* ── Panel helpers ── */
+function closePanel(id){document.getElementById(id).classList.remove("open");}
+function closeOnBg(e,id){if(e.target===document.getElementById(id))closePanel(id);}
+
+/* ── Toast ── */
+function toast(icon,msg){
+  const el=document.getElementById("toast");
+  document.getElementById("toast-icon").textContent=icon;
+  document.getElementById("toast-msg").textContent=msg;
+  el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2800);
+}
+
+/* ── Eventos ── */
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("f-app").addEventListener("keydown",e=>{if(e.key==="Enter")addRow();});
+document.getElementById("e-app").addEventListener("keydown",e=>{if(e.key==="Enter")saveEdit();});
+document.getElementById("f-sec-name").addEventListener("keydown",e=>{if(e.key==="Enter")addSection();});
+
+const uz=document.getElementById("uploadZone");
+uz.addEventListener("dragover",e=>{e.preventDefault();uz.classList.add("dragover");});
+uz.addEventListener("dragleave",()=>uz.classList.remove("dragover"));
+uz.addEventListener("drop",e=>{
+  e.preventDefault();uz.classList.remove("dragover");
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith("image/")){
+    const inp=document.getElementById("f-img");
+    const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;handleFileSelect(inp);
+  }
+});
+
+/* ── Tema ── */
+let _dark=localStorage.getItem("np_theme")!=="light";
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",_dark?"dark":"light");
+  const b=document.getElementById("btnTheme");if(b)b.textContent=_dark?"🌙":"☀️";
+  localStorage.setItem("np_theme",_dark?"dark":"light");
+}
+function toggleTheme(){
+  _dark=!_dark;const b=document.getElementById("btnTheme");
+  b.style.transform="rotate(20deg) scale(.9)";setTimeout(()=>b.style.transform="",220);
+  applyTheme();
+}
+applyTheme();
+
+/* ── Ripple tabs ── */
+document.getElementById("tabs").addEventListener("click",function(e){
+  const tab=e.target.closest(".tab");if(!tab)return;
+  const r=document.createElement("span");r.className="tab-ripple";
+  const rect=tab.getBoundingClientRect();
+  r.style.left=(e.clientX-rect.left-3)+"px";r.style.top=(e.clientY-rect.top-3)+"px";
+  tab.appendChild(r);setTimeout(()=>r.remove(),460);
+});
+
+/* ── Exportar / Importar JSON ── */
+function exportarJSON(){
+  if(!data.length){toast("⚠","No hay datos para exportar");return;}
+  const payload={secciones,data};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const fecha=new Date().toISOString().split("T")[0];
+  const a=document.createElement("a");
+  a.href=url;a.download=`numeros_parte_${fecha}.json`;a.click();
+  URL.revokeObjectURL(url);
+  toast("✓",`Respaldo exportado (${data.length} registros)`);
+}
+
+function importarJSON(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      // Acepta formato {secciones, data} o directamente array de registros
+      const registros=Array.isArray(parsed)?parsed:(parsed.data||[]);
+      const secsImport=Array.isArray(parsed.secciones)?parsed.secciones:null;
+      if(!Array.isArray(registros))throw new Error("Formato inválido");
+
+      if(db){
+        // Con Firebase: merge en batch
+        const batch=db.batch();
+        registros.forEach(r=>{
+          const {id:_,...rest}=r;
+          const ref=db.collection("pinturas").doc();
+          batch.set(ref,{...rest,_importado:true});
+        });
+        batch.commit().then(()=>{
+          toast("✓",`${registros.length} registros importados a Firebase`);
+          if(secsImport){
+            const sb=db.batch();
+            secsImport.forEach(s=>{const {id:_,...rest}=s;sb.set(db.collection("secciones").doc(),rest);});
+            sb.commit();
+          }
+        }).catch(()=>toast("⚠","Error al importar a Firebase"));
+      } else {
+        // Sin Firebase: merge local evitando duplicados por np+cat
+        const keys=new Set(data.map(r=>r.cat+"|"+r.np));
+        const nuevos=registros.filter(r=>!keys.has(r.cat+"|"+r.np));
+        data=[...nuevos,...data];
+        if(secsImport){
+          const secKeys=new Set(secciones.map(s=>s.name.toLowerCase()));
+          secsImport.forEach(s=>{if(!secKeys.has(s.name.toLowerCase()))secciones.push(s);});
+          rebuildSelects();buildTabs();
+        }
+        render();
+        toast("✓",`${nuevos.length} registros nuevos importados`);
+      }
+    }catch(err){toast("⚠","Archivo inválido — verifica el JSON");}
+    event.target.value="";
+  };
+  reader.readAsText(file);
+}
+
+initFirebase();
+</script>
+
+<script>
+/* PWA OFFLINE — registro compartido para GitHub Pages */
+(function(){
+  const APP_FILE = './np.html';
+  const APP_NAME = 'Números de Parte';
+
+  function npToast(msg){
+    try {
+      if (typeof toast === 'function') { toast('📲', msg); return; }
+      console.log(msg);
+    } catch(e) { console.log(msg); }
+  }
+
+  window.addEventListener('online', () => {
+    npToast('Conexión recuperada. Revisando actualizaciones...');
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({type:'CHECK_UPDATE', file: APP_FILE});
+    }
+  });
+
+  window.addEventListener('offline', () => {
+    npToast('Modo sin datos: usando información guardada');
+  });
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+        console.log('SW compartido registrado:', reg.scope);
+
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({type:'CACHE_APP', file: APP_FILE});
+        }
+
+        reg.addEventListener('updatefound', () => {
+          const nuevoSW = reg.installing;
+          if (!nuevoSW) return;
+          nuevoSW.addEventListener('statechange', () => {
+            if (nuevoSW.state === 'installed' && navigator.serviceWorker.controller) {
+              npToast('Nueva versión lista. Abre de nuevo la app.');
+            }
+          });
+        });
+
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (!event.data) return;
+          if (event.data.type === 'APP_UPDATED' && event.data.file === APP_FILE) {
+            npToast(APP_NAME + ' actualizado. Recargando...');
+            setTimeout(() => location.reload(), 900);
+          }
+        });
+      } catch (e) {
+        console.warn('SW error:', e);
+      }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

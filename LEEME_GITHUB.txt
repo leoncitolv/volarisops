@@ -1,0 +1,7 @@
+VolApp - paquete para GitHub
+
+Sube estos archivos juntos en la misma carpeta:
+- index.html
+- horarios.html
+
+El botón Horarios del index apunta a ./horarios.html con ruta relativa, por eso funciona en GitHub Pages cuando ambos archivos están en la misma carpeta.
