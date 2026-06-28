@@ -2,8 +2,8 @@
    Un solo sw.js para toda la carpeta de GitHub Pages.
    Controla: index + VolarisOps + Reports + Paint + NP + Horarios. */
 const CACHE_PREFIX = 'volaris-suite';
-const APP_CACHE = `${CACHE_PREFIX}-app-v9`; // v9 fuerza limpieza de caché tras fix VolarisOps
-const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-v9`; // v9
+const APP_CACHE = `${CACHE_PREFIX}-app-v10`; // v10 fuerza limpieza de caché para VolarisOps 5.0
+const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-v10`; // v10
 
 const APP_SHELL = [
   './',
