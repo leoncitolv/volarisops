@@ -1,0 +1,47 @@
+name: Volaris Ops Telegram
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: volaris-ops-telegram
+  cancel-in-progress: false
+
+jobs:
+  check-ops:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Revisar Volaris Ops y mandar Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          APP_TIMEZONE: ${{ vars.APP_TIMEZONE || 'America/Mexico_City' }}
+          APP_BASE_URL: ${{ vars.APP_BASE_URL }}
+        run: python scripts/check_ops_telegram.py
+
+      - name: Guardar historial de avisos enviados
+        run: |
+          if git diff --quiet .ops_telegram_state.json; then
+            echo "Sin cambios en .ops_telegram_state.json"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .ops_telegram_state.json
+          git commit -m "Actualizar historial Telegram Volaris Ops"
+          git push
