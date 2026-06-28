@@ -32,6 +32,7 @@ jobs:
           OPS_FIREBASE_API_KEY: ${{ secrets.OPS_FIREBASE_API_KEY }}
           OPS_FIREBASE_AUTH_EMAIL: ${{ secrets.OPS_FIREBASE_AUTH_EMAIL }}
           OPS_FIREBASE_AUTH_PASSWORD: ${{ secrets.OPS_FIREBASE_AUTH_PASSWORD }}
+          OPS_FIREBASE_URL: ${{ secrets.OPS_FIREBASE_URL }}
           APP_TIMEZONE: ${{ vars.APP_TIMEZONE || 'America/Mexico_City' }}
           APP_BASE_URL: ${{ vars.APP_BASE_URL }}
         run: python scripts/check_ops_telegram.py
