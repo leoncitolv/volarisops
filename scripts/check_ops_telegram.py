@@ -288,6 +288,57 @@ def build_closed_message(mat: str, entry: dict[str, Any], tz) -> str:
     return "\n".join(lines)
 
 
+
+
+def history_close_events(entry: dict[str, Any]) -> list[dict[str, Any]]:
+    """Devuelve eventos de historial donde alguien marcó una tarea como realizada.
+
+    La app VolarisOps registra action='cierra' cada vez que se palomea un ítem.
+    Esto permite avisar incluso cuando la nota tiene varios ítems y todavía no todos están cerrados.
+    """
+    hist = entry.get("history")
+    if not isinstance(hist, list):
+        return []
+    events: list[dict[str, Any]] = []
+    for item in hist:
+        if not isinstance(item, dict):
+            continue
+        if item.get("action") != "cierra":
+            continue
+        try:
+            ts = int(item.get("ts") or 0)
+        except Exception:
+            ts = 0
+        if not ts:
+            continue
+        events.append(item)
+    return events
+
+
+def user_from_history_event(event: dict[str, Any]) -> str:
+    name = str(event.get("userName") or "?").strip()
+    num = str(event.get("userNum") or "").strip()
+    return f"{name} #{num}" if num else name
+
+
+def build_item_closed_message(mat: str, entry: dict[str, Any], event: dict[str, Any], tz) -> str:
+    texto = text_from_entry(entry)
+    urgent = texto.strip().startswith("⚠️")
+    title = "🚨 <b>Ítem realizado · URGENTE</b>" if urgent else "✅ <b>Ítem marcado como realizado</b>"
+    lines = [
+        "🛫 <b>Volaris Ops</b>",
+        title,
+        f"✈️ Matrícula: <b>{html.escape(mat)}</b>",
+        f"👤 Por: {html.escape(user_from_history_event(event))}",
+        f"🕐 {html.escape(fmt_ms(event.get('ts'), tz))}",
+    ]
+    if texto:
+        lines.append("📝 " + html.escape(texto))
+    if app_link():
+        lines.append("Abrir app: " + html.escape(app_link()))
+    return "\n".join(lines)
+
+
 def iter_entries(data: dict[str, Any]):
     for mat_key, meta in data.items():
         if not isinstance(meta, dict):
@@ -331,11 +382,29 @@ def main() -> int:
         if created_ts and not state.get(created_key):
             seen_created += 1
             should_send = (not first_run) or created_ts >= cutoff
+            print(f"Nueva nota detectada: {mat} / {entry_id} / ts={created_ts} / enviar={should_send}")
             if should_send:
                 if telegram_send(build_created_message(mat, entry, tz)):
                     sent += 1
             state[created_key] = {"mat": mat, "entry_id": entry_id, "ts": created_ts, "type": "created"}
 
+        # 1) Aviso por cada palomita/cierre registrado en history.
+        # Esto cubre notas con varios ítems donde solo se cerró uno.
+        for ev in history_close_events(entry):
+            cts = int(ev.get("ts") or 0)
+            closed_key = f"history_closed|{mat_key}|{entry_id}|{cts}"
+            if state.get(closed_key):
+                continue
+            seen_closed += 1
+            should_send = (not first_run) or cts >= cutoff
+            print(f"Cierre/ítem detectado: {mat} / {entry_id} / ts={cts} / enviar={should_send}")
+            if should_send:
+                if telegram_send(build_item_closed_message(mat, entry, ev, tz)):
+                    sent += 1
+            state[closed_key] = {"mat": mat, "entry_id": entry_id, "ts": cts, "type": "history_closed"}
+
+        # 2) Aviso de trabajo totalmente cerrado si todos los ítems quedaron listos.
+        # Se conserva para distinguir cierre total de cierre parcial.
         if is_entry_closed(entry):
             cts = closed_ts_from_entry(entry)
             if cts:
@@ -343,6 +412,7 @@ def main() -> int:
                 if not state.get(closed_key):
                     seen_closed += 1
                     should_send = (not first_run) or cts >= cutoff
+                    print(f"Trabajo completo detectado: {mat} / {entry_id} / ts={cts} / enviar={should_send}")
                     if should_send:
                         if telegram_send(build_closed_message(mat, entry, tz)):
                             sent += 1
