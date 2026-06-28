@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Volaris Ops · notificaciones Telegram seguras.
 
-Lee Firebase Realtime Database con REST, detecta notas nuevas y trabajos cerrados,
+Lee Firebase Realtime Database con REST, detecta notas nuevas, ítems palomeados y trabajos cerrados,
 y envía mensajes por Telegram usando secretos de GitHub Actions.
 
 No requiere paquetes externos.
@@ -43,9 +43,37 @@ def now_ms() -> int:
     return int(datetime.now(timezone.utc).timestamp() * 1000)
 
 
+def to_int_ms(value: Any) -> int:
+    """Convierte timestamps de Firebase a milisegundos de forma tolerante."""
+    if value is None:
+        return 0
+    try:
+        if isinstance(value, (int, float)):
+            return int(value)
+        s = str(value).strip()
+        if not s:
+            return 0
+        if s.isdigit():
+            return int(s)
+        return int(float(s))
+    except Exception:
+        return 0
+
+
+def ts_from_entry_id(entry_id: str) -> int:
+    """Extrae el timestamp de IDs tipo e_1710000000000_abc."""
+    try:
+        parts = str(entry_id).split("_")
+        if len(parts) >= 2 and parts[0] == "e" and parts[1].isdigit():
+            return int(parts[1])
+    except Exception:
+        pass
+    return 0
+
+
 def ms_to_dt(ms: Any, tz) -> datetime | None:
     try:
-        return datetime.fromtimestamp(int(ms) / 1000, tz=timezone.utc).astimezone(tz)
+        return datetime.fromtimestamp(to_int_ms(ms) / 1000, tz=timezone.utc).astimezone(tz)
     except Exception:
         return None
 
@@ -221,7 +249,7 @@ def closer_from_entry(entry: dict[str, Any]) -> str:
 def closed_ts_from_entry(entry: dict[str, Any]) -> int | None:
     if entry.get("closedTs"):
         try:
-            return int(entry["closedTs"])
+            return to_int_ms(entry["closedTs"])
         except Exception:
             pass
     hist = entry.get("history")
@@ -229,7 +257,7 @@ def closed_ts_from_entry(entry: dict[str, Any]) -> int | None:
         for item in reversed(hist):
             if isinstance(item, dict) and item.get("action") == "cierra" and item.get("ts"):
                 try:
-                    return int(item["ts"])
+                    return to_int_ms(item["ts"])
                 except Exception:
                     return None
     return None
@@ -287,6 +315,65 @@ def build_closed_message(mat: str, entry: dict[str, Any], tz) -> str:
         lines.append("Abrir app: " + html.escape(app_link()))
     return "\n".join(lines)
 
+
+
+
+def history_create_events(entry: dict[str, Any]) -> list[dict[str, Any]]:
+    """Devuelve eventos de historial donde se creó una nota/tarea."""
+    hist = entry.get("history")
+    if not isinstance(hist, list):
+        return []
+    events: list[dict[str, Any]] = []
+    for item in hist:
+        if not isinstance(item, dict):
+            continue
+        if item.get("action") != "crea":
+            continue
+        if not to_int_ms(item.get("ts")):
+            continue
+        events.append(item)
+    return events
+
+
+def created_ts_from_entry(entry_id: str, entry: dict[str, Any]) -> int:
+    """Obtiene la mejor hora de creación disponible.
+
+    Algunas versiones de la app guardan `ts`; otras dejan la evidencia más clara
+    en `history` con action='crea'. Como respaldo final, el id `e_<ts>_xxx`
+    también contiene el timestamp.
+    """
+    for key in ("ts", "createdTs", "createdAt"):
+        ts = to_int_ms(entry.get(key))
+        if ts:
+            return ts
+    events = history_create_events(entry)
+    if events:
+        return to_int_ms(events[0].get("ts"))
+    return ts_from_entry_id(entry_id)
+
+
+def creator_from_history_event(event: dict[str, Any]) -> str:
+    name = str(event.get("userName") or "?").strip()
+    num = str(event.get("userNum") or "").strip()
+    return f"{name} #{num}" if num else name
+
+
+def build_created_message_from_event(mat: str, entry: dict[str, Any], event: dict[str, Any], tz) -> str:
+    texto = text_from_entry(entry)
+    urgent = texto.strip().startswith("⚠️")
+    title = "🚨 <b>Nueva tarea creada · URGENTE</b>" if urgent else "🆕 <b>Nueva tarea creada</b>"
+    lines = [
+        "🛫 <b>Volaris Ops</b>",
+        title,
+        f"✈️ Matrícula: <b>{html.escape(mat)}</b>",
+        f"👤 Por: {html.escape(creator_from_history_event(event))}",
+        f"🕐 {html.escape(fmt_ms(event.get('ts'), tz))}",
+    ]
+    if texto:
+        lines.append("📝 " + html.escape(texto))
+    if app_link():
+        lines.append("Abrir app: " + html.escape(app_link()))
+    return "\n".join(lines)
 
 
 
@@ -377,21 +464,52 @@ def main() -> int:
     seen_closed = 0
 
     for mat_key, mat, entry_id, entry in entries:
-        created_ts = int(entry.get("ts") or 0) if str(entry.get("ts") or "").isdigit() else 0
+        created_ts = created_ts_from_entry(entry_id, entry)
         created_key = f"created|{mat_key}|{entry_id}|{created_ts}"
+        primary_created_sent_this_run = False
         if created_ts and not state.get(created_key):
             seen_created += 1
             should_send = (not first_run) or created_ts >= cutoff
-            print(f"Nueva nota detectada: {mat} / {entry_id} / ts={created_ts} / enviar={should_send}")
+            print(f"Nueva nota detectada por entry.ts/id: {mat} / {entry_id} / ts={created_ts} / enviar={should_send}")
             if should_send:
                 if telegram_send(build_created_message(mat, entry, tz)):
                     sent += 1
-            state[created_key] = {"mat": mat, "entry_id": entry_id, "ts": created_ts, "type": "created"}
+                    primary_created_sent_this_run = True
+                    state[created_key] = {"mat": mat, "entry_id": entry_id, "ts": created_ts, "type": "created"}
+                else:
+                    print("No marco como enviada la creación porque Telegram falló; se reintentará.")
+            else:
+                state[created_key] = {"mat": mat, "entry_id": entry_id, "ts": created_ts, "type": "created_seen_first_run"}
+
+        # 0b) Respaldo: detectar creación desde history.action='crea'.
+        # Esto corrige casos donde la creación quedó registrada en historial pero
+        # una versión anterior del detector no mandó alerta de nueva tarea.
+        for ev in history_create_events(entry):
+            hts = to_int_ms(ev.get("ts"))
+            h_created_key = f"history_created|{mat_key}|{entry_id}|{hts}"
+            if state.get(h_created_key):
+                continue
+            if primary_created_sent_this_run:
+                state[h_created_key] = {"mat": mat, "entry_id": entry_id, "ts": hts, "type": "history_created_linked"}
+                continue
+            # Como este detector se agregó después, no queremos inundar el grupo con
+            # notas antiguas. Solo manda creaciones de historial dentro de la ventana
+            # reciente configurada por OPS_FIRST_RUN_LOOKBACK_MINUTES.
+            should_send = hts >= cutoff
+            print(f"Nueva nota detectada por historial: {mat} / {entry_id} / ts={hts} / enviar={should_send}")
+            if should_send:
+                if telegram_send(build_created_message_from_event(mat, entry, ev, tz)):
+                    sent += 1
+                    state[h_created_key] = {"mat": mat, "entry_id": entry_id, "ts": hts, "type": "history_created"}
+                else:
+                    print("No marco como enviada la creación de historial porque Telegram falló; se reintentará.")
+            else:
+                state[h_created_key] = {"mat": mat, "entry_id": entry_id, "ts": hts, "type": "history_created_old_seen"}
 
         # 1) Aviso por cada palomita/cierre registrado en history.
         # Esto cubre notas con varios ítems donde solo se cerró uno.
         for ev in history_close_events(entry):
-            cts = int(ev.get("ts") or 0)
+            cts = to_int_ms(ev.get("ts"))
             closed_key = f"history_closed|{mat_key}|{entry_id}|{cts}"
             if state.get(closed_key):
                 continue
