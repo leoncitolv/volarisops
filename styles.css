@@ -1717,7 +1717,7 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
 
 
 
-/* === TOP BAR OPTION 3 · VOLARIS OPS 3.0 === */
+/* === TOP BAR OPTION 3 · VOLARIS OPS 4.0 === */
 .top-bar.topbar-v30-option3{
   flex-wrap:nowrap ;
   overflow-x:auto ;
@@ -2043,4 +2043,344 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
 [data-theme="light"] .historial-text,
 [data-theme="light"] .nota-personal-date{
   color:var(--text-muted) !important;
+}
+
+
+/* === AJUSTE VISUAL · junio 2026 === */
+.top-bar.topbar-v30-option3 #syncBadge{display:none !important;}
+#sectionInicio .quick-btn .radar-inline-live{display:none !important;}
+#sectionInicio .quick-btn .radar-status-badge{line-height:1;}
+#sectionInicio .quick-btn.v2-radar::after{display:none !important; content:none !important;}
+
+
+/* ==========================================================
+   VOLARIS OPS v4.0 — Pulido visual pantalla principal
+   Ajusta solo Inicio: topbar, hero, quick cards, badges y footer.
+========================================================== */
+:root{
+  --home-v4-x: clamp(.92rem, 3.4vw, 1.18rem);
+  --home-v4-gap: clamp(.72rem, 2.5vw, .95rem);
+  --home-v4-card-radius: 26px;
+}
+
+/* Contenedor principal más respirable en móvil */
+#mainContent{
+  padding-bottom: max(2.4rem, env(safe-area-inset-bottom, 0px) + 1.4rem) !important;
+}
+#sectionInicio{
+  padding-top: .12rem !important;
+}
+
+/* Barra superior v4.0: compacta, sin badge de conexión duplicado */
+.top-bar.topbar-v30-option3{
+  width: calc(100% - (var(--home-v4-x) * 2)) !important;
+  margin: .72rem var(--home-v4-x) .55rem !important;
+  padding: .48rem .62rem !important;
+  gap: .46rem !important;
+  border-radius: 24px !important;
+  overflow: hidden !important;
+  min-height: 58px !important;
+  border: 1px solid rgba(220,180,255,.16) !important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.035)),
+    rgba(12,6,24,.74) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+.top-bar.topbar-v30-option3 #syncBadge,
+.top-bar.topbar-v30-option3 #btnTheme,
+.top-bar.topbar-v30-option3 .v2-bell{
+  display:none !important;
+}
+.top-bar.topbar-v30-option3 .logo-volaris,
+.top-bar .logo-volaris{
+  width: 98px !important;
+  min-width: 98px !important;
+  height: 36px !important;
+  padding: 6px 10px !important;
+  margin: 0 .18rem 0 0 !important;
+  border-radius: 999px !important;
+}
+.top-bar.topbar-v30-option3 .top-user-chip{
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  gap: .55rem !important;
+  padding: .02rem .12rem .02rem .02rem !important;
+  margin: 0 !important;
+}
+.top-bar.topbar-v30-option3 .top-user-avatar{
+  width: 48px !important;
+  min-width: 48px !important;
+  height: 48px !important;
+  font-size: .98rem !important;
+}
+.top-bar.topbar-v30-option3 .top-user-name{
+  max-width: 118px !important;
+  font-size: 1.36rem !important;
+  line-height: .86 !important;
+}
+.top-bar.topbar-v30-option3 .top-user-emp{
+  font-size: .48rem !important;
+  letter-spacing: .18em !important;
+}
+.top-bar.topbar-v30-option3 .top-bar-spacer{
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+.top-bar.topbar-v30-option3 .top-role-switch{
+  flex: 0 0 auto !important;
+  gap: .26rem !important;
+}
+.top-bar.topbar-v30-option3 #btnUserManager,
+.top-bar.topbar-v30-option3 .top-role-ghost{
+  display:none !important;
+}
+.top-bar.topbar-v30-option3 #rolBadgeTop{
+  min-height: 32px !important;
+  padding: .14rem .62rem !important;
+  font-size: .48rem !important;
+  letter-spacing: .07em !important;
+  max-width: 58px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Tarjeta de bienvenida más limpia */
+#sectionInicio .hero-card{
+  margin: .72rem var(--home-v4-x) 0 !important;
+  padding: 1.08rem 1.15rem !important;
+  min-height: 118px !important;
+  border-radius: 26px !important;
+  gap: .92rem !important;
+  background:
+    linear-gradient(135deg,rgba(178,76,255,.20),rgba(92,22,158,.34)),
+    radial-gradient(circle at 14% 20%,rgba(255,255,255,.08),transparent 36%) !important;
+  border:1px solid rgba(226,181,255,.17) !important;
+  box-shadow: 0 18px 42px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+#sectionInicio .hero-card-icon{
+  width: 72px !important;
+  height: 72px !important;
+  min-width: 72px !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: 0 14px 26px rgba(0,0,0,.28), 0 0 24px rgba(178,76,255,.18) !important;
+}
+#sectionInicio .hero-card-title{
+  font-size: clamp(1.03rem, 4.7vw, 1.24rem) !important;
+  letter-spacing: .14em !important;
+  color:#f5eaff !important;
+}
+#sectionInicio .hero-card-sub{
+  margin-top:.32rem !important;
+  font-size: clamp(.70rem, 3.1vw, .83rem) !important;
+  line-height:1.35 !important;
+  color:rgba(231,205,255,.62) !important;
+  letter-spacing:.08em !important;
+}
+
+/* Encabezado de sección */
+#sectionInicio .sec-label{
+  padding: 1.03rem var(--home-v4-x) .48rem !important;
+  font-size: .58rem !important;
+  letter-spacing: .24em !important;
+  color: rgba(231,205,255,.46) !important;
+}
+
+/* Grid principal más balanceado */
+#sectionInicio .quick-grid{
+  gap: var(--home-v4-gap) !important;
+  padding: .52rem var(--home-v4-x) 0 !important;
+}
+#sectionInicio .quick-grid .quick-btn{
+  min-height: 152px !important;
+  border-radius: var(--home-v4-card-radius) !important;
+  padding: 1.05rem 1rem .92rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 16px 36px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+#sectionInicio .quick-grid .quick-icon{
+  width: 54px !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius: 18px !important;
+  margin-bottom: .46rem !important;
+  font-size: 1.32rem !important;
+}
+#sectionInicio .quick-grid .quick-label{
+  font-size: clamp(.76rem, 3.35vw, .92rem) !important;
+  letter-spacing:.15em !important;
+  line-height:1.1 !important;
+}
+#sectionInicio .quick-grid .quick-btn p{
+  margin-top:.48rem !important;
+  font-size:.61rem !important;
+  line-height:1.35 !important;
+}
+
+/* Nueva Nota: se mantiene protagonista, centrada y limpia */
+#sectionInicio .quick-grid .quick-btn.v2-new{
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  padding-top: 1.15rem !important;
+}
+#sectionInicio .quick-grid .quick-btn.v2-new .quick-icon{
+  width: 70px !important;
+  height: 70px !important;
+  border-radius: 50% !important;
+  margin: 0 auto .62rem !important;
+  font-size: 2.05rem !important;
+  background: rgba(255,255,255,.92) !important;
+  color:#150524 !important;
+}
+
+/* Badges dentro de las tarjetas, sin montarse en el borde */
+#sectionInicio #homeMatBadge,
+#sectionInicio #homeGlobalBadge{
+  top:.68rem !important;
+  left:.78rem !important;
+  transform:none !important;
+  animation:none !important;
+  font-size:.50rem !important;
+  padding:.16rem .52rem !important;
+  max-width: calc(100% - 4.2rem) !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 8px 16px rgba(0,0,0,.12) !important;
+}
+#sectionInicio #homeMatCount,
+#sectionInicio #homeGlobalCount{
+  top:.68rem !important;
+  right:.78rem !important;
+  width:28px !important;
+  height:28px !important;
+  font-size:.72rem !important;
+}
+#sectionInicio .quick-btn.v2-mat,
+#sectionInicio .quick-btn.v2-global{
+  padding-top: 2.62rem !important;
+}
+#sectionInicio .quick-btn.v2-mat .quick-icon,
+#sectionInicio .quick-btn.v2-global .quick-icon{
+  margin-bottom: .42rem !important;
+}
+#sectionInicio .quick-btn.v2-mat > div,
+#sectionInicio .quick-btn.v2-global > div{
+  height: 6px !important;
+  border-radius: 999px !important;
+  margin-top: .84rem !important;
+}
+
+/* Flight Radar: sin etiquetas duplicadas ni montadas */
+#sectionInicio .quick-btn.v2-radar{
+  padding-top: 2.38rem !important;
+}
+#sectionInicio .quick-btn.v2-radar .radar-status-badge{
+  top:.70rem !important;
+  left:.78rem !important;
+  transform:none !important;
+  animation:none !important;
+  font-size:.50rem !important;
+  padding:.16rem .52rem !important;
+  max-width: calc(100% - 1.55rem) !important;
+}
+#sectionInicio .quick-btn.v2-radar .radar-inline-live,
+#sectionInicio .quick-btn.v2-radar::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* Barra de sincronización menos pesada */
+#sectionInicio .info-strip{
+  margin: 1rem var(--home-v4-x) 0 !important;
+  padding: .82rem 1rem !important;
+  border-radius: 20px !important;
+  gap: .68rem !important;
+  background: rgba(255,255,255,.055) !important;
+  border:1px solid rgba(226,181,255,.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+#sectionInicio .info-strip span:last-child{
+  font-size: clamp(.66rem, 2.75vw, .78rem) !important;
+  letter-spacing:.07em !important;
+  color:rgba(231,205,255,.56) !important;
+}
+
+/* Footer v4.0 más cercano y alineado */
+#sectionInicio .footer-version,
+#sectionInicio [class*="footer"]{
+  margin-top: 4.2rem !important;
+}
+#sectionInicio > div[style*="by laraclv"]{
+  margin-top: 4.2rem !important;
+}
+
+/* Ajustes específicos para pantallas estrechas como iPhone */
+@media(max-width:430px){
+  :root{--home-v4-x:.92rem;--home-v4-gap:.72rem;}
+  .top-bar.topbar-v30-option3{
+    min-height: 56px !important;
+    padding:.44rem .52rem !important;
+    gap:.36rem !important;
+  }
+  .top-bar.topbar-v30-option3 .logo-volaris,
+  .top-bar .logo-volaris{
+    width: 90px !important;
+    min-width: 90px !important;
+    height: 34px !important;
+    padding:6px 8px !important;
+  }
+  .top-bar.topbar-v30-option3 .top-user-avatar{
+    width:44px !important;
+    min-width:44px !important;
+    height:44px !important;
+  }
+  .top-bar.topbar-v30-option3 .top-user-name{
+    max-width: 98px !important;
+    font-size:1.22rem !important;
+  }
+  .top-bar.topbar-v30-option3 #rolBadgeTop{
+    max-width: 50px !important;
+    padding:.12rem .46rem !important;
+  }
+  #sectionInicio .hero-card{
+    min-height:112px !important;
+    padding:1rem !important;
+    gap:.82rem !important;
+  }
+  #sectionInicio .hero-card-icon{
+    width:64px !important;
+    min-width:64px !important;
+    height:64px !important;
+    border-radius:18px !important;
+  }
+  #sectionInicio .quick-grid .quick-btn{
+    min-height: 146px !important;
+    padding-left:.88rem !important;
+    padding-right:.88rem !important;
+  }
+  #sectionInicio .quick-grid .quick-icon{
+    width:50px !important;
+    height:50px !important;
+    min-height:50px !important;
+  }
+  #sectionInicio .quick-grid .quick-btn.v2-new .quick-icon{
+    width:64px !important;
+    height:64px !important;
+    font-size:1.9rem !important;
+  }
+}
+
+@media(max-width:370px){
+  .top-bar.topbar-v30-option3 .logo-volaris,
+  .top-bar .logo-volaris{
+    width: 82px !important;
+    min-width: 82px !important;
+  }
+  .top-bar.topbar-v30-option3 .top-user-name{max-width:82px !important;font-size:1.08rem !important;}
+  .top-bar.topbar-v30-option3 #rolBadgeTop{display:none !important;}
+  #sectionInicio .quick-grid .quick-btn{min-height:138px !important;}
 }
