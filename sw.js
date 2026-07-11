@@ -21,8 +21,6 @@ const APP_SHELL = [
   './manifest-horarios.json',
   './icon-192.png',
   './icon-512.png',
-  './targaryen-logo.png',
-  './targaryen-banner.jpg',
   './icon-paint-192.png',
   './icon-paint-512.png',
   './icon-np-192.png',
