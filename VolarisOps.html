@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Volaris Ops"/>
-<link rel="stylesheet" href="styles.css?v=5.2-bot-topbar"/>
+<link rel="stylesheet" href="styles.css?v=5.2"/>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -108,9 +108,13 @@
           <p id="homeGlobalProgressText" style="margin:0.3rem 0 0;font-size:0.58rem;color:rgba(85,200,255,0.6);font-weight:600;">0% completado</p>
         </button>
       </div>
-      <div class="info-strip">
-        <span style="font-size:1rem;">🔄</span>
-        <span style="font-size:clamp(.68rem,2.5vw,.77rem);font-weight:700;color:rgba(180,140,255,.5);letter-spacing:.04em;">Sincronización en tiempo real · Firebase</span>
+      <div class="targaryen-sync-card" aria-label="Sincronización con House Targaryen">
+        <img src="targaryen-dragon.png" alt="Emblema House Targaryen" class="targaryen-sync-icon">
+        <div class="targaryen-sync-copy">
+          <strong>Sincronización en tiempo real</strong>
+          <span>Conectado con House Targaryen</span>
+        </div>
+        <span class="targaryen-online-dot" aria-label="Conectado"></span>
       </div>
     </div>
 
@@ -152,12 +156,11 @@
   <button class="btn-nueva-nota" id="btnNuevaNota" onclick="openModal('new')" style="display:none;">＋</button>
 
   <!-- FOOTER VERSION -->
-  <div style="text-align:center;padding:2.2rem 1rem 5.5rem;pointer-events:none;user-select:none;">
-    <div style="display:inline-flex;flex-direction:column;align-items:center;gap:.22rem;opacity:.28;">
-      <span style="font-style:italic;font-family:Georgia,'Times New Roman',serif;font-size:.72rem;letter-spacing:.06em;color:var(--text-main);">by laraclv</span>
-      <span style="font-size:.52rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--text-main);font-family:'Nunito',sans-serif;">v 5.2 Bot Top</span>
+  <div class="targaryen-footer" aria-label="House Targaryen">
+      <img src="targaryen-brand.png" alt="House Targaryen" class="targaryen-footer-logo">
+      <span class="targaryen-byline">by laraclv</span>
+      <span class="targaryen-version">v 5.2 BOT TOP</span>
     </div>
-  </div>
 </div>
 
 <!-- PANTALLA CARPETA -->
@@ -1764,91 +1767,10 @@ function openOpsGithubTriggerConfig(){
 window.openOpsGithubTriggerConfig = openOpsGithubTriggerConfig;
 
 (function injectOpsBotButton(){
-  /* Bot integrado a la barra superior: junto a Supervisor / Usuario,
-     ya no queda fijo encima de la tarjeta principal. */
-  const styleAsTopbarChip = (b) => {
-    b.style.cssText = [
-      'position:static',
-      'right:auto',
-      'top:auto',
-      'bottom:auto',
-      'z-index:auto',
-      'display:inline-flex',
-      'align-items:center',
-      'justify-content:center',
-      'flex-shrink:0',
-      'min-height:24px',
-      'border:none',
-      'border-radius:999px',
-      'padding:.18rem .58rem',
-      'background:linear-gradient(135deg,rgba(110,40,255,.95),rgba(180,65,255,.95))',
-      'color:#fff',
-      'font-family:Nunito,sans-serif',
-      'font-size:.6rem',
-      'font-weight:950',
-      'letter-spacing:.06em',
-      'text-transform:uppercase',
-      'box-shadow:0 8px 22px rgba(110,40,255,.28)',
-      'cursor:pointer',
-      'white-space:nowrap'
-    ].join(';') + ';';
-  };
-
-  const ensureTopRoleSwitch = () => {
-    const top = document.querySelector('.top-bar');
-    if(!top) return null;
-
-    let switcher = document.getElementById('topRoleSwitch');
-    if(!switcher){
-      switcher = document.createElement('div');
-      switcher.id = 'topRoleSwitch';
-      switcher.className = 'top-role-switch';
-      const spacer = top.querySelector('.top-bar-spacer');
-      const themeBtn = document.getElementById('btnTheme');
-      top.insertBefore(switcher, spacer || themeBtn || null);
-    }
-    return switcher;
-  };
-
-  const placeBotInTopbar = () => {
-    let b = document.getElementById('btnOpsBotConfig');
-    if(!b){
-      b = document.createElement('button');
-      b.id = 'btnOpsBotConfig';
-      b.textContent = '⚡ Bot';
-      b.title = 'Configurar disparo seguro de GitHub Actions';
-      b.onclick = openOpsGithubTriggerConfig;
-    }
-
-    styleAsTopbarChip(b);
-
-    const switcher = ensureTopRoleSwitch();
-    if(!switcher){
-      document.body.appendChild(b);
-      return;
-    }
-
-    // Mantener el orden: Supervisor → Usuario → Bot
-    const userBtn = document.getElementById('btnUserManager');
-    const ghost = switcher.querySelector('.top-role-ghost');
-    const roleBadge = document.getElementById('rolBadgeTop');
-    const anchor = userBtn || ghost || roleBadge;
-
-    if(anchor && anchor.parentNode === switcher){
-      if(anchor.nextSibling !== b) switcher.insertBefore(b, anchor.nextSibling);
-    }else if(b.parentNode !== switcher){
-      switcher.appendChild(b);
-    }
-  };
-
-  const make = () => {
-    placeBotInTopbar();
-    // Reacomoda si la barra crea después los chips de rol / usuarios.
-    [150, 400, 900, 1600, 3000, 5000].forEach(ms => setTimeout(placeBotInTopbar, ms));
-  };
-
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', make);
-  else make();
+  // v5.0 compartida: el botón ⚡ Bot queda oculto para usuarios finales.
+  // El código seguro de disparo se conserva; si este navegador ya tenía token local configurado,
+  // tgNotify puede seguir disparando GitHub Actions sin exponer Telegram en el HTML.
+  return;
 })();
 
 function tgMsgToggle(newDone, nombre, textoNota, perfil){

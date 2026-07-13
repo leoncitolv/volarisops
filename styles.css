@@ -2385,258 +2385,48 @@ html,body{font-family:'Manrope','Nunito',system-ui,-apple-system,BlinkMacSystemF
   #sectionInicio .quick-grid .quick-btn{min-height:138px !important;}
 }
 
-/* ==========================================================
-   VOLARIS OPS v5.0 — MODO MODERADO + ANTI ZOOM iOS
-   Objetivo: bajar la escala visual de Inicio sin cambiar lógica.
-   También evita que Safari/iPhone haga zoom al tocar inputs.
-========================================================== */
-html{
-  -webkit-text-size-adjust:100% !important;
-  text-size-adjust:100% !important;
-}
-body{
-  overscroll-behavior-y:none;
-}
-input,
-textarea,
-select,
-button{
-  -webkit-tap-highlight-color:transparent;
-}
-input,
-textarea,
-select,
-.search-box input,
-.login-input,
-.input-field,
-.input-modal,
-.user-add-input,
-.item-editor-input{
-  font-size:16px !important; /* evita zoom automático de iOS al enfocar */
-}
 
-/* Escala base moderada para pantalla principal */
-:root{
-  --home-v5-x:clamp(.78rem,2.8vw,.95rem);
-  --home-v5-gap:clamp(.52rem,2.1vw,.72rem);
-  --home-v5-radius:22px;
+/* ══════════════════════════════════════
+   HOUSE TARGARYEN — HOME MOBILE
+══════════════════════════════════════ */
+.targaryen-sync-card{
+  margin:1.15rem .9rem 0;
+  min-height:92px;
+  padding:.72rem .9rem;
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr) 18px;
+  align-items:center;
+  gap:.72rem;
+  border:1.5px solid #ff101c;
+  border-radius:30px;
+  background:linear-gradient(110deg,rgba(13,0,14,.96),rgba(15,4,30,.94));
+  box-shadow:0 0 22px rgba(255,0,20,.18),inset 0 1px 0 rgba(255,255,255,.04);
+  overflow:hidden;
 }
-
-#mainContent{
-  padding-bottom:max(2rem, env(safe-area-inset-bottom, 0px) + 1.1rem) !important;
+.targaryen-sync-icon{
+  width:72px;height:72px;object-fit:cover;object-position:center;
+  border-radius:50%;filter:drop-shadow(0 0 7px rgba(255,0,20,.35));
 }
-#sectionInicio{
-  padding-top:0 !important;
-}
-
-/* Barra superior más compacta */
-.top-bar.topbar-v30-option3{
-  width:calc(100% - (var(--home-v5-x) * 2)) !important;
-  margin:.56rem var(--home-v5-x) .36rem !important;
-  padding:.36rem .46rem !important;
-  gap:.32rem !important;
-  min-height:50px !important;
-  border-radius:21px !important;
-}
-.top-bar.topbar-v30-option3 .logo-volaris,
-.top-bar .logo-volaris{
-  width:82px !important;
-  min-width:82px !important;
-  height:31px !important;
-  padding:5px 8px !important;
-}
-.top-bar.topbar-v30-option3 .top-user-chip{
-  gap:.42rem !important;
-  padding:0 .08rem 0 0 !important;
-}
-.top-bar.topbar-v30-option3 .top-user-avatar{
-  width:39px !important;
-  min-width:39px !important;
-  height:39px !important;
-  font-size:.82rem !important;
-}
-.top-bar.topbar-v30-option3 .top-user-name{
-  max-width:88px !important;
-  font-size:1.06rem !important;
-  line-height:.88 !important;
-}
-.top-bar.topbar-v30-option3 .top-user-emp{
-  font-size:.42rem !important;
-  letter-spacing:.16em !important;
-}
-.top-bar.topbar-v30-option3 #rolBadgeTop{
-  min-height:28px !important;
-  max-width:48px !important;
-  padding:.10rem .42rem !important;
-  font-size:.44rem !important;
-}
-
-/* Hero menos alto */
-#sectionInicio .hero-card{
-  margin:.56rem var(--home-v5-x) 0 !important;
-  padding:.84rem .9rem !important;
-  min-height:92px !important;
-  border-radius:22px !important;
-  gap:.72rem !important;
-}
-#sectionInicio .hero-card-icon{
-  width:54px !important;
-  min-width:54px !important;
-  height:54px !important;
-  border-radius:16px !important;
-}
-#sectionInicio .hero-card-title{
-  font-size:clamp(.86rem,3.7vw,1.02rem) !important;
-  letter-spacing:.12em !important;
-}
-#sectionInicio .hero-card-sub{
-  margin-top:.22rem !important;
-  font-size:clamp(.60rem,2.55vw,.72rem) !important;
-  line-height:1.26 !important;
-  letter-spacing:.06em !important;
-}
-
-/* Etiquetas y cards más moderadas */
-#sectionInicio .sec-label{
-  padding:.78rem var(--home-v5-x) .36rem !important;
-  font-size:.50rem !important;
-  letter-spacing:.20em !important;
-}
-#sectionInicio .quick-grid{
-  gap:var(--home-v5-gap) !important;
-  padding:.40rem var(--home-v5-x) 0 !important;
-}
-#sectionInicio .quick-grid .quick-btn{
-  min-height:118px !important;
-  border-radius:var(--home-v5-radius) !important;
-  padding:.78rem .78rem .70rem !important;
-}
-#sectionInicio .quick-grid .quick-icon{
-  width:42px !important;
-  height:42px !important;
-  min-height:42px !important;
-  border-radius:14px !important;
-  margin-bottom:.34rem !important;
-  font-size:1.08rem !important;
-}
-#sectionInicio .quick-grid .quick-label{
-  font-size:clamp(.62rem,2.8vw,.74rem) !important;
-  letter-spacing:.13em !important;
-  line-height:1.05 !important;
-}
-#sectionInicio .quick-grid .quick-btn p{
-  margin-top:.34rem !important;
-  font-size:.52rem !important;
-  line-height:1.25 !important;
-}
-#sectionInicio .quick-grid .quick-btn.v2-new{
-  padding-top:.84rem !important;
-}
-#sectionInicio .quick-grid .quick-btn.v2-new .quick-icon{
-  width:54px !important;
-  height:54px !important;
-  font-size:1.65rem !important;
-  margin:0 auto .45rem !important;
-}
-#sectionInicio .quick-btn.v2-mat,
-#sectionInicio .quick-btn.v2-global{
-  padding-top:2.20rem !important;
-}
-#sectionInicio #homeMatBadge,
-#sectionInicio #homeGlobalBadge,
-#sectionInicio .quick-btn.v2-radar .radar-status-badge{
-  top:.54rem !important;
-  left:.62rem !important;
-  font-size:.43rem !important;
-  padding:.13rem .42rem !important;
-  max-width:calc(100% - 3.7rem) !important;
-}
-#sectionInicio #homeMatCount,
-#sectionInicio #homeGlobalCount{
-  top:.54rem !important;
-  right:.62rem !important;
-  width:24px !important;
-  height:24px !important;
-  font-size:.62rem !important;
-}
-#sectionInicio .quick-btn.v2-mat > div,
-#sectionInicio .quick-btn.v2-global > div{
-  height:5px !important;
-  margin-top:.62rem !important;
-}
-#sectionInicio .quick-btn.v2-radar{
-  padding-top:2rem !important;
-}
-
-/* Tira de sincronización más baja y menos dominante */
-#sectionInicio .info-strip{
-  margin:.78rem var(--home-v5-x) 0 !important;
-  padding:.62rem .78rem !important;
-  border-radius:17px !important;
-  gap:.52rem !important;
-}
-#sectionInicio .info-strip span:last-child{
-  font-size:clamp(.56rem,2.35vw,.66rem) !important;
-  letter-spacing:.055em !important;
-}
-
-/* Listas / buscador: un poco más compactos sin romper operación */
-.search-wrap{padding:.58rem var(--home-v5-x) .28rem !important;}
-.search-box{min-height:46px !important;border-radius:18px !important;}
-.folder-list{gap:.56rem !important;padding:.40rem var(--home-v5-x) 5rem !important;}
-.folder-header{padding:.78rem .86rem !important;}
-.folder-icon{width:36px !important;height:36px !important;border-radius:12px !important;}
-.folder-mat{font-size:.88rem !important;}
-.folder-mat-sub{font-size:.58rem !important;}
-.folder-count{font-size:.58rem !important;padding:.16rem .48rem !important;}
-.btn-nueva-nota{width:56px !important;height:56px !important;right:.86rem !important;bottom:.95rem !important;}
-
-/* Ajuste extra para iPhone angosto */
+.targaryen-sync-copy{min-width:0;display:flex;flex-direction:column;gap:.2rem;}
+.targaryen-sync-copy strong{font-size:clamp(.92rem,3.7vw,1.18rem);line-height:1.18;color:#fff;font-weight:900;letter-spacing:.025em;white-space:nowrap;}
+.targaryen-sync-copy span{font-size:clamp(.78rem,3.25vw,1rem);line-height:1.2;color:#ff1728;font-weight:800;letter-spacing:.035em;white-space:nowrap;}
+.targaryen-online-dot{width:14px;height:14px;border-radius:50%;background:#27df55;box-shadow:0 0 0 7px rgba(39,223,85,.08),0 0 15px rgba(39,223,85,.75);justify-self:end;}
+.targaryen-footer{padding:2.4rem 1rem 4.7rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;text-align:center;user-select:none;}
+.targaryen-footer-logo{display:block;width:min(78vw,390px);height:auto;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 8px rgba(255,0,20,.12));}
+.targaryen-byline{margin-top:-.1rem;font:italic 1rem Georgia,'Times New Roman',serif;letter-spacing:.04em;color:rgba(225,210,235,.42);}
+.targaryen-version{margin-top:.35rem;font-size:.68rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:rgba(225,210,235,.4);}
 @media(max-width:430px){
-  .top-bar.topbar-v30-option3 .logo-volaris,
-  .top-bar .logo-volaris{
-    width:78px !important;
-    min-width:78px !important;
-    height:30px !important;
-  }
-  .top-bar.topbar-v30-option3 .top-user-avatar{
-    width:38px !important;
-    min-width:38px !important;
-    height:38px !important;
-  }
-  .top-bar.topbar-v30-option3 .top-user-name{
-    max-width:82px !important;
-    font-size:1rem !important;
-  }
-  #sectionInicio .quick-grid .quick-btn{
-    min-height:112px !important;
-    padding-left:.68rem !important;
-    padding-right:.68rem !important;
-  }
-  #sectionInicio .quick-grid .quick-icon{
-    width:40px !important;
-    height:40px !important;
-    min-height:40px !important;
-  }
-  #sectionInicio .quick-grid .quick-btn.v2-new .quick-icon{
-    width:52px !important;
-    height:52px !important;
-    font-size:1.55rem !important;
-  }
+  .targaryen-sync-card{margin:1.05rem .75rem 0;min-height:88px;padding:.64rem .76rem;grid-template-columns:70px minmax(0,1fr) 15px;gap:.62rem;border-radius:27px;}
+  .targaryen-sync-icon{width:66px;height:66px;}
+  .targaryen-sync-copy strong{font-size:.88rem;letter-spacing:.01em;}
+  .targaryen-sync-copy span{font-size:.75rem;letter-spacing:.015em;}
+  .targaryen-online-dot{width:13px;height:13px;}
+  .targaryen-footer{padding-top:2.2rem;padding-bottom:4.6rem;}
+  .targaryen-footer-logo{width:min(82vw,350px);}
 }
-
-@media(max-width:370px){
-  .top-bar.topbar-v30-option3 .logo-volaris,
-  .top-bar .logo-volaris{
-    width:70px !important;
-    min-width:70px !important;
-  }
-  .top-bar.topbar-v30-option3 .top-user-name{
-    max-width:70px !important;
-    font-size:.94rem !important;
-  }
-  #sectionInicio .quick-grid .quick-btn{
-    min-height:104px !important;
-  }
+@media(max-width:365px){
+  .targaryen-sync-card{grid-template-columns:60px minmax(0,1fr) 12px;padding:.58rem .65rem;gap:.48rem;}
+  .targaryen-sync-icon{width:57px;height:57px;}
+  .targaryen-sync-copy strong{font-size:.76rem;}
+  .targaryen-sync-copy span{font-size:.66rem;}
 }
-
