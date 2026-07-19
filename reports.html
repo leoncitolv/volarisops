@@ -2081,6 +2081,43 @@ body.view-historial .floating-report-actions{display:none}
 .tech-helper-card textarea {
   min-height: 82px !important;
 }
+/* PATCH CLAUDE — glosario técnico plegable (más amigable en celular) */
+.tech-helper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.tech-helper-header .form-label {
+  margin: 0;
+}
+.tech-helper-toggle-btn {
+  background: rgba(170,34,255,.12);
+  border: 1px solid rgba(205,132,255,.35);
+  color: var(--accent-light);
+  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform .25s ease;
+}
+.tech-helper-card.collapsed .tech-helper-toggle-btn {
+  transform: rotate(-90deg);
+}
+.tech-helper-body {
+  margin-top: 10px;
+  overflow: hidden;
+}
+.tech-helper-card.collapsed .tech-helper-body {
+  display: none;
+}
 .tech-helper-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4661,18 +4698,30 @@ function renderTechHelperBlock(id, editMode=false) {
   const addFn = editMode ? `editMejorarActividadesAeronave(${id})` : `mejorarActividadesAeronave(${id})`;
   const rewriteFn = editMode ? `editNormalizarActividadesAeronave(${id})` : `normalizarActividadesAeronave(${id})`;
   const exampleFn = editMode ? `editCargarEjemploTecnico(${id})` : `cargarEjemploTecnico(${id})`;
+  const cardId = `${prefix}techcard-${id}`;
   return `
-    <div class="tech-helper-card">
-      <label class="form-label">🧠 Nota rápida / glosario técnico</label>
-      <textarea id="${prefix}tech-${id}" placeholder="Ej: se pinto tapa de tobogan; se retoco poceta; instale calcomania apu fuel drain"></textarea>
-      <div class="tech-helper-actions">
-        <button type="button" class="btn btn-success btn-small" onclick="${addFn}">Agregar redacción técnica</button>
-        <button type="button" class="btn btn-secondary btn-small" onclick="${rewriteFn}">Reescribir actividades</button>
+    <div class="tech-helper-card collapsed" id="${cardId}">
+      <div class="tech-helper-header" onclick="toggleTechHelper('${cardId}')">
+        <label class="form-label">🧠 Nota rápida / glosario técnico</label>
+        <button type="button" class="tech-helper-toggle-btn" aria-label="Mostrar u ocultar glosario técnico" onclick="event.stopPropagation(); toggleTechHelper('${cardId}')">▾</button>
       </div>
-      <button type="button" class="btn btn-secondary btn-small" style="width:100%; justify-content:center; margin-top:8px;" onclick="${exampleFn}">Cargar ejemplo</button>
-      <button type="button" class="btn btn-secondary btn-small" style="width:100%; justify-content:center; margin-top:8px;" onclick="abrirGlosario()">🧠 Editar glosario</button>
-      <div class="tech-helper-note">Ejemplo: “se pinto tapa de tobogan” → “Paint touch-up performed on Escape Slide Cover Assy”. Usa “Editar glosario” para agregar o corregir frases.</div>
+      <div class="tech-helper-body">
+        <textarea id="${prefix}tech-${id}" placeholder="Ej: se pinto tapa de tobogan; se retoco poceta; instale calcomania apu fuel drain"></textarea>
+        <div class="tech-helper-actions">
+          <button type="button" class="btn btn-success btn-small" onclick="${addFn}">Agregar redacción técnica</button>
+          <button type="button" class="btn btn-secondary btn-small" onclick="${rewriteFn}">Reescribir actividades</button>
+        </div>
+        <button type="button" class="btn btn-secondary btn-small" style="width:100%; justify-content:center; margin-top:8px;" onclick="${exampleFn}">Cargar ejemplo</button>
+        <button type="button" class="btn btn-secondary btn-small" style="width:100%; justify-content:center; margin-top:8px;" onclick="abrirGlosario()">🧠 Editar glosario</button>
+        <div class="tech-helper-note">Ejemplo: “se pinto tapa de tobogan” → “Paint touch-up performed on Escape Slide Cover Assy”. Usa “Editar glosario” para agregar o corregir frases.</div>
+      </div>
     </div>`;
+}
+
+function toggleTechHelper(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  card.classList.toggle('collapsed');
 }
 
 function handleActivityEnter(textarea, afterChange) {
